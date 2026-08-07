@@ -57,12 +57,12 @@
                 @endauth
 
                 <!-- Cart Button -->
-                <a href="#cart" class="group relative inline-flex items-center justify-center p-2 text-brand-charcoal hover:text-brand-red transition-colors" aria-label="Shopping Cart">
+                <a href="{{ route('cart.index') }}" class="group relative inline-flex items-center justify-center p-2 text-brand-charcoal hover:text-brand-red transition-colors" aria-label="Shopping Cart">
                     <svg class="h-6 w-6 stroke-[2]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="square" stroke-linejoin="miter" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                     </svg>
                     <span class="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center bg-brand-red font-mono text-[11px] font-bold text-white shadow-sm">
-                        0
+                        {{ array_sum(array_column(session('cart', []), 'quantity')) }}
                     </span>
                 </a>
 
@@ -124,6 +124,22 @@
 
     <!-- Main Content Area -->
     <main class="flex-grow">
+        @if(session('success'))
+            <div class="bg-emerald-500 text-white font-mono text-xs font-bold uppercase tracking-wider py-3 px-4 text-center">
+                ✓ {{ session('success') }}
+            </div>
+        @endif
+        @if(session('error'))
+            <div class="bg-brand-red text-white font-mono text-xs font-bold uppercase tracking-wider py-3 px-4 text-center">
+                ✕ {{ session('error') }}
+            </div>
+        @endif
+        @if(session('warning'))
+            <div class="bg-amber-500 text-white font-mono text-xs font-bold uppercase tracking-wider py-3 px-4 text-center">
+                ⚠ {{ session('warning') }}
+            </div>
+        @endif
+
         @yield('content')
     </main>
 

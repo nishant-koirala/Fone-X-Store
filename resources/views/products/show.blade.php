@@ -123,12 +123,17 @@
                 <div>
                     <!-- Enabled State -->
                     <template x-if="Number(activeCondition.quantity_in_stock) > 0">
-                        <button type="button" class="w-full bg-brand-red hover:bg-brand-red-dark text-white font-mono text-xs uppercase font-bold tracking-wider py-4 transition-colors flex items-center justify-center space-x-2">
-                            <svg class="h-4 w-4 stroke-[2]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="square" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                            </svg>
-                            <span>Add Selected Grade to Cart</span>
-                        </button>
+                        <form method="POST" action="{{ route('cart.add') }}">
+                            @csrf
+                            <input type="hidden" name="product_condition_id" :value="activeCondition.id">
+                            <input type="hidden" name="quantity" value="1">
+                            <button type="submit" class="w-full bg-brand-red hover:bg-brand-red-dark text-white font-mono text-xs uppercase font-bold tracking-wider py-4 transition-colors flex items-center justify-center space-x-2">
+                                <svg class="h-4 w-4 stroke-[2]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="square" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                                </svg>
+                                <span>Add Selected Grade to Cart</span>
+                            </button>
+                        </form>
                     </template>
 
                     <!-- Disabled State when Stock == 0 -->

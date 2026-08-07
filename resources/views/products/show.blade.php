@@ -160,7 +160,7 @@
                     </div>
                     <div class="flex items-center space-x-2">
                         <span class="text-brand-red font-bold">✓</span>
-                        <span>Full 70-Point Hardware & Battery Health Diagnostic</span>
+                        <span>Full 100-Point Hardware & Battery Health Diagnostic</span>
                     </div>
                     <div class="flex items-center space-x-2">
                         <span class="text-brand-red font-bold">✓</span>

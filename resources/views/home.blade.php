@@ -90,7 +90,7 @@
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center font-mono text-xs font-semibold text-brand-charcoal uppercase tracking-wider">
                 <div class="flex items-center justify-center space-x-1.5">
                     <span class="text-brand-red font-bold">✓</span>
-                    <span>70-POINT DIAGNOSTIC TEST</span>
+                    <span>100-POINT DIAGNOSTIC TEST</span>
                 </div>
                 <div class="flex items-center justify-center space-x-1.5">
                     <span class="text-brand-red font-bold">✓</span>

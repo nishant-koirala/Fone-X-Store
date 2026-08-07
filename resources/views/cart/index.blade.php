@@ -134,7 +134,7 @@
                             <span class="font-bold text-emerald-600">FREE</span>
                         </div>
                         <div class="flex items-center justify-between text-brand-grey">
-                            <span>12-Mo FoneX Warranty</span>
+                            <span>7-Day Check Guarantee</span>
                             <span class="font-bold text-emerald-600">INCLUDED</span>
                         </div>
                         <div class="border-t border-gray-200 pt-3 flex items-baseline justify-between text-brand-charcoal">

@@ -176,7 +176,7 @@
                 <div>
                     <h3 class="font-mono text-xs font-bold uppercase tracking-widest text-brand-charcoal mb-3">Guarantees</h3>
                     <ul class="space-y-2 font-sans text-sm text-brand-grey">
-                        <li><span class="text-brand-charcoal font-medium">12-Month Warranty</span> on all items</li>
+                        <li><span class="text-brand-charcoal font-medium">7-Day Check Guarantee</span> for used phones</li>
                         <li><span class="text-brand-charcoal font-medium">70-Point Inspection</span> for used grades</li>
                         <li><span class="text-brand-charcoal font-medium">Secure Payments</span> & EMI option</li>
                     </ul>

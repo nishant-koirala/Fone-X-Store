@@ -94,7 +94,7 @@
                 </div>
                 <div class="flex items-center justify-center space-x-1.5">
                     <span class="text-brand-red font-bold">✓</span>
-                    <span>12-MONTH WARRANTY</span>
+                    <span>7-DAY CHECKING GUARANTEE</span>
                 </div>
                 <div class="flex items-center justify-center space-x-1.5">
                     <span class="text-brand-red font-bold">✓</span>

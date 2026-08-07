@@ -156,7 +156,7 @@
                 <div class="bg-brand-offwhite border border-gray-200 p-4 space-y-2 font-mono text-xs text-brand-charcoal">
                     <div class="flex items-center space-x-2">
                         <span class="text-brand-red font-bold">✓</span>
-                        <span>12-Month Official FoneX Warranty on all purchases</span>
+                        <span x-text="activeCondition.grade === 'new' ? '1-Year Official Brand Warranty' : '7-Day Check Time / Testing Guarantee for Used Devices'"></span>
                     </div>
                     <div class="flex items-center space-x-2">
                         <span class="text-brand-red font-bold">✓</span>

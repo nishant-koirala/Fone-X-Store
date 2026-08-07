@@ -177,9 +177,9 @@
                             <div class="font-mono text-xs text-brand-grey uppercase tracking-wider mb-1">
                                 {{ $condition->product->category->name ?? 'SMARTPHONE' }}
                             </div>
-                            <h3 class="font-sans font-bold text-brand-charcoal text-lg group-hover:text-brand-red transition-colors leading-snug">
+                            <a href="{{ route('products.show', $condition->product->slug) }}" class="font-sans font-bold text-brand-charcoal text-lg group-hover:text-brand-red transition-colors leading-snug">
                                 {{ $condition->product->name }}
-                            </h3>
+                            </a>
                             <p class="font-mono text-xs text-brand-grey mt-1">
                                 {{ $condition->product->brand }} • {{ strtoupper($condition->grade) }} CONDITION
                             </p>
@@ -191,19 +191,19 @@
                                 <span class="font-mono text-xs text-brand-grey uppercase block">Price</span>
                                 <div class="flex items-baseline space-x-2">
                                     <span class="font-mono font-bold text-brand-charcoal text-xl">
-                                        ${{ number_format($condition->price, 2) }}
+                                        Rs {{ number_format($condition->price) }}
                                     </span>
                                     @if($condition->price < $condition->product->base_price)
                                         <span class="font-mono text-xs text-brand-grey line-through">
-                                            ${{ number_format($condition->product->base_price, 2) }}
+                                            Rs {{ number_format($condition->product->base_price) }}
                                         </span>
                                     @endif
                                 </div>
                             </div>
 
-                            <button type="button" class="font-mono text-xs uppercase font-bold text-white bg-brand-charcoal group-hover:bg-brand-red px-3 py-2 transition-colors duration-150">
+                            <a href="{{ route('products.show', $condition->product->slug) }}" class="font-mono text-xs uppercase font-bold text-white bg-brand-charcoal group-hover:bg-brand-red px-3 py-2 transition-colors duration-150">
                                 View
-                            </button>
+                            </a>
                         </div>
 
                     </div>

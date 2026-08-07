@@ -30,17 +30,17 @@
 
             <!-- Desktop Navigation Links -->
             <nav class="hidden md:flex items-center space-x-8">
-                <a href="#new-phones" class="font-sans text-sm font-semibold text-brand-charcoal hover:text-brand-red transition-colors duration-150 py-1 border-b-2 border-transparent hover:border-brand-red">
+                <a href="{{ route('products.index', ['grade' => 'new']) }}" class="font-sans text-sm font-semibold text-brand-charcoal hover:text-brand-red transition-colors duration-150 py-1 border-b-2 border-transparent hover:border-brand-red">
                     New Phones
                 </a>
-                <a href="#used-phones" class="font-sans text-sm font-semibold text-brand-charcoal hover:text-brand-red transition-colors duration-150 py-1 border-b-2 border-transparent hover:border-brand-red">
+                <a href="{{ route('products.index', ['grade' => 'used']) }}" class="font-sans text-sm font-semibold text-brand-charcoal hover:text-brand-red transition-colors duration-150 py-1 border-b-2 border-transparent hover:border-brand-red">
                     Certified Used
+                </a>
+                <a href="{{ route('products.index') }}" class="font-sans text-sm font-semibold text-brand-charcoal hover:text-brand-red transition-colors duration-150 py-1 border-b-2 border-transparent hover:border-brand-red">
+                    All Inventory
                 </a>
                 <a href="#trade-in" class="font-sans text-sm font-semibold text-brand-charcoal hover:text-brand-red transition-colors duration-150 py-1 border-b-2 border-transparent hover:border-brand-red">
                     Trade-In & Upgrade
-                </a>
-                <a href="#support" class="font-sans text-sm font-semibold text-brand-charcoal hover:text-brand-red transition-colors duration-150 py-1 border-b-2 border-transparent hover:border-brand-red">
-                    Support
                 </a>
             </nav>
 

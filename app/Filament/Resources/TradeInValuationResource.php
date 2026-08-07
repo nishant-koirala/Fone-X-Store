@@ -36,7 +36,7 @@ class TradeInValuationResource extends Resource
 
                 Forms\Components\TextInput::make('estimated_value')
                     ->numeric()
-                    ->prefix('$')
+                    ->prefix('Rs ')
                     ->nullable(),
 
                 Forms\Components\Select::make('status')
@@ -63,9 +63,16 @@ class TradeInValuationResource extends Resource
                     ->label('Customer')
                     ->default('Guest')
                     ->searchable(),
+                Tables\Columns\TextColumn::make('customer.phone')
+                    ->label('Phone')
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('device_brand')->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('device_model')->searchable()->sortable(),
-                Tables\Columns\TextColumn::make('estimated_value')->money('USD')->sortable(),
+                Tables\Columns\TextColumn::make('estimated_value')
+                    ->prefix('Rs ')
+                    ->numeric()
+                    ->sortable()
+                    ->placeholder('Unassessed'),
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {

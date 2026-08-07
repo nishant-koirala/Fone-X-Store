@@ -39,7 +39,7 @@
                 <a href="{{ route('products.index') }}" class="font-sans text-sm font-semibold text-brand-charcoal hover:text-brand-red transition-colors duration-150 py-1 border-b-2 border-transparent hover:border-brand-red">
                     All Inventory
                 </a>
-                <a href="#trade-in" class="font-sans text-sm font-semibold text-brand-charcoal hover:text-brand-red transition-colors duration-150 py-1 border-b-2 border-transparent hover:border-brand-red">
+                <a href="{{ route('trade-in.create') }}" class="font-sans text-sm font-semibold text-brand-charcoal hover:text-brand-red transition-colors duration-150 py-1 border-b-2 border-transparent hover:border-brand-red">
                     Trade-In & Upgrade
                 </a>
             </nav>

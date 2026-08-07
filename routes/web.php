@@ -5,6 +5,7 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\TradeInController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -21,6 +22,11 @@ Route::delete('/cart/{conditionId}', [CartController::class, 'destroy'])->name('
 Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
 Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
 Route::get('/orders/{order}/confirmation', [CheckoutController::class, 'confirmation'])->name('orders.confirmation');
+
+// Trade-In Valuation Routes
+Route::get('/trade-in', [TradeInController::class, 'create'])->name('trade-in.create');
+Route::post('/trade-in', [TradeInController::class, 'store'])->name('trade-in.store');
+Route::get('/trade-in/confirmation/{valuation}', [TradeInController::class, 'confirmation'])->name('trade-in.confirmation');
 
 Route::get('/dashboard', function () {
     return view('dashboard');

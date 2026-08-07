@@ -65,7 +65,7 @@
                 </a>
 
                 <!-- Path 03: Trade & Upgrade -->
-                <a href="#trade-in" class="group block p-6 sm:p-8 hover:bg-brand-red-dark/60 transition-colors duration-200">
+                <a href="{{ route('trade-in.create') }}" class="group block p-6 sm:p-8 hover:bg-brand-red-dark/60 transition-colors duration-200">
                     <div class="flex items-center justify-between">
                         <span class="font-mono text-xs font-bold uppercase tracking-widest text-white/70">03 / INSTANT EXCHANGE</span>
                         <svg class="h-5 w-5 text-white transform group-hover:translate-x-1 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -233,7 +233,7 @@
                 </div>
 
                 <div class="flex-shrink-0">
-                    <a href="#trade-in-request" class="inline-flex items-center space-x-3 bg-brand-red hover:bg-brand-red-dark text-white font-mono text-xs uppercase tracking-wider font-bold px-8 py-4 transition-colors duration-150 shadow-sm">
+                    <a href="{{ route('trade-in.create') }}" class="inline-flex items-center space-x-3 bg-brand-red hover:bg-brand-red-dark text-white font-mono text-xs uppercase tracking-wider font-bold px-8 py-4 transition-colors duration-150 shadow-sm">
                         <span>Get Instant Device Valuation</span>
                         <svg class="h-4 w-4 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="square" d="M14 5l7 7m0 0l-7 7m7-7H3" />

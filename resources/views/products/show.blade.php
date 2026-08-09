@@ -23,13 +23,21 @@
              x-data="{ 
                  conditions: {{ json_encode($product->conditions) }},
                  activeIndex: 0,
+                 showStickyCart: false,
                  get activeCondition() {
                      return this.conditions[this.activeIndex] || {};
                  },
                  formatRupees(val) {
                      return Number(val || 0).toLocaleString('en-US');
+                 },
+                 checkSticky() {
+                     if (!this.$refs.addToCartContainer) return;
+                     const rect = this.$refs.addToCartContainer.getBoundingClientRect();
+                     this.showStickyCart = rect.bottom < 0;
                  }
-             }">
+             }"
+             @scroll.window="checkSticky"
+             @resize.window="checkSticky">
 
             <!-- Left Column: Interactive 3D Phone Presentation Stage -->
             <div class="lg:col-span-6 relative">
@@ -128,7 +136,7 @@
                 </div>
 
                 <!-- Add to Cart Action Form -->
-                <div>
+                <div x-ref="addToCartContainer">
                     <template x-if="Number(activeCondition.quantity_in_stock) > 0">
                         <form method="POST" action="{{ route('cart.add') }}">
                             @csrf
@@ -176,6 +184,47 @@
 
             </div>
 
+            <!-- Sticky Mobile Cart Bar -->
+            <div x-show="showStickyCart" 
+                 x-cloak
+                 x-transition:enter="transition ease-out duration-200"
+                 x-transition:enter-start="translate-y-full"
+                 x-transition:enter-end="translate-y-0"
+                 x-transition:leave="transition ease-in duration-200"
+                 x-transition:leave-start="translate-y-0"
+                 x-transition:leave-end="translate-y-full"
+                 class="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-brand-red/20 p-4 shadow-[0_-10px_40px_-10px_rgba(0,0,0,0.2)] md:hidden">
+                <div class="flex items-center justify-between gap-4 max-w-7xl mx-auto">
+                    <div class="flex flex-col">
+                        <span class="font-mono text-[10px] uppercase font-bold text-brand-charcoal line-clamp-1">{{ $product->name }}</span>
+                        <div class="flex items-baseline space-x-1.5">
+                            <span class="font-sans font-bold text-brand-red">Rs <span x-text="formatRupees(activeCondition.price)"></span></span>
+                            <span class="font-mono text-[9px] uppercase text-brand-grey border border-gray-200 px-1 py-0.5" x-text="activeCondition.grade === 'new' ? 'NEW' : 'GRADE ' + activeCondition.grade.toUpperCase()"></span>
+                        </div>
+                    </div>
+                    <div class="flex-shrink-0">
+                        <template x-if="Number(activeCondition.quantity_in_stock) > 0">
+                            <form method="POST" action="{{ route('cart.add') }}" class="m-0">
+                                @csrf
+                                <input type="hidden" name="product_condition_id" :value="activeCondition.id">
+                                <input type="hidden" name="quantity" value="1">
+                                <button type="submit" class="bg-brand-red text-white font-mono text-[11px] uppercase font-bold tracking-wider px-5 py-3 shadow-md active:scale-95 transition-transform flex items-center space-x-1.5">
+                                    <svg class="h-4 w-4 stroke-[2]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="square" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                                    </svg>
+                                    <span>Add</span>
+                                </button>
+                            </form>
+                        </template>
+                        <template x-if="Number(activeCondition.quantity_in_stock) <= 0">
+                            <button type="button" disabled class="bg-gray-200 text-gray-400 border border-gray-300 font-mono text-[11px] uppercase font-bold tracking-wider px-5 py-3 cursor-not-allowed">
+                                Out of Stock
+                            </button>
+                        </template>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
         <!-- Related Products Section -->
@@ -206,11 +255,7 @@
                                 </div>
 
                                 <div class="shine-container aspect-[4/3] flex items-center justify-center bg-brand-offwhite p-4 mb-4 border border-gray-100">
-                                    <svg class="h-20 w-20 text-brand-charcoal/20 group-hover:text-brand-red/40 transition-colors stroke-[1.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <rect x="5" y="2" width="14" height="20" rx="2" ry="2" />
-                                        <line x1="10" y1="4" x2="14" y2="4" stroke-linecap="round" />
-                                        <circle cx="12" cy="19" r="0.75" fill="currentColor" />
-                                    </svg>
+                                    <x-product-icon :categorySlug="$relProduct->category->slug ?? ''" class="h-20 w-20 text-brand-charcoal/20 group-hover:text-brand-red/40 transition-colors stroke-[1.5]" />
                                 </div>
 
                                 <div>

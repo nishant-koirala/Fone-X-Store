@@ -39,6 +39,15 @@ class ProductController extends Controller
             });
         }
 
+        // Filter by Search (Name or Brand)
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->whereHas('product', function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('brand', 'like', "%{$search}%");
+            });
+        }
+
         // Filter by Condition Grade (new, used, A, B, C)
         if ($request->filled('grade')) {
             $grade = $request->input('grade');

@@ -21,6 +21,16 @@ class OrderResource extends Resource
 
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-shopping-bag';
 
+    public static function getNavigationGroup(): ?string
+    {
+        return 'Sales & Operations';
+    }
+
+    public static function getNavigationSort(): ?int
+    {
+        return 1;
+    }
+
     public static function form(Schema $schema): Schema
     {
         return $schema
@@ -30,7 +40,6 @@ class OrderResource extends Resource
                         Forms\Components\Select::make('customer_id')
                             ->relationship('customer', 'name')
                             ->searchable()
-                            ->preload()
                             ->required(),
 
                         Forms\Components\Select::make('status')
@@ -56,12 +65,21 @@ class OrderResource extends Resource
                             ->schema([
                                 Forms\Components\Select::make('product_condition_id')
                                     ->label('Product & Grade')
-                                    ->options(function () {
-                                        return ProductCondition::with('product')
-                                            ->get()
-                                            ->mapWithKeys(fn ($cond) => [
-                                                $cond->id => "{$cond->product->brand} {$cond->product->name} (Grade: {$cond->grade}) - \${$cond->price}",
-                                            ]);
+                                    ->getSearchResultsUsing(fn (string $search): array => ProductCondition::with('product')
+                                        ->whereHas('product', function ($query) use ($search) {
+                                            $query->where('name', 'like', "%{$search}%")
+                                                  ->orWhere('brand', 'like', "%{$search}%");
+                                        })
+                                        ->limit(50)
+                                        ->get()
+                                        ->mapWithKeys(fn ($cond) => [
+                                            $cond->id => "{$cond->product->brand} {$cond->product->name} (Grade: {$cond->grade}) - \${$cond->price}",
+                                        ])
+                                        ->toArray()
+                                    )
+                                    ->getOptionLabelUsing(function ($value): ?string {
+                                        $cond = ProductCondition::with('product')->find($value);
+                                        return $cond ? "{$cond->product->brand} {$cond->product->name} (Grade: {$cond->grade}) - \${$cond->price}" : null;
                                     })
                                     ->searchable()
                                     ->required()

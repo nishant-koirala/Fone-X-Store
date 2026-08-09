@@ -18,7 +18,17 @@ class CategoryResource extends Resource
 {
     protected static ?string $model = Category::class;
 
-    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
+    public static function getNavigationIcon(): ?string { return 'heroicon-o-rectangle-stack'; }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return 'Inventory Management';
+    }
+
+    public static function getNavigationSort(): ?int
+    {
+        return 2;
+    }
 
     public static function form(Schema $schema): Schema
     {

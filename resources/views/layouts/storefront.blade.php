@@ -80,6 +80,16 @@
                 <!-- Header Actions: Admin Link & Cart Button -->
                 <div class="flex items-center space-x-4">
                     
+                    <!-- Search Input (Desktop) -->
+                    <form method="GET" action="{{ route('products.index') }}" class="hidden lg:flex relative items-center">
+                        <input type="text" name="search" placeholder="Search phones..." value="{{ request('search') }}" class="font-sans text-xs border border-gray-300 bg-white text-brand-charcoal pl-3 pr-8 py-2 focus:border-brand-red focus:ring-1 focus:ring-brand-red outline-none shadow-sm placeholder-gray-400 w-48 transition-all focus:w-64">
+                        <button type="submit" class="absolute right-2 text-brand-charcoal hover:text-brand-red">
+                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="square" stroke-linejoin="miter" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </button>
+                    </form>
+
                     @auth
                         <a href="/admin" class="hidden sm:inline-flex items-center space-x-1.5 font-mono text-xs font-bold uppercase text-brand-charcoal hover:text-brand-red border border-gray-300 hover:border-brand-red px-3.5 py-2 transition-all shadow-sm bg-white">
                             <svg class="h-4 w-4 stroke-[2]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -102,10 +112,10 @@
                         </svg>
                         
                         <!-- Badge -->
-                        <span class="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center bg-brand-red font-mono text-[11px] font-bold text-white shadow-md">
-                            {{ $cartCount }}
-                        </span>
                         @if($cartCount > 0)
+                            <span class="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center bg-brand-red font-mono text-[11px] font-bold text-white shadow-md">
+                                {{ $cartCount }}
+                            </span>
                             <span class="absolute -top-2 -right-2 h-5 w-5 bg-brand-red animate-ping opacity-75"></span>
                         @endif
                     </a>
@@ -138,6 +148,19 @@
              x-transition:leave-start="opacity-100 translate-y-0"
              x-transition:leave-end="opacity-0 -translate-y-2"
              class="md:hidden border-t border-gray-200 bg-white/95 backdrop-blur-lg">
+             
+            <!-- Search Input (Mobile) -->
+            <div class="px-4 pt-4 pb-2">
+                <form method="GET" action="{{ route('products.index') }}" class="relative flex items-center">
+                    <input type="text" name="search" placeholder="Search phones..." value="{{ request('search') }}" class="w-full font-sans text-base border border-gray-300 bg-white text-brand-charcoal pl-4 pr-10 py-3 focus:border-brand-red focus:ring-1 focus:ring-brand-red outline-none shadow-sm placeholder-gray-400">
+                    <button type="submit" class="absolute right-3 text-brand-charcoal hover:text-brand-red">
+                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="square" stroke-linejoin="miter" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </button>
+                </form>
+            </div>
+
             <div class="space-y-1 px-4 pt-3 pb-6">
                 <a href="{{ route('products.index', ['grade' => 'new']) }}" class="block px-3 py-2.5 font-sans text-base font-bold text-brand-charcoal hover:bg-brand-offwhite hover:text-brand-red">
                     New Phones

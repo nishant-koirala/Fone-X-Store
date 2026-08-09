@@ -19,7 +19,17 @@ class ProductResource extends Resource
 {
     protected static ?string $model = Product::class;
 
-    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-device-phone-mobile';
+    public static function getNavigationIcon(): ?string { return 'heroicon-o-device-phone-mobile'; }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return 'Inventory Management';
+    }
+
+    public static function getNavigationSort(): ?int
+    {
+        return 1;
+    }
 
     public static function form(Schema $schema): Schema
     {

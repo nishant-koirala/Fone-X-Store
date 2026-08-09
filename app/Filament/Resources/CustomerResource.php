@@ -17,7 +17,17 @@ class CustomerResource extends Resource
 {
     protected static ?string $model = Customer::class;
 
-    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-users';
+    public static function getNavigationIcon(): ?string { return 'heroicon-o-users'; }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return 'Sales & Operations';
+    }
+
+    public static function getNavigationSort(): ?int
+    {
+        return 3;
+    }
 
     public static function form(Schema $schema): Schema
     {

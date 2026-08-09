@@ -17,7 +17,17 @@ class TradeInValuationResource extends Resource
 {
     protected static ?string $model = TradeInValuation::class;
 
-    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-currency-dollar';
+    public static function getNavigationIcon(): ?string { return 'heroicon-o-arrows-right-left'; }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return 'Sales & Operations';
+    }
+
+    public static function getNavigationSort(): ?int
+    {
+        return 2;
+    }
 
     protected static ?string $navigationLabel = 'Trade-In Valuations';
 

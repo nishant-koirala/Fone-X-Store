@@ -5,7 +5,7 @@
 @section('content')
 
     <!-- Catalog Page Header -->
-    <div class="bg-brand-charcoal text-white border-b border-white/10 py-12 relative overflow-hidden">
+    <div x-data="catalogFilter()" class="bg-brand-charcoal text-white border-b border-white/10 py-12 relative overflow-hidden">
         <div class="absolute -right-20 -top-20 h-80 w-80 bg-brand-red/25 blur-[100px] pointer-events-none"></div>
 
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
@@ -17,7 +17,7 @@
                     </h1>
                 </div>
                 <div class="font-mono text-xs text-white/70">
-                    SHOWING <span class="font-bold text-white">{{ $conditions->total() }}</span> AVAILABLE LISTINGS
+                    SHOWING <span id="result-count" class="font-bold text-white">{{ $conditions->total() }}</span> AVAILABLE LISTINGS
                 </div>
             </div>
         </div>
@@ -26,9 +26,43 @@
     <!-- Filter & Catalog Main Container -->
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
 
-        <!-- Glassmorphism Filter Bar -->
-        <form method="GET" action="{{ route('products.index') }}" class="mb-10 glass-panel p-6 border border-gray-200 shadow-sm">
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
+        <!-- Mobile Filter Toggle Button -->
+        <div class="lg:hidden mb-6">
+            <button type="button" @click="mobileFiltersOpen = true" class="w-full font-mono text-xs uppercase font-bold text-brand-charcoal bg-white border border-gray-300 py-3 shadow-sm hover:border-brand-red flex items-center justify-center space-x-2">
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="square" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                </svg>
+                <span>Filter & Sort Options</span>
+            </button>
+        </div>
+
+        <!-- Glassmorphism Filter Bar (Slide-over on Mobile) -->
+        <form x-ref="filterForm" @submit.prevent="applyFilters" @change="applyFilters" method="GET" action="{{ route('products.index') }}" 
+              :class="mobileFiltersOpen ? 'fixed inset-0 z-[100] flex flex-col justify-end bg-brand-charcoal/50 backdrop-blur-sm' : 'hidden lg:block'"
+              class="mb-10 lg:block">
+            
+            <!-- Mobile Overlay Click-to-Close -->
+            <div x-show="mobileFiltersOpen" @click="mobileFiltersOpen = false" class="absolute inset-0 lg:hidden"></div>
+
+            <div :class="mobileFiltersOpen ? 'relative bg-white w-full rounded-t-3xl p-6 shadow-2xl max-h-[85vh] overflow-y-auto transform transition-transform' : 'glass-panel p-6 border border-gray-200 shadow-sm'"
+                 x-transition:enter="transition ease-out duration-300"
+                 x-transition:enter-start="translate-y-full"
+                 x-transition:enter-end="translate-y-0"
+                 x-transition:leave="transition ease-in duration-200"
+                 x-transition:leave-start="translate-y-0"
+                 x-transition:leave-end="translate-y-full">
+                
+                <!-- Mobile Header -->
+                <div class="flex items-center justify-between mb-6 lg:hidden">
+                    <h2 class="font-display text-xl uppercase tracking-tight text-brand-charcoal">Filters</h2>
+                    <button type="button" @click="mobileFiltersOpen = false" class="p-2 text-brand-grey hover:text-brand-red">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="square" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
                 
                 <!-- Category Filter -->
                 <div>
@@ -89,17 +123,94 @@
                         Filter Results
                     </button>
                     @if(request()->anyFilled(['category', 'brand', 'grade', 'sort', 'min_price', 'max_price']))
-                        <a href="{{ route('products.index') }}" class="font-mono text-xs uppercase font-bold text-brand-charcoal border border-gray-300 bg-white hover:border-brand-red px-3 py-2.5 transition-colors whitespace-nowrap shadow-sm">
+                        <a href="{{ route('products.index') }}" @click.prevent="resetFilters" class="font-mono text-xs uppercase font-bold text-brand-charcoal border border-gray-300 bg-white hover:border-brand-red px-3 py-2.5 transition-colors whitespace-nowrap shadow-sm text-center">
                             Reset
                         </a>
                     @endif
                 </div>
 
+                <!-- Mobile Apply Button -->
+                <div class="mt-6 lg:hidden">
+                    <button type="button" @click="mobileFiltersOpen = false" class="w-full font-mono text-xs uppercase font-bold text-white bg-brand-charcoal hover:bg-brand-red py-3 shadow-sm transition-colors">
+                        Show Results
+                    </button>
+                </div>
+
             </div>
         </form>
 
-        <!-- Product Grid -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        <!-- Active Filter Chips -->
+        <div id="active-filters-container" class="mb-6 flex flex-wrap items-center gap-2 min-h-[28px]">
+            @if(request()->anyFilled(['category', 'brand', 'grade', 'search']))
+                <span class="font-mono text-[10px] uppercase text-brand-grey mr-2 tracking-wider">Active Filters:</span>
+                
+                @if(request('search'))
+                    <span class="inline-flex items-center bg-brand-charcoal text-white font-mono text-[10px] uppercase px-2 py-1 space-x-1">
+                        <span>Search: {{ request('search') }}</span>
+                        <button type="button" @click="removeFilter('search')" class="hover:text-brand-red ml-1">×</button>
+                    </span>
+                @endif
+
+                @if(request('category'))
+                    @php 
+                        $cat = collect($categories)->first(function($c) {
+                            return (is_object($c) ? $c->slug : $c['slug']) === request('category');
+                        });
+                        $catName = $cat ? (is_object($cat) ? $cat->name : $cat['name']) : request('category');
+                    @endphp
+                    <span class="inline-flex items-center bg-brand-charcoal text-white font-mono text-[10px] uppercase px-2 py-1 space-x-1">
+                        <span>Category: {{ $catName }}</span>
+                        <button type="button" @click="removeFilter('category')" class="hover:text-brand-red ml-1">×</button>
+                    </span>
+                @endif
+
+                @if(request('brand'))
+                    <span class="inline-flex items-center bg-brand-charcoal text-white font-mono text-[10px] uppercase px-2 py-1 space-x-1">
+                        <span>Brand: {{ request('brand') }}</span>
+                        <button type="button" @click="removeFilter('brand')" class="hover:text-brand-red ml-1">×</button>
+                    </span>
+                @endif
+
+                @if(request('grade'))
+                    <span class="inline-flex items-center bg-brand-charcoal text-white font-mono text-[10px] uppercase px-2 py-1 space-x-1">
+                        <span>Condition: {{ request('grade') }}</span>
+                        <button type="button" @click="removeFilter('grade')" class="hover:text-brand-red ml-1">×</button>
+                    </span>
+                @endif
+
+                <button type="button" @click="resetFilters" class="text-[10px] font-mono uppercase font-bold text-brand-red hover:underline ml-2">
+                    Clear All
+                </button>
+            @endif
+        </div>
+
+        <!-- Product Grid & Loading Skeleton Wrapper -->
+        <div class="relative min-h-[400px]">
+
+            <!-- Skeleton Overlay -->
+            <div x-show="isLoading" style="display: none;" class="absolute inset-0 z-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 bg-white">
+                @for($i = 0; $i < 4; $i++)
+                    <div class="border border-gray-200 p-5 flex flex-col justify-between animate-pulse">
+                        <div class="flex justify-between mb-4">
+                            <div class="h-4 w-16 bg-gray-200"></div>
+                            <div class="h-4 w-20 bg-gray-200"></div>
+                        </div>
+                        <div class="aspect-[4/3] bg-gray-100 mb-5"></div>
+                        <div class="space-y-2 mb-6">
+                            <div class="h-3 w-24 bg-gray-200"></div>
+                            <div class="h-5 w-48 bg-gray-200"></div>
+                            <div class="h-3 w-32 bg-gray-200"></div>
+                        </div>
+                        <div class="pt-4 border-t border-gray-100 flex justify-between">
+                            <div class="h-6 w-24 bg-gray-200"></div>
+                            <div class="h-8 w-16 bg-gray-200"></div>
+                        </div>
+                    </div>
+                @endfor
+            </div>
+
+            <!-- Product Grid -->
+            <div id="product-grid" :class="{ 'opacity-0': isLoading }" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 transition-opacity duration-200">
             @forelse($conditions as $condition)
                 <div class="group card-glow-hover relative flex flex-col justify-between border border-gray-200 bg-white p-5">
                     
@@ -194,15 +305,122 @@
                     </div>
                 </div>
             @endforelse
+            </div>
         </div>
 
         <!-- Pagination -->
-        @if($conditions->hasPages())
-            <div class="mt-12">
-                {{ $conditions->links() }}
-            </div>
-        @endif
+        <div id="pagination-container">
+            @if($conditions->hasPages())
+                <div class="mt-12" @click="handlePaginationClick">
+                    {{ $conditions->links() }}
+                </div>
+            @endif
+        </div>
 
     </div>
 
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('catalogFilter', () => ({
+                mobileFiltersOpen: false,
+                isLoading: false,
+                applyFilters() {
+                    const currentUrl = new URL(window.location.href);
+                    const url = new URL(this.$refs.filterForm.action);
+                    
+                    if (currentUrl.searchParams.has('search')) {
+                        url.searchParams.set('search', currentUrl.searchParams.get('search'));
+                    }
+
+                    const formData = new FormData(this.$refs.filterForm);
+                    for (const [key, value] of formData.entries()) {
+                        if (value) {
+                            url.searchParams.set(key, value);
+                        }
+                    }
+
+                    this.fetchAndUpdate(url.toString());
+                },
+                removeFilter(key) {
+                    const currentUrl = new URL(window.location.href);
+                    if (key === 'search') {
+                        currentUrl.searchParams.delete('search');
+                    } else {
+                        const input = this.$refs.filterForm.querySelector(`[name="${key}"]`);
+                        if (input) input.value = '';
+                    }
+                    
+                    const url = new URL(this.$refs.filterForm.action);
+                    if (key !== 'search' && currentUrl.searchParams.has('search')) {
+                        url.searchParams.set('search', currentUrl.searchParams.get('search'));
+                    }
+                    
+                    const formData = new FormData(this.$refs.filterForm);
+                    for (const [keyForm, value] of formData.entries()) {
+                        if (value) {
+                            url.searchParams.set(keyForm, value);
+                        }
+                    }
+
+                    this.fetchAndUpdate(url.toString());
+                },
+                resetFilters() {
+                    this.$refs.filterForm.reset();
+                    // Dispatch change event to update Alpine/native selects
+                    const selects = this.$refs.filterForm.querySelectorAll('select');
+                    selects.forEach(select => {
+                        select.value = '';
+                    });
+                    
+                    const url = new URL(this.$refs.filterForm.action);
+                    this.fetchAndUpdate(url.toString());
+                },
+                handlePaginationClick(e) {
+                    const link = e.target.closest('a');
+                    if (link) {
+                        e.preventDefault();
+                        this.fetchAndUpdate(link.href);
+                    }
+                },
+                fetchAndUpdate(url) {
+                    this.isLoading = true;
+                    window.history.pushState({}, '', url);
+
+                    fetch(url, {
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(response => response.text())
+                    .then(html => {
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(html, 'text/html');
+                        
+                        const newGrid = doc.querySelector('#product-grid');
+                        if (newGrid) {
+                            document.querySelector('#product-grid').innerHTML = newGrid.innerHTML;
+                        }
+                        
+                        const newCount = doc.querySelector('#result-count');
+                        if (newCount) {
+                            document.querySelector('#result-count').innerHTML = newCount.innerHTML;
+                        }
+
+                        const newPagination = doc.querySelector('#pagination-container');
+                        if (newPagination) {
+                            document.querySelector('#pagination-container').innerHTML = newPagination.innerHTML;
+                        }
+
+                        const newActiveFilters = doc.querySelector('#active-filters-container');
+                        if (newActiveFilters) {
+                            document.querySelector('#active-filters-container').innerHTML = newActiveFilters.innerHTML;
+                        }
+                    })
+                    .finally(() => {
+                        this.isLoading = false;
+                    });
+                }
+            }));
+        });
+    </script>
 @endsection

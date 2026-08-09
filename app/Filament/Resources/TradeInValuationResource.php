@@ -5,6 +5,8 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\TradeInValuationResource\Pages;
 use App\Models\TradeInValuation;
 use BackedEnum;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\EditAction;
 use Filament\Forms;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -91,8 +93,8 @@ class TradeInValuationResource extends Resource
                     ]),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                EditAction::make(),
+                DeleteAction::make(),
             ]);
     }
 

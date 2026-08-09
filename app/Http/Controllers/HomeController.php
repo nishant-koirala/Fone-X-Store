@@ -15,6 +15,9 @@ class HomeController extends Controller
     public function index(): View
     {
         $featuredConditions = ProductCondition::with(['product', 'product.category'])
+            ->whereHas('product', function ($q) {
+                $q->where('is_visible', true);
+            })
             ->where('quantity_in_stock', '>', 0)
             ->latest()
             ->take(8)

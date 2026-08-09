@@ -22,6 +22,8 @@
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start" 
              x-data="{ 
                  conditions: {{ json_encode($product->conditions) }},
+                 gallery: {{ json_encode($product->gallery ?? []) }},
+                 activeImage: '{{ $product->image ? Storage::url($product->image) : '' }}',
                  activeIndex: 0,
                  showStickyCart: false,
                  get activeCondition() {
@@ -34,24 +36,44 @@
                      if (!this.$refs.addToCartContainer) return;
                      const rect = this.$refs.addToCartContainer.getBoundingClientRect();
                      this.showStickyCart = rect.bottom < 0;
+                 },
+                 isZooming: false,
+                 zoomX: '50%',
+                 zoomY: '50%',
+                 handleZoom(e) {
+                     if (window.innerWidth < 1024) return;
+                     const rect = e.currentTarget.getBoundingClientRect();
+                     const x = ((e.clientX - rect.left) / rect.width) * 100;
+                     const y = ((e.clientY - rect.top) / rect.height) * 100;
+                     this.zoomX = `${x}%`;
+                     this.zoomY = `${y}%`;
+                     this.isZooming = true;
+                 },
+                 resetZoom() {
+                     this.isZooming = false;
                  }
              }"
              @scroll.window="checkSticky"
              @resize.window="checkSticky">
 
             <!-- Left Column: Interactive 3D Phone Presentation Stage -->
-            <div class="lg:col-span-6 relative lg:sticky lg:top-28 lg:h-max z-20">
-                <div class="aspect-square flex items-center justify-center bg-brand-offwhite border border-gray-200 p-12 relative overflow-hidden shadow-sm">
+            <div class="lg:col-span-6 relative lg:sticky lg:top-28 lg:h-max z-20 space-y-4">
+                <div class="aspect-square flex items-center justify-center bg-brand-offwhite border border-gray-200 relative overflow-hidden shadow-sm transition-opacity duration-300 cursor-zoom-in"
+                     @mousemove="handleZoom"
+                     @mouseleave="resetZoom">
                     
                     <!-- Ambient Red Glow Pedestal -->
                     <div class="absolute bottom-4 h-32 w-64 bg-brand-red/20 blur-3xl rounded-full"></div>
 
                     <!-- Levitating Phone Contour -->
-                    @if($product->image)
-                        <img src="{{ Storage::url($product->image) }}" class="animate-float h-64 w-64 object-contain relative z-10" />
-                    @else
-                        <x-product-icon :categorySlug="$product->category->slug ?? ''" class="animate-float h-64 w-64 text-brand-charcoal/30 stroke-[1.5] relative z-10" />
-                    @endif
+                    <template x-if="activeImage">
+                        <img :src="activeImage" 
+                             class="w-full h-full object-cover relative z-10 pointer-events-none" 
+                             :style="isZooming ? `transform: scale(2.5); transform-origin: ${zoomX} ${zoomY}; transition: transform 0.1s ease-out;` : `transform: scale(1); transform-origin: center; transition: transform 0.25s ease-out;`" />
+                    </template>
+                    <template x-if="!activeImage">
+                        <x-product-icon :categorySlug="$product->category->slug ?? ''" class="w-full h-full p-12 text-brand-charcoal/30 stroke-[1.5] relative z-10" />
+                    </template>
 
                     <!-- Overlay Brand Tag -->
                     <div class="absolute bottom-4 left-4 font-mono text-xs font-bold uppercase tracking-wider text-brand-grey border border-gray-200 bg-white/90 backdrop-blur px-3 py-1.5 shadow-sm">
@@ -64,6 +86,24 @@
                     </div>
 
                 </div>
+                
+                <!-- Gallery Thumbnails -->
+                <template x-if="gallery.length > 0">
+                    <div class="grid grid-cols-5 gap-4">
+                        <button @click="activeImage = '{{ $product->image ? Storage::url($product->image) : '' }}'" 
+                                :class="activeImage === '{{ $product->image ? Storage::url($product->image) : '' }}' ? 'border-brand-red ring-1 ring-brand-red' : 'border-gray-200 hover:border-gray-300'"
+                                class="aspect-square bg-brand-offwhite border flex items-center justify-center p-2 transition-all">
+                            <img src="{{ $product->image ? Storage::url($product->image) : '' }}" class="object-contain h-full w-full" />
+                        </button>
+                        <template x-for="image in gallery" :key="image">
+                            <button @click="activeImage = '{{ Storage::url('') }}' + image" 
+                                    :class="activeImage === '{{ Storage::url('') }}' + image ? 'border-brand-red ring-1 ring-brand-red' : 'border-gray-200 hover:border-gray-300'"
+                                    class="aspect-square bg-brand-offwhite border flex items-center justify-center p-2 transition-all">
+                                <img :src="'{{ Storage::url('') }}' + image" class="object-contain h-full w-full" />
+                            </button>
+                        </template>
+                    </div>
+                </template>
             </div>
 
             <!-- Right Column: Product Details & Dynamic Condition Tabs -->
@@ -297,6 +337,96 @@
                 </div>
             </div>
         @endif
+
+        <!-- Reviews Section -->
+        <div class="mt-24 border-t border-gray-200 pt-16">
+            <div class="flex flex-col lg:flex-row gap-12">
+                <!-- Reviews List & Summary -->
+                <div class="lg:w-2/3 space-y-8">
+                    <div>
+                        <h2 class="text-2xl font-semibold tracking-tight text-brand-charcoal uppercase">Customer Reviews</h2>
+                        <div class="flex items-center space-x-4 mt-2">
+                            <div class="flex items-center text-brand-red">
+                                @for($i = 1; $i <= 5; $i++)
+                                    @if($i <= round($product->reviews_avg_rating ?? 0))
+                                        <svg class="w-5 h-5 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                                    @else
+                                        <svg class="w-5 h-5 text-gray-300 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                                    @endif
+                                @endfor
+                            </div>
+                            <span class="font-mono text-sm text-brand-grey">{{ number_format($product->reviews_avg_rating ?? 0, 1) }} out of 5 ({{ $product->reviews_count ?? 0 }} Reviews)</span>
+                        </div>
+                    </div>
+
+                    @if($product->reviews->isEmpty())
+                        <div class="bg-brand-offwhite p-6 border border-gray-200 font-mono text-sm text-brand-grey">
+                            No reviews yet. Be the first to review this product!
+                        </div>
+                    @else
+                        <div class="space-y-6">
+                            @foreach($product->reviews as $review)
+                                <div class="bg-brand-offwhite p-6 border border-gray-200">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <div class="font-bold text-brand-charcoal">{{ $review->name }}</div>
+                                        <div class="font-mono text-xs text-brand-grey">{{ $review->created_at->diffForHumans() }}</div>
+                                    </div>
+                                    <div class="flex items-center text-brand-red mb-4">
+                                        @for($i = 1; $i <= 5; $i++)
+                                            @if($i <= $review->rating)
+                                                <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                                            @else
+                                                <svg class="w-4 h-4 text-gray-300 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                                            @endif
+                                        @endfor
+                                    </div>
+                                    <p class="text-sm text-brand-charcoal/80 leading-relaxed">{{ $review->comment }}</p>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
+                </div>
+
+                <!-- Submit Review Form -->
+                <div class="lg:w-1/3">
+                    <div class="bg-brand-charcoal text-white p-8">
+                        <h3 class="text-xl font-bold uppercase tracking-wide mb-6">Write a Review</h3>
+                        
+                        @if(session('success'))
+                            <div class="bg-brand-red/10 border border-brand-red text-brand-red p-4 mb-6 font-mono text-sm">
+                                {{ session('success') }}
+                            </div>
+                        @endif
+
+                        <form action="{{ route('products.reviews.store', $product) }}" method="POST" class="space-y-4">
+                            @csrf
+                            <div>
+                                <label class="block font-mono text-xs uppercase mb-1">Your Name</label>
+                                <input type="text" name="name" required class="w-full bg-white/10 border-white/20 text-white focus:border-brand-red focus:ring-0">
+                            </div>
+                            <div>
+                                <label class="block font-mono text-xs uppercase mb-1">Rating</label>
+                                <select name="rating" required class="w-full bg-[#303030] border-white/20 text-white focus:border-brand-red focus:ring-0 appearance-none">
+                                    <option value="5">5 Stars - Excellent</option>
+                                    <option value="4">4 Stars - Good</option>
+                                    <option value="3">3 Stars - Average</option>
+                                    <option value="2">2 Stars - Poor</option>
+                                    <option value="1">1 Star - Terrible</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block font-mono text-xs uppercase mb-1">Review Comment</label>
+                                <textarea name="comment" required rows="4" class="w-full bg-white/10 border-white/20 text-white focus:border-brand-red focus:ring-0"></textarea>
+                            </div>
+                            <button type="submit" class="w-full bg-brand-red hover:bg-red-700 text-white font-mono text-sm font-bold uppercase py-3 transition-colors">
+                                Submit Review
+                            </button>
+                            <p class="font-mono text-[10px] text-white/50 text-center mt-2">Note: Reviews are moderated and must be approved before they appear.</p>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
 
     </div>
 

@@ -16,7 +16,17 @@ class ProductController extends Controller
      */
     public function index(Request $request): View
     {
-        $query = ProductCondition::query()->with(['product', 'product.category']);
+        $query = ProductCondition::query()
+            ->with([
+                'product' => function ($q) {
+                    $q->withCount(['reviews' => fn ($r) => $r->where('is_approved', true)])
+                      ->withAvg(['reviews' => fn ($r) => $r->where('is_approved', true)], 'rating');
+                },
+                'product.category'
+            ])
+            ->whereHas('product', function ($q) {
+                $q->where('is_visible', true);
+            });
 
         // Filter by Category Slug
         if ($request->filled('category')) {
@@ -92,14 +102,44 @@ class ProductController extends Controller
      */
     public function show(Product $product): View
     {
-        $product->load(['conditions', 'category']);
+        abort_if(! $product->is_visible, 404);
+
+        $product->load([
+            'conditions',
+            'category',
+            'reviews' => fn ($q) => $q->where('is_approved', true)->latest()
+        ]);
+        $product->loadAvg(['reviews' => fn ($q) => $q->where('is_approved', true)], 'rating');
+        $product->loadCount(['reviews' => fn ($q) => $q->where('is_approved', true)]);
 
         $relatedProducts = Product::with(['conditions', 'category'])
             ->where('category_id', $product->category_id)
             ->where('id', '!=', $product->id)
+            ->where('is_visible', true)
             ->take(4)
             ->get();
 
         return view('products.show', compact('product', 'relatedProducts'));
+    }
+
+    /**
+     * Store a new product review.
+     */
+    public function storeReview(Request $request, Product $product)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'rating' => 'required|integer|min:1|max:5',
+            'comment' => 'required|string|max:1000',
+        ]);
+
+        $product->reviews()->create([
+            'name' => $validated['name'],
+            'rating' => $validated['rating'],
+            'comment' => $validated['comment'],
+            'is_approved' => false,
+        ]);
+
+        return back()->with('success', 'Thank you! Your review has been submitted and is pending approval.');
     }
 }

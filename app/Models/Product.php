@@ -20,11 +20,15 @@ class Product extends Model
         'category_id',
         'base_price',
         'is_new',
+        'is_visible',
+        'gallery',
     ];
 
     protected $casts = [
         'base_price' => 'decimal:2',
         'is_new' => 'boolean',
+        'is_visible' => 'boolean',
+        'gallery' => 'array',
     ];
 
     public function category(): BelongsTo
@@ -35,5 +39,10 @@ class Product extends Model
     public function conditions(): HasMany
     {
         return $this->hasMany(ProductCondition::class);
+    }
+
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class);
     }
 }

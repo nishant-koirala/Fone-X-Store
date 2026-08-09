@@ -65,6 +65,10 @@ class ProductResource extends Resource
                             ->label('New Condition Available')
                             ->default(true),
 
+                        Forms\Components\Toggle::make('is_visible')
+                            ->label('Show on Storefront')
+                            ->default(true),
+
                         Forms\Components\Textarea::make('description')
                             ->columnSpanFull(),
 
@@ -89,6 +93,15 @@ class ProductResource extends Resource
                             ->visibility('public')
                             ->formatStateUsing(fn () => null)
                             ->dehydrated(fn ($state) => filled($state))
+                            ->columnSpanFull(),
+
+                        Forms\Components\FileUpload::make('gallery')
+                            ->label('Product Gallery')
+                            ->image()
+                            ->multiple()
+                            ->disk('public')
+                            ->directory('products/gallery')
+                            ->visibility('public')
                             ->columnSpanFull(),
                     ])->columns(2),
 
@@ -141,6 +154,7 @@ class ProductResource extends Resource
                 Tables\Columns\TextColumn::make('category.name')->sortable(),
                 Tables\Columns\TextColumn::make('base_price')->money('USD')->sortable(),
                 Tables\Columns\IconColumn::make('is_new')->boolean(),
+                Tables\Columns\ToggleColumn::make('is_visible')->label('Visible on Store'),
                 Tables\Columns\TextColumn::make('conditions_count')
                     ->counts('conditions')
                     ->label('Condition Listings'),

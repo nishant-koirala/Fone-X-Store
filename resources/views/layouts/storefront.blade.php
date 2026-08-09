@@ -62,6 +62,10 @@
                         <span>Certified Used</span>
                         <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-brand-red group-hover:w-full transition-all duration-300"></span>
                     </a>
+                    <a href="{{ route('products.index', ['category' => 'accessories']) }}" class="group relative py-2 text-brand-charcoal hover:text-brand-red transition-colors">
+                        <span>Accessories</span>
+                        <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-brand-red group-hover:w-full transition-all duration-300"></span>
+                    </a>
                     <a href="{{ route('products.index') }}" class="group relative py-2 text-brand-charcoal hover:text-brand-red transition-colors">
                         <span>All Inventory</span>
                         <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-brand-red group-hover:w-full transition-all duration-300"></span>
@@ -140,6 +144,9 @@
                 </a>
                 <a href="{{ route('products.index', ['grade' => 'used']) }}" class="block px-3 py-2.5 font-sans text-base font-bold text-brand-charcoal hover:bg-brand-offwhite hover:text-brand-red">
                     Certified Used
+                </a>
+                <a href="{{ route('products.index', ['category' => 'accessories']) }}" class="block px-3 py-2.5 font-sans text-base font-bold text-brand-charcoal hover:bg-brand-offwhite hover:text-brand-red">
+                    Shop Accessories
                 </a>
                 <a href="{{ route('products.index') }}" class="block px-3 py-2.5 font-sans text-base font-bold text-brand-charcoal hover:bg-brand-offwhite hover:text-brand-red">
                     All Inventory

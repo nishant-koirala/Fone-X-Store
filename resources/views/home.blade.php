@@ -241,15 +241,9 @@
                                     OUT OF STOCK
                                 </span>
                             @endif
-                        </div>
-
                         <!-- Product Image Placeholder: Shine Overlay Contour -->
                         <div class="shine-container aspect-[4/3] flex items-center justify-center bg-brand-offwhite p-6 relative overflow-hidden mb-5 border border-gray-100">
-                            <svg class="h-28 w-28 text-brand-charcoal/20 group-hover:text-brand-red/40 transition-colors duration-300 stroke-[1.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <rect x="5" y="2" width="14" height="20" rx="2" ry="2" />
-                                <line x1="10" y1="4" x2="14" y2="4" stroke-linecap="round" />
-                                <circle cx="12" cy="19" r="0.75" fill="currentColor" />
-                            </svg>
+                            <x-product-icon :categorySlug="$condition->product->category->slug ?? ''" class="h-28 w-28 text-brand-charcoal/20 group-hover:text-brand-red/40 transition-colors duration-300 stroke-[1.5]" />
 
                             <span class="absolute bottom-2 left-2 font-mono text-[10px] uppercase tracking-wider text-brand-grey">
                                 {{ strtoupper($condition->product->brand) }}

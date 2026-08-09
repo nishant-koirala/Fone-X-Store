@@ -39,11 +39,7 @@
                     <div class="absolute bottom-4 h-32 w-64 bg-brand-red/20 blur-3xl rounded-full"></div>
 
                     <!-- Levitating Phone Contour -->
-                    <svg class="animate-float h-64 w-64 text-brand-charcoal/30 stroke-[1.5] relative z-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <rect x="5" y="2" width="14" height="20" rx="2" ry="2" />
-                        <line x1="10" y1="4" x2="14" y2="4" stroke-linecap="round" />
-                        <circle cx="12" cy="19" r="0.75" fill="currentColor" />
-                    </svg>
+                    <x-product-icon :categorySlug="$product->category->slug ?? ''" class="animate-float h-64 w-64 text-brand-charcoal/30 stroke-[1.5] relative z-10" />
 
                     <!-- Overlay Brand Tag -->
                     <div class="absolute bottom-4 left-4 font-mono text-xs font-bold uppercase tracking-wider text-brand-grey border border-gray-200 bg-white/90 backdrop-blur px-3 py-1.5 shadow-sm">

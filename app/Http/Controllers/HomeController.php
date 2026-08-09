@@ -2,21 +2,28 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\ProductCondition;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Cache;
 
 class HomeController extends Controller
 {
     /**
-     * Display the public storefront homepage with recent product listings.
+     * Display storefront homepage with eager-loaded featured listings & accessory categories.
      */
     public function index(): View
     {
         $featuredConditions = ProductCondition::with(['product', 'product.category'])
+            ->where('quantity_in_stock', '>', 0)
             ->latest()
-            ->take(4)
+            ->take(8)
             ->get();
 
-        return view('home', compact('featuredConditions'));
+        $accessoryCategories = Cache::remember('home_accessory_categories', 3600, function () {
+            return Category::whereIn('slug', ['chargers-cables', 'cases-covers', 'audio-speakers', 'power-banks', 'accessories'])->get();
+        });
+
+        return view('home', compact('featuredConditions', 'accessoryCategories'));
     }
 }

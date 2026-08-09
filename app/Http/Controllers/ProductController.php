@@ -7,11 +7,12 @@ use App\Models\Product;
 use App\Models\ProductCondition;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class ProductController extends Controller
 {
     /**
-     * Display a paginated catalog of ProductCondition listings with server-side filters & sorting.
+     * Display a paginated catalog of ProductCondition listings with server-side filters & caching optimizations.
      */
     public function index(Request $request): View
     {
@@ -19,9 +20,16 @@ class ProductController extends Controller
 
         // Filter by Category Slug
         if ($request->filled('category')) {
-            $query->whereHas('product.category', function ($q) use ($request) {
-                $q->where('slug', $request->input('category'));
-            });
+            $catSlug = $request->input('category');
+            if ($catSlug === 'accessories') {
+                $query->whereHas('product.category', function ($q) {
+                    $q->whereIn('slug', ['accessories', 'chargers-cables', 'cases-covers', 'audio-speakers', 'power-banks']);
+                });
+            } else {
+                $query->whereHas('product.category', function ($q) use ($catSlug) {
+                    $q->where('slug', $catSlug);
+                });
+            }
         }
 
         // Filter by Brand
@@ -59,8 +67,14 @@ class ProductController extends Controller
 
         $conditions = $query->paginate(12)->withQueryString();
 
-        $categories = Category::orderBy('name')->get();
-        $brands = Product::distinct()->orderBy('brand')->pluck('brand');
+        // Cached Categories & Brands List for Performance
+        $categories = Cache::remember('catalog_categories_list', 3600, function () {
+            return Category::orderBy('name')->get();
+        });
+
+        $brands = Cache::remember('catalog_brands_list', 3600, function () {
+            return Product::distinct()->orderBy('brand')->pluck('brand');
+        });
 
         return view('products.index', compact('conditions', 'categories', 'brands'));
     }

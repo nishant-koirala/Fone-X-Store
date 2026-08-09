@@ -25,21 +25,25 @@
 
     <!-- Filter & Catalog Main Container -->
     <div class="mx-auto max-w-[90rem] px-4 sm:px-6 lg:px-8 py-10">
+        <div class="flex flex-col lg:flex-row gap-8 items-start">
+            
+            <!-- Left Sidebar (Sticky on Desktop) -->
+            <div class="w-full lg:w-64 flex-shrink-0 lg:sticky lg:top-28 z-30">
 
-        <!-- Mobile Filter Toggle Button -->
-        <div class="lg:hidden mb-6">
-            <button type="button" @click="mobileFiltersOpen = true" class="w-full font-mono text-xs uppercase font-bold text-brand-charcoal bg-white border border-gray-300 py-3 shadow-sm hover:border-brand-red flex items-center justify-center space-x-2">
-                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="square" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-                </svg>
-                <span>Filter & Sort Options</span>
-            </button>
-        </div>
+                <!-- Mobile Filter Toggle Button -->
+                <div class="lg:hidden mb-6">
+                    <button type="button" @click="mobileFiltersOpen = true" class="w-full font-mono text-xs uppercase font-bold text-brand-charcoal bg-white border border-gray-300 py-3 shadow-sm hover:border-brand-red flex items-center justify-center space-x-2">
+                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="square" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                        </svg>
+                        <span>Filter & Sort Options</span>
+                    </button>
+                </div>
 
-        <!-- Glassmorphism Filter Bar (Slide-over on Mobile) -->
-        <form x-ref="filterForm" @submit.prevent="applyFilters" @change="applyFilters" method="GET" action="{{ route('products.index') }}" 
-              :class="mobileFiltersOpen ? 'fixed inset-0 z-[100] flex flex-col justify-end bg-brand-charcoal/50 backdrop-blur-sm' : 'hidden lg:block'"
-              class="mb-10 lg:block">
+                <!-- Glassmorphism Filter Bar (Slide-over on Mobile) -->
+                <form x-ref="filterForm" @submit.prevent="applyFilters" @change="applyFilters" method="GET" action="{{ route('products.index') }}" 
+                      :class="mobileFiltersOpen ? 'fixed inset-0 z-[100] flex flex-col justify-end bg-brand-charcoal/50 backdrop-blur-sm' : 'hidden lg:block'"
+                      class="lg:block">
             
             <!-- Mobile Overlay Click-to-Close -->
             <div x-show="mobileFiltersOpen" @click="mobileFiltersOpen = false" class="absolute inset-0 lg:hidden"></div>
@@ -62,7 +66,7 @@
                     </button>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
+                <div class="flex flex-col gap-5">
                 
                 <!-- Category Filter -->
                 <div>
@@ -137,7 +141,12 @@
                 </div>
 
             </div>
+            </div> <!-- End glass-panel -->
         </form>
+        </div> <!-- End Left Sidebar -->
+
+        <!-- Right Content Area -->
+        <div class="flex-grow min-w-0">
 
         <!-- Active Filter Chips -->
         <div id="active-filters-container" class="mb-6 flex flex-wrap items-center gap-2 min-h-[28px]">
@@ -239,14 +248,18 @@
 
                     <!-- Shine Container Placeholder -->
                     <div class="shine-container aspect-[4/3] flex items-center justify-center bg-brand-offwhite p-6 relative overflow-hidden mb-5 border border-gray-100">
-                        <x-product-icon :categorySlug="$condition->product->category->slug ?? ''" class="h-28 w-28 text-brand-charcoal/20 group-hover:text-brand-red/40 transition-colors duration-300 stroke-[1.5]" />
+                        @if($condition->product->image)
+                            <img src="{{ Storage::url($condition->product->image) }}" class="h-28 w-28 object-contain group-hover:scale-110 transition-transform duration-300" />
+                        @else
+                            <x-product-icon :categorySlug="$condition->product->category->slug ?? ''" class="h-28 w-28 text-brand-charcoal/20 group-hover:text-brand-red/40 transition-colors duration-300 stroke-[1.5]" />
+                        @endif
 
                         <span class="absolute bottom-2 left-2 font-mono text-[10px] uppercase tracking-wider text-brand-grey">
                             {{ strtoupper($condition->product->brand) }}
                         </span>
 
-                        @if($condition->price < $condition->product->base_price)
-                            @php $savings = round((($condition->product->base_price - $condition->price) / $condition->product->base_price) * 100); @endphp
+                        @if($condition->original_price && $condition->original_price > $condition->price)
+                            @php $savings = round((($condition->original_price - $condition->price) / $condition->original_price) * 100); @endphp
                             <span class="absolute top-2 right-2 bg-brand-red text-white font-mono text-[10px] font-bold px-1.5 py-0.5 shadow">
                                 SAVE {{ $savings }}%
                             </span>
@@ -274,9 +287,9 @@
                                 <span class="font-mono font-bold text-brand-charcoal text-xl">
                                     Rs {{ number_format($condition->price) }}
                                 </span>
-                                @if($condition->price < $condition->product->base_price)
+                                @if($condition->original_price && $condition->original_price > $condition->price)
                                     <span class="font-mono text-xs text-brand-grey line-through">
-                                        Rs {{ number_format($condition->product->base_price) }}
+                                        Rs {{ number_format($condition->original_price) }}
                                     </span>
                                 @endif
                             </div>
@@ -313,6 +326,8 @@
             @endif
         </div>
 
+        </div> <!-- End Right Content Area -->
+        </div> <!-- End Flex Layout -->
     </div>
 
     <script>

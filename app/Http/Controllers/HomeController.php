@@ -24,6 +24,13 @@ class HomeController extends Controller
             return Category::whereIn('slug', ['chargers-cables', 'cases-covers', 'audio-speakers', 'power-banks', 'accessories'])->get();
         });
 
-        return view('home', compact('featuredConditions', 'accessoryCategories'));
+        $heroConditions = ProductCondition::with(['product', 'product.category'])
+            ->where('quantity_in_stock', '>', 0)
+            ->where('grade', 'new')
+            ->latest()
+            ->take(3)
+            ->get();
+
+        return view('home', compact('featuredConditions', 'accessoryCategories', 'heroConditions'));
     }
 }

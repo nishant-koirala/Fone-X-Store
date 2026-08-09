@@ -40,14 +40,18 @@
              @resize.window="checkSticky">
 
             <!-- Left Column: Interactive 3D Phone Presentation Stage -->
-            <div class="lg:col-span-6 relative">
+            <div class="lg:col-span-6 relative lg:sticky lg:top-28 lg:h-max z-20">
                 <div class="aspect-square flex items-center justify-center bg-brand-offwhite border border-gray-200 p-12 relative overflow-hidden shadow-sm">
                     
                     <!-- Ambient Red Glow Pedestal -->
                     <div class="absolute bottom-4 h-32 w-64 bg-brand-red/20 blur-3xl rounded-full"></div>
 
                     <!-- Levitating Phone Contour -->
-                    <x-product-icon :categorySlug="$product->category->slug ?? ''" class="animate-float h-64 w-64 text-brand-charcoal/30 stroke-[1.5] relative z-10" />
+                    @if($product->image)
+                        <img src="{{ Storage::url($product->image) }}" class="animate-float h-64 w-64 object-contain relative z-10" />
+                    @else
+                        <x-product-icon :categorySlug="$product->category->slug ?? ''" class="animate-float h-64 w-64 text-brand-charcoal/30 stroke-[1.5] relative z-10" />
+                    @endif
 
                     <!-- Overlay Brand Tag -->
                     <div class="absolute bottom-4 left-4 font-mono text-xs font-bold uppercase tracking-wider text-brand-grey border border-gray-200 bg-white/90 backdrop-blur px-3 py-1.5 shadow-sm">
@@ -110,9 +114,9 @@
                                 <span class="font-mono font-bold text-brand-charcoal text-3xl sm:text-4xl">
                                     Rs <span x-text="formatRupees(activeCondition.price)"></span>
                                 </span>
-                                <template x-if="Number(activeCondition.price) < Number({{ $product->base_price }})">
+                                <template x-if="activeCondition.original_price && Number(activeCondition.original_price) > Number(activeCondition.price)">
                                     <span class="font-mono text-sm text-brand-grey line-through">
-                                        Rs {{ number_format($product->base_price) }}
+                                        Rs <span x-text="formatRupees(activeCondition.original_price)"></span>
                                     </span>
                                 </template>
                             </div>
@@ -193,12 +197,15 @@
                  x-transition:leave="transition ease-in duration-200"
                  x-transition:leave-start="translate-y-0"
                  x-transition:leave-end="translate-y-full"
-                 class="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-brand-red/20 p-4 shadow-[0_-10px_40px_-10px_rgba(0,0,0,0.2)] md:hidden">
+                 class="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-brand-red/20 p-4 shadow-[0_-10px_40px_-10px_rgba(0,0,0,0.2)]">
                 <div class="flex items-center justify-between gap-4 max-w-[90rem] mx-auto">
                     <div class="flex flex-col">
                         <span class="font-mono text-[10px] uppercase font-bold text-brand-charcoal line-clamp-1">{{ $product->name }}</span>
                         <div class="flex items-baseline space-x-1.5">
                             <span class="font-sans font-bold text-brand-red">Rs <span x-text="formatRupees(activeCondition.price)"></span></span>
+                            <template x-if="activeCondition.original_price && Number(activeCondition.original_price) > Number(activeCondition.price)">
+                                <span class="font-mono text-[9px] text-brand-grey line-through">Rs <span x-text="formatRupees(activeCondition.original_price)"></span></span>
+                            </template>
                             <span class="font-mono text-[9px] uppercase text-brand-grey border border-gray-200 px-1 py-0.5" x-text="activeCondition.grade === 'new' ? 'NEW' : 'GRADE ' + activeCondition.grade.toUpperCase()"></span>
                         </div>
                     </div>
@@ -255,7 +262,11 @@
                                 </div>
 
                                 <div class="shine-container aspect-[4/3] flex items-center justify-center bg-brand-offwhite p-4 mb-4 border border-gray-100">
-                                    <x-product-icon :categorySlug="$relProduct->category->slug ?? ''" class="h-20 w-20 text-brand-charcoal/20 group-hover:text-brand-red/40 transition-colors stroke-[1.5]" />
+                                    @if($relProduct->image)
+                                        <img src="{{ Storage::url($relProduct->image) }}" class="h-20 w-20 object-contain group-hover:scale-110 transition-transform duration-300" />
+                                    @else
+                                        <x-product-icon :categorySlug="$relProduct->category->slug ?? ''" class="h-20 w-20 text-brand-charcoal/20 group-hover:text-brand-red/40 transition-colors stroke-[1.5]" />
+                                    @endif
                                 </div>
 
                                 <div>
@@ -265,9 +276,16 @@
                                 </div>
 
                                 <div class="mt-4 pt-3 border-t border-gray-100 flex items-baseline justify-between">
-                                    <span class="font-mono font-bold text-brand-charcoal text-base">
-                                        Rs {{ number_format($firstCond->price) }}
-                                    </span>
+                                    <div class="flex items-baseline space-x-1.5">
+                                        <span class="font-mono font-bold text-brand-charcoal text-base">
+                                            Rs {{ number_format($firstCond->price) }}
+                                        </span>
+                                        @if($firstCond->original_price && $firstCond->original_price > $firstCond->price)
+                                            <span class="font-mono text-[10px] text-brand-grey line-through">
+                                                Rs {{ number_format($firstCond->original_price) }}
+                                            </span>
+                                        @endif
+                                    </div>
                                     <a href="{{ route('products.show', $relProduct->slug) }}" class="font-mono text-[11px] uppercase font-bold text-white bg-brand-charcoal group-hover:bg-brand-red px-3 py-1.5 transition-colors">
                                         View
                                     </a>

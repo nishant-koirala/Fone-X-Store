@@ -45,12 +45,12 @@
                                 
                                 <!-- Product Details & SVG Silhouette Icon -->
                                 <div class="sm:col-span-6 flex items-center space-x-4">
-                                    <div class="h-16 w-16 flex-shrink-0 bg-brand-offwhite border border-gray-200 flex items-center justify-center p-2">
-                                        <svg class="h-10 w-10 text-brand-charcoal/30 stroke-[1.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <rect x="5" y="2" width="14" height="20" rx="2" ry="2" />
-                                            <line x1="10" y1="4" x2="14" y2="4" stroke-linecap="round" />
-                                            <circle cx="12" cy="19" r="0.75" fill="currentColor" />
-                                        </svg>
+                                    <div class="h-16 w-16 flex-shrink-0 bg-brand-offwhite border border-gray-100 flex items-center justify-center p-2">
+                                        @if($prod->image)
+                                            <img src="{{ Storage::url($prod->image) }}" class="h-12 w-12 object-contain" />
+                                        @else
+                                            <x-product-icon :categorySlug="$prod->category->slug ?? ''" class="h-8 w-8 text-brand-charcoal/30 stroke-[1.5]" />
+                                        @endif
                                     </div>
                                     <div>
                                         <div class="flex items-center space-x-2">

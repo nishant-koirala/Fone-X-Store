@@ -30,6 +30,11 @@ class ProductController extends Controller
                     $q->where('slug', $catSlug);
                 });
             }
+        } else {
+            // If no category is selected, exclude all accessories so they only show on their dedicated page
+            $query->whereHas('product.category', function ($q) {
+                $q->whereNotIn('slug', ['accessories', 'chargers-cables', 'cases-covers', 'audio-speakers', 'power-banks']);
+            });
         }
 
         // Filter by Brand

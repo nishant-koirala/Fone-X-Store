@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\ProductResource\Pages;
 use App\Models\Product;
 use BackedEnum;
+use Illuminate\Support\Facades\Storage;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
@@ -57,7 +58,7 @@ class ProductResource extends Resource
 
                         Forms\Components\TextInput::make('base_price')
                             ->numeric()
-                            ->prefix('$')
+                            ->prefix('Rs ')
                             ->required(),
 
                         Forms\Components\Toggle::make('is_new')
@@ -65,6 +66,29 @@ class ProductResource extends Resource
                             ->default(true),
 
                         Forms\Components\Textarea::make('description')
+                            ->columnSpanFull(),
+
+                        Forms\Components\Placeholder::make('current_image_preview')
+                            ->label('Current Image')
+                            ->content(function ($record) {
+                                if ($record && $record->image) {
+                                    $url = Storage::disk('public')->url($record->image);
+                                    return new \Illuminate\Support\HtmlString(
+                                        '<img src="' . $url . '" style="max-height:150px;border-radius:8px;" />'
+                                    );
+                                }
+                                return 'No image uploaded yet.';
+                            })
+                            ->columnSpanFull(),
+
+                        Forms\Components\FileUpload::make('image')
+                            ->label('Upload New Image')
+                            ->image()
+                            ->disk('public')
+                            ->directory('products')
+                            ->visibility('public')
+                            ->formatStateUsing(fn () => null)
+                            ->dehydrated(fn ($state) => filled($state))
                             ->columnSpanFull(),
                     ])->columns(2),
 
@@ -83,9 +107,16 @@ class ProductResource extends Resource
                                     ])
                                     ->required(),
 
-                                Forms\Components\TextInput::make('price')
+                                Forms\Components\TextInput::make('original_price')
+                                    ->label('Old Price (Crossed Out)')
                                     ->numeric()
-                                    ->prefix('$')
+                                    ->prefix('Rs ')
+                                    ->nullable(),
+
+                                Forms\Components\TextInput::make('price')
+                                    ->label('New/Current Price')
+                                    ->numeric()
+                                    ->prefix('Rs ')
                                     ->required(),
 
                                 Forms\Components\TextInput::make('quantity_in_stock')
@@ -93,7 +124,7 @@ class ProductResource extends Resource
                                     ->default(0)
                                     ->required(),
                             ])
-                            ->columns(3)
+                            ->columns(4)
                             ->defaultItems(1),
                     ]),
             ]);
@@ -104,6 +135,7 @@ class ProductResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('id')->sortable(),
+                Tables\Columns\ImageColumn::make('image')->disk('public'),
                 Tables\Columns\TextColumn::make('name')->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('brand')->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('category.name')->sortable(),

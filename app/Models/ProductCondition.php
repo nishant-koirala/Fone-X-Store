@@ -16,11 +16,13 @@ class ProductCondition extends Model
         'product_id',
         'grade',
         'price',
+        'original_price',
         'quantity_in_stock',
     ];
 
     protected $casts = [
         'price' => 'decimal:2',
+        'original_price' => 'decimal:2',
         'quantity_in_stock' => 'integer',
     ];
 

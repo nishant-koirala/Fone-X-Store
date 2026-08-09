@@ -63,51 +63,98 @@
                 </div>
 
                 <!-- Right Hero Floating Phone Presentation Stage -->
-                <div class="lg:col-span-5 flex justify-center relative">
+                <div class="lg:col-span-5 flex justify-center relative"
+                     x-data="{ 
+                        activeSlide: 0, 
+                        slides: {{ json_encode($heroConditions) }},
+                        init() {
+                            if(this.slides.length > 1) {
+                                setInterval(() => {
+                                    this.activeSlide = (this.activeSlide + 1) % this.slides.length;
+                                }, 5000);
+                            }
+                        }
+                     }">
                     <!-- Glowing Pedestal Base -->
                     <div class="absolute bottom-0 h-32 w-64 bg-brand-red/40 blur-3xl rounded-full"></div>
 
-                    <!-- Floating Phone Silhouette Card -->
-                    <div class="animate-float relative z-10 w-full max-w-sm glass-panel-dark p-8 border border-white/20 shadow-2xl text-center space-y-6">
-                        
-                        <!-- Header Tag -->
-                        <div class="flex items-center justify-between font-mono text-xs">
-                            <span class="bg-brand-red text-white px-2 py-0.5 font-bold uppercase tracking-wider text-[10px]">
-                                FEATURED DEVICE
-                            </span>
-                            <span class="text-white/70">100-PT PASSED</span>
-                        </div>
+                    @if(isset($heroConditions) && $heroConditions->count() > 0)
+                        <!-- Carousel Wrapper -->
+                        <div class="relative z-10 w-full max-w-sm">
+                            <template x-for="(slide, index) in slides" :key="slide.id">
+                                <!-- Floating Phone Silhouette Card -->
+                                <div x-show="activeSlide === index"
+                                     x-transition:enter="transition ease-out duration-500 delay-100"
+                                     x-transition:enter-start="opacity-0 translate-x-8"
+                                     x-transition:enter-end="opacity-100 translate-x-0"
+                                     x-transition:leave="transition ease-in duration-500 absolute top-0 left-0 right-0"
+                                     x-transition:leave-start="opacity-100 translate-x-0"
+                                     x-transition:leave-end="opacity-0 -translate-x-8"
+                                     class="animate-float glass-panel-dark p-8 border border-white/20 shadow-2xl text-center space-y-6 w-full">
+                                    
+                                    <!-- Header Tag -->
+                                    <div class="flex items-center justify-between font-mono text-xs">
+                                        <span class="bg-brand-red text-white px-2 py-0.5 font-bold uppercase tracking-wider text-[10px]">
+                                            FEATURED DEVICE
+                                        </span>
+                                        <span class="text-white/70" x-text="slide.grade === 'new' ? 'BRAND NEW' : '100-PT PASSED'"></span>
+                                    </div>
 
-                        <!-- Phone Graphic Silhouette Contour -->
-                        <div class="aspect-[4/3] bg-white/5 border border-white/10 flex items-center justify-center relative overflow-hidden group">
-                            <svg class="h-32 w-32 text-brand-red/80 stroke-[1.2] transform group-hover:scale-110 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <rect x="5" y="2" width="14" height="20" rx="2" ry="2" />
-                                <line x1="10" y1="4" x2="14" y2="4" stroke-linecap="round" />
-                                <circle cx="12" cy="19" r="0.75" fill="currentColor" />
-                            </svg>
-                            <!-- Live Spec Badge -->
-                            <div class="absolute bottom-2 left-2 bg-black/70 backdrop-blur-md px-2 py-1 font-mono text-[10px] text-white">
-                                APPLE • GRADE A
+                                    <!-- Phone Graphic Silhouette Contour -->
+                                    <div class="aspect-[4/3] bg-white/5 border border-white/10 flex items-center justify-center relative overflow-hidden group">
+                                        <template x-if="slide.product.image">
+                                            <img :src="'/storage/' + slide.product.image" class="h-32 w-32 object-contain transform group-hover:scale-110 transition-transform duration-300" />
+                                        </template>
+                                        <template x-if="!slide.product.image">
+                                            <svg class="h-32 w-32 text-brand-red/80 stroke-[1.2] transform group-hover:scale-110 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <rect x="5" y="2" width="14" height="20" rx="2" ry="2" />
+                                                <line x1="10" y1="4" x2="14" y2="4" stroke-linecap="round" />
+                                                <circle cx="12" cy="19" r="0.75" fill="currentColor" />
+                                            </svg>
+                                        </template>
+                                        <!-- Live Spec Badge -->
+                                        <div class="absolute bottom-2 left-2 bg-black/70 backdrop-blur-md px-2 py-1 font-mono text-[10px] text-white">
+                                            <span x-text="(slide.product.brand || '').toUpperCase()"></span> • 
+                                            <span x-text="slide.grade === 'new' ? 'NEW' : 'GRADE ' + (slide.grade || '').toUpperCase()"></span>
+                                        </div>
+                                        
+                                        <!-- Discount Badge -->
+                                        <template x-if="slide.original_price && Number(slide.original_price) > Number(slide.price)">
+                                            <span class="absolute top-2 right-2 bg-brand-red text-white font-mono text-[10px] font-bold px-1.5 py-0.5 shadow"
+                                                  x-text="'SAVE ' + Math.round(((Number(slide.original_price) - Number(slide.price)) / Number(slide.original_price)) * 100) + '%'">
+                                            </span>
+                                        </template>
+                                    </div>
+
+                                    <!-- Device Info & Pricing -->
+                                    <div class="space-y-2">
+                                        <h4 class="font-display text-xl uppercase text-white" x-text="slide.product.name"></h4>
+                                        <div class="flex items-center justify-center space-x-2 font-mono">
+                                            <span class="font-bold text-2xl text-white">Rs <span x-text="Number(slide.price).toLocaleString('en-US')"></span></span>
+                                            <template x-if="slide.original_price && Number(slide.original_price) > Number(slide.price)">
+                                                <span class="text-xs text-white/50 line-through">Rs <span x-text="Number(slide.original_price).toLocaleString('en-US')"></span></span>
+                                            </template>
+                                        </div>
+                                    </div>
+
+                                    <!-- Action -->
+                                    <a :href="'/products/' + (slide.product.slug || '')" class="block w-full border border-white text-white font-mono text-xs uppercase font-bold tracking-wider py-3 hover:bg-white hover:text-brand-charcoal transition-colors">
+                                        View Device &rarr;
+                                    </a>
+                                </div>
+                            </template>
+
+                            <!-- Carousel Indicators -->
+                            <div class="flex justify-center space-x-2 mt-8 h-4 relative z-20">
+                                <template x-for="(slide, index) in slides" :key="index">
+                                    <button type="button" @click="activeSlide = index"
+                                            class="h-1.5 rounded-full transition-all duration-300"
+                                            :class="activeSlide === index ? 'w-6 bg-brand-red' : 'w-2 bg-white/30 hover:bg-white/50'">
+                                    </button>
+                                </template>
                             </div>
                         </div>
-
-                        <!-- Device Info & Pricing -->
-                        <div class="space-y-2">
-                            <h4 class="font-display text-xl uppercase text-white">iPhone 15 Pro Max</h4>
-                            <div class="flex items-center justify-center space-x-2 font-mono">
-                                <span class="font-bold text-2xl text-white">Rs 155,000</span>
-                                <span class="text-xs text-white/50 line-through">Rs 185,000</span>
-                            </div>
-                        </div>
-
-                        <!-- Floating Live Badges -->
-                        <div class="space-y-2 font-mono text-xs">
-                            <div class="bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 px-3 py-1.5 text-[11px] uppercase">
-                                ✓ IN STOCK • 7-DAY RETURN GUARANTEE
-                            </div>
-                        </div>
-
-                    </div>
+                    @endif
                 </div>
 
             </div>
@@ -120,51 +167,60 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 
                 <!-- Path 01: Direct Deals (New) -->
-                <a href="{{ route('products.index', ['grade' => 'new']) }}" class="group glass-panel p-8 border border-gray-200 hover:border-brand-red card-glow-hover relative overflow-hidden">
-                    <div class="flex items-center justify-between mb-4">
-                        <span class="font-mono text-xs font-bold uppercase tracking-widest text-brand-red bg-brand-red/10 px-2 py-1">01 / DIRECT DEALS</span>
-                        <svg class="h-5 w-5 text-brand-charcoal transform group-hover:translate-x-1 group-hover:text-brand-red transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="square" stroke-linejoin="miter" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                        </svg>
+                <a href="{{ route('products.index', ['grade' => 'new']) }}" class="group glass-panel p-8 border border-gray-200 hover:border-brand-red card-glow-hover relative overflow-hidden flex flex-col justify-between">
+                    <div class="absolute -right-2 -bottom-6 font-display text-[120px] leading-none text-transparent z-0 select-none transition-transform duration-500 group-hover:scale-110" style="-webkit-text-stroke: 3px #f3f4f6; opacity: 0.7;">01</div>
+                    <div class="relative z-10">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="font-mono text-xs font-bold uppercase tracking-widest text-brand-red bg-brand-red/10 px-2 py-1">01 / DIRECT DEALS</span>
+                            <svg class="h-5 w-5 text-brand-charcoal transform group-hover:translate-x-1 group-hover:text-brand-red transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="square" stroke-linejoin="miter" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                            </svg>
+                        </div>
+                        <h3 class="font-display text-2xl uppercase tracking-tight text-brand-charcoal group-hover:text-brand-red transition-colors">
+                            Brand New Phones
+                        </h3>
+                        <p class="mt-2 font-sans text-sm text-brand-grey leading-relaxed">
+                            Factory sealed devices with official manufacturer brand warranty.
+                        </p>
                     </div>
-                    <h3 class="font-display text-2xl uppercase tracking-tight text-brand-charcoal group-hover:text-brand-red transition-colors">
-                        Brand New Phones
-                    </h3>
-                    <p class="mt-2 font-sans text-sm text-brand-grey leading-relaxed">
-                        Factory sealed devices with official manufacturer brand warranty.
-                    </p>
                 </a>
 
                 <!-- Path 02: Graded Inventory (Certified Used) -->
-                <a href="{{ route('products.index', ['grade' => 'used']) }}" class="group glass-panel p-8 border border-gray-200 hover:border-brand-red card-glow-hover relative overflow-hidden">
-                    <div class="flex items-center justify-between mb-4">
-                        <span class="font-mono text-xs font-bold uppercase tracking-widest text-brand-red bg-brand-red/10 px-2 py-1">02 / GRADED INVENTORY</span>
-                        <svg class="h-5 w-5 text-brand-charcoal transform group-hover:translate-x-1 group-hover:text-brand-red transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="square" stroke-linejoin="miter" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                        </svg>
+                <a href="{{ route('products.index', ['grade' => 'used']) }}" class="group glass-panel p-8 border border-gray-200 hover:border-brand-red card-glow-hover relative overflow-hidden flex flex-col justify-between">
+                    <div class="absolute -right-2 -bottom-6 font-display text-[120px] leading-none text-transparent z-0 select-none transition-transform duration-500 group-hover:scale-110" style="-webkit-text-stroke: 3px #f3f4f6; opacity: 0.7;">02</div>
+                    <div class="relative z-10">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="font-mono text-xs font-bold uppercase tracking-widest text-brand-red bg-brand-red/10 px-2 py-1">02 / GRADED INVENTORY</span>
+                            <svg class="h-5 w-5 text-brand-charcoal transform group-hover:translate-x-1 group-hover:text-brand-red transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="square" stroke-linejoin="miter" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                            </svg>
+                        </div>
+                        <h3 class="font-display text-2xl uppercase tracking-tight text-brand-charcoal group-hover:text-brand-red transition-colors">
+                            Certified Used
+                        </h3>
+                        <p class="mt-2 font-sans text-sm text-brand-grey leading-relaxed">
+                            Rigorously tested Grade A, B & C pre-owned phones with 7-day checking guarantee.
+                        </p>
                     </div>
-                    <h3 class="font-display text-2xl uppercase tracking-tight text-brand-charcoal group-hover:text-brand-red transition-colors">
-                        Certified Used
-                    </h3>
-                    <p class="mt-2 font-sans text-sm text-brand-grey leading-relaxed">
-                        Rigorously tested Grade A, B & C pre-owned phones with 7-day checking guarantee.
-                    </p>
                 </a>
 
                 <!-- Path 03: Trade & Upgrade -->
-                <a href="{{ route('trade-in.create') }}" class="group glass-panel p-8 border border-gray-200 hover:border-brand-red card-glow-hover relative overflow-hidden">
-                    <div class="flex items-center justify-between mb-4">
-                        <span class="font-mono text-xs font-bold uppercase tracking-widest text-brand-red bg-brand-red/10 px-2 py-1">03 / INSTANT EXCHANGE</span>
-                        <svg class="h-5 w-5 text-brand-charcoal transform group-hover:translate-x-1 group-hover:text-brand-red transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="square" stroke-linejoin="miter" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                        </svg>
+                <a href="{{ route('trade-in.create') }}" class="group glass-panel p-8 border border-gray-200 hover:border-brand-red card-glow-hover relative overflow-hidden flex flex-col justify-between">
+                    <div class="absolute -right-2 -bottom-6 font-display text-[120px] leading-none text-transparent z-0 select-none transition-transform duration-500 group-hover:scale-110" style="-webkit-text-stroke: 3px #f3f4f6; opacity: 0.7;">03</div>
+                    <div class="relative z-10">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="font-mono text-xs font-bold uppercase tracking-widest text-brand-red bg-brand-red/10 px-2 py-1">03 / INSTANT EXCHANGE</span>
+                            <svg class="h-5 w-5 text-brand-charcoal transform group-hover:translate-x-1 group-hover:text-brand-red transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="square" stroke-linejoin="miter" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                            </svg>
+                        </div>
+                        <h3 class="font-display text-2xl uppercase tracking-tight text-brand-charcoal group-hover:text-brand-red transition-colors">
+                            Trade & Upgrade
+                        </h3>
+                        <p class="mt-2 font-sans text-sm text-brand-grey leading-relaxed">
+                            Bring your old device for instant credit valuation toward your next phone purchase.
+                        </p>
                     </div>
-                    <h3 class="font-display text-2xl uppercase tracking-tight text-brand-charcoal group-hover:text-brand-red transition-colors">
-                        Trade & Upgrade
-                    </h3>
-                    <p class="mt-2 font-sans text-sm text-brand-grey leading-relaxed">
-                        Bring your old device for instant credit valuation toward your next phone purchase.
-                    </p>
                 </a>
 
             </div>
@@ -196,8 +252,11 @@
     </div>
 
     <!-- Featured Products Section -->
-    <section x-data="{ shown: false }" x-intersect.once="shown = true" :class="shown ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'" class="py-16 bg-white transition-all duration-700 ease-out">
-        <div class="mx-auto max-w-[90rem] px-4 sm:px-6 lg:px-8">
+    <section x-data="{ shown: false }" x-intersect.once="shown = true" :class="shown ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'" class="py-16 bg-white transition-all duration-700 ease-out relative overflow-hidden">
+        <!-- Giant Watermark Typography -->
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 font-display text-[150px] lg:text-[250px] leading-none text-transparent z-0 select-none pointer-events-none" style="-webkit-text-stroke: 2px #f3f4f6; opacity: 0.6; white-space: nowrap;">INVENTORY</div>
+
+        <div class="mx-auto max-w-[90rem] px-4 sm:px-6 lg:px-8 relative z-10">
             
             <!-- Section Header -->
             <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 pb-4 border-b border-gray-200 gap-4">
@@ -245,14 +304,18 @@
 
                         <!-- Product Image Placeholder: Shine Overlay Contour -->
                         <div class="shine-container aspect-[4/3] flex items-center justify-center bg-brand-offwhite p-6 relative overflow-hidden mb-5 border border-gray-100">
-                            <x-product-icon :categorySlug="$condition->product->category->slug ?? ''" class="h-28 w-28 text-brand-charcoal/20 group-hover:text-brand-red/40 transition-colors duration-300 stroke-[1.5]" />
+                            @if($condition->product->image)
+                                <img src="{{ Storage::url($condition->product->image) }}" class="h-28 w-28 object-contain group-hover:scale-110 transition-transform duration-300" />
+                            @else
+                                <x-product-icon :categorySlug="$condition->product->category->slug ?? ''" class="h-28 w-28 text-brand-charcoal/20 group-hover:text-brand-red/40 transition-colors duration-300 stroke-[1.5]" />
+                            @endif
 
                             <span class="absolute bottom-2 left-2 font-mono text-[10px] uppercase tracking-wider text-brand-grey">
                                 {{ strtoupper($condition->product->brand) }}
                             </span>
 
-                            @if($condition->price < $condition->product->base_price)
-                                @php $savings = round((($condition->product->base_price - $condition->price) / $condition->product->base_price) * 100); @endphp
+                            @if($condition->original_price && $condition->original_price > $condition->price)
+                                @php $savings = round((($condition->original_price - $condition->price) / $condition->original_price) * 100); @endphp
                                 <span class="absolute top-2 right-2 bg-brand-red text-white font-mono text-[10px] font-bold px-1.5 py-0.5 shadow">
                                     SAVE {{ $savings }}%
                                 </span>
@@ -280,9 +343,9 @@
                                     <span class="font-mono font-bold text-brand-charcoal text-xl">
                                         Rs {{ number_format($condition->price) }}
                                     </span>
-                                    @if($condition->price < $condition->product->base_price)
+                                    @if($condition->original_price && $condition->original_price > $condition->price)
                                         <span class="font-mono text-xs text-brand-grey line-through">
-                                            Rs {{ number_format($condition->product->base_price) }}
+                                            Rs {{ number_format($condition->original_price) }}
                                         </span>
                                     @endif
                                 </div>

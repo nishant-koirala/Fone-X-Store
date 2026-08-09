@@ -1,3 +1,115 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer utilities {
+  /* Floating levitation animation */
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0px) rotate(0deg);
+    }
+    50% {
+      transform: translateY(-10px) rotate(1deg);
+    }
+  }
+
+  /* Ambient glowing pulse animation */
+  @keyframes glowPulse {
+    0%, 100% {
+      box-shadow: 0 0 15px rgba(200, 32, 45, 0.25), 0 0 30px rgba(200, 32, 45, 0.1);
+    }
+    50% {
+      box-shadow: 0 0 25px rgba(200, 32, 45, 0.45), 0 0 50px rgba(200, 32, 45, 0.25);
+    }
+  }
+
+  /* Shine sweep animation across cards on hover */
+  @keyframes shineSweep {
+    0% {
+      transform: translateX(-150%) skewX(-25deg);
+    }
+    100% {
+      transform: translateX(250%) skewX(-25deg);
+    }
+  }
+
+  .animate-float {
+    animation: float 4s ease-in-out infinite;
+  }
+
+  .animate-glow-pulse {
+    animation: glowPulse 3s infinite ease-in-out;
+  }
+
+  /* Glassmorphism Classes */
+  .glass-panel {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(229, 231, 235, 0.8);
+  }
+
+  .glass-panel-dark {
+    background: rgba(24, 24, 27, 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+  }
+
+  .glass-nav {
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  /* Radiant Red Gradient Text */
+  .gradient-text-red {
+    background: linear-gradient(135deg, #C8202D 0%, #E11D48 50%, #F43F5E 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .gradient-text-hero {
+    background: linear-gradient(135deg, #FFFFFF 30%, #F43F5E 70%, #C8202D 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  /* Shine hover overlay */
+  .shine-container {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .shine-container::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 60%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.35) 50%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    transform: translateX(-150%) skewX(-25deg);
+    transition: none;
+  }
+
+  .shine-container:hover::after {
+    animation: shineSweep 0.85s ease-out;
+  }
+
+  /* Hover Card Glow Elevation */
+  .card-glow-hover {
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .card-glow-hover:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 35px -10px rgba(200, 32, 45, 0.2), 0 10px 15px -5px rgba(0, 0, 0, 0.05);
+    border-color: rgba(200, 32, 45, 0.6);
+  }
+}

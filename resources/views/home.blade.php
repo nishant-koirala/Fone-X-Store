@@ -241,6 +241,8 @@
                                     OUT OF STOCK
                                 </span>
                             @endif
+                        </div>
+
                         <!-- Product Image Placeholder: Shine Overlay Contour -->
                         <div class="shine-container aspect-[4/3] flex items-center justify-center bg-brand-offwhite p-6 relative overflow-hidden mb-5 border border-gray-100">
                             <x-product-icon :categorySlug="$condition->product->category->slug ?? ''" class="h-28 w-28 text-brand-charcoal/20 group-hover:text-brand-red/40 transition-colors duration-300 stroke-[1.5]" />

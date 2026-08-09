@@ -36,8 +36,12 @@
                     <select id="filter-category" name="category" class="w-full font-sans text-xs border border-gray-300 bg-white text-brand-charcoal px-3 py-2.5 focus:border-brand-red focus:ring-2 focus:ring-brand-red/20 shadow-sm">
                         <option value="">All Categories</option>
                         @foreach($categories as $cat)
-                            <option value="{{ $cat->slug }}" {{ request('category') == $cat->slug ? 'selected' : '' }}>
-                                {{ $cat->name }}
+                            @php
+                                $slug = is_object($cat) ? $cat->slug : ($cat['slug'] ?? $cat);
+                                $name = is_object($cat) ? $cat->name : ($cat['name'] ?? $cat);
+                            @endphp
+                            <option value="{{ $slug }}" {{ request('category') == $slug ? 'selected' : '' }}>
+                                {{ $name }}
                             </option>
                         @endforeach
                     </select>

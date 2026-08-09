@@ -67,14 +67,8 @@ class ProductController extends Controller
 
         $conditions = $query->paginate(12)->withQueryString();
 
-        // Cached Categories & Brands List for Performance
-        $categories = Cache::remember('catalog_categories_list', 3600, function () {
-            return Category::orderBy('name')->get();
-        });
-
-        $brands = Cache::remember('catalog_brands_list', 3600, function () {
-            return Product::distinct()->orderBy('brand')->pluck('brand');
-        });
+        $categories = Category::orderBy('name')->get();
+        $brands = Product::distinct()->orderBy('brand')->pluck('brand');
 
         return view('products.index', compact('conditions', 'categories', 'brands'));
     }

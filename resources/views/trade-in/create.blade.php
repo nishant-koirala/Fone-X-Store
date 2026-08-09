@@ -6,7 +6,7 @@
 
     <!-- Trade-In Header Banner -->
     <div class="bg-brand-offwhite border-b border-gray-200 py-10">
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="mx-auto max-w-[90rem] px-4 sm:px-6 lg:px-8">
             <span class="font-mono text-xs font-bold uppercase tracking-widest text-brand-red">EXCHANGE & UPGRADE</span>
             <h1 class="font-display text-3xl sm:text-5xl uppercase tracking-tight text-brand-charcoal mt-1">
                 Trade-In Valuation Request

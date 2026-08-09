@@ -6,7 +6,7 @@
 
     <!-- Breadcrumb Header -->
     <div class="bg-brand-offwhite border-b border-gray-200 py-4">
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="mx-auto max-w-[90rem] px-4 sm:px-6 lg:px-8">
             <nav class="flex items-center space-x-2 font-mono text-xs text-brand-grey uppercase">
                 <a href="{{ route('home') }}" class="hover:text-brand-red transition-colors">Home</a>
                 <span>/</span>
@@ -18,7 +18,7 @@
     </div>
 
     <!-- Product Detail Stage Container -->
-    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
+    <div class="mx-auto max-w-[90rem] px-4 sm:px-6 lg:px-8 py-12">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start" 
              x-data="{ 
                  conditions: {{ json_encode($product->conditions) }},
@@ -142,7 +142,7 @@
                             @csrf
                             <input type="hidden" name="product_condition_id" :value="activeCondition.id">
                             <input type="hidden" name="quantity" value="1">
-                            <button type="submit" class="w-full bg-brand-red hover:bg-brand-red-dark text-white font-mono text-xs uppercase font-bold tracking-wider py-4 shadow-lg shadow-brand-red/25 transition-all duration-200 flex items-center justify-center space-x-2">
+                            <button type="submit" class="w-full bg-brand-red text-white font-mono text-xs uppercase font-bold tracking-wider py-4 shadow-lg shadow-brand-red/20 hover:bg-brand-red-dark transition-all active:scale-95 flex items-center justify-center space-x-2">
                                 <svg class="h-4 w-4 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="square" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                                 </svg>
@@ -194,7 +194,7 @@
                  x-transition:leave-start="translate-y-0"
                  x-transition:leave-end="translate-y-full"
                  class="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-brand-red/20 p-4 shadow-[0_-10px_40px_-10px_rgba(0,0,0,0.2)] md:hidden">
-                <div class="flex items-center justify-between gap-4 max-w-7xl mx-auto">
+                <div class="flex items-center justify-between gap-4 max-w-[90rem] mx-auto">
                     <div class="flex flex-col">
                         <span class="font-mono text-[10px] uppercase font-bold text-brand-charcoal line-clamp-1">{{ $product->name }}</span>
                         <div class="flex items-baseline space-x-1.5">

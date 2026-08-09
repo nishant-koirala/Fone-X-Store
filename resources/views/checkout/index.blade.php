@@ -6,7 +6,7 @@
 
     <!-- Checkout Page Header -->
     <div class="bg-brand-offwhite border-b border-gray-200 py-8">
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="mx-auto max-w-[90rem] px-4 sm:px-6 lg:px-8">
             <span class="font-mono text-xs font-bold uppercase tracking-widest text-brand-red">FINAL STEP</span>
             <h1 class="font-display text-3xl sm:text-4xl uppercase tracking-tight text-brand-charcoal mt-1">
                 Checkout & Shipping
@@ -15,7 +15,7 @@
     </div>
 
     <!-- Main Checkout Container -->
-    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
+    <div class="mx-auto max-w-[90rem] px-4 sm:px-6 lg:px-8 py-12">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
             
             <!-- Left Column: Customer & Delivery Details Form -->

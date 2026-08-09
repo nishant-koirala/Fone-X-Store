@@ -10,7 +10,7 @@
         <div class="absolute -top-32 left-1/4 h-96 w-96 rounded-full bg-brand-red/30 blur-[120px] pointer-events-none"></div>
         <div class="absolute top-1/2 -right-20 h-96 w-96 rounded-full bg-rose-600/20 blur-[140px] pointer-events-none"></div>
 
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
+        <div class="mx-auto max-w-[90rem] px-4 sm:px-6 lg:px-8 relative z-10">
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
                 
                 <!-- Left Hero Copy & Action Buttons -->
@@ -34,13 +34,13 @@
 
                     <!-- CTA Actions -->
                     <div class="pt-4 flex flex-col sm:flex-row items-stretch sm:items-center space-y-3 sm:space-y-0 sm:space-x-4">
-                        <a href="{{ route('products.index') }}" class="group relative inline-flex items-center justify-center space-x-3 bg-brand-red hover:bg-brand-red-dark text-white font-mono text-xs uppercase font-bold tracking-wider px-8 py-4 shadow-lg shadow-brand-red/30 transition-all duration-200">
+                        <a href="{{ route('products.index') }}" class="group relative inline-flex items-center justify-center space-x-3 bg-brand-red hover:bg-brand-red-dark text-white font-mono text-xs uppercase font-bold tracking-wider px-8 py-4 shadow-lg shadow-brand-red/30 transition-all active:scale-95 duration-200">
                             <span>Explore Phone Inventory</span>
                             <svg class="h-4 w-4 stroke-[2.5] transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="square" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                             </svg>
                         </a>
-                        <a href="{{ route('trade-in.create') }}" class="inline-flex items-center justify-center space-x-2 border border-white/25 hover:border-white bg-white/5 hover:bg-white/10 text-white font-mono text-xs uppercase font-bold tracking-wider px-6 py-4 backdrop-blur-md transition-all">
+                        <a href="{{ route('trade-in.create') }}" class="inline-flex items-center justify-center space-x-2 border border-white/25 hover:border-white bg-white/5 hover:bg-white/10 text-white font-mono text-xs uppercase font-bold tracking-wider px-6 py-4 backdrop-blur-md transition-all active:scale-95">
                             <span>Trade-In Old Phone</span>
                         </a>
                     </div>
@@ -115,8 +115,8 @@
     </section>
 
     <!-- Three-Path Selector (01 / 02 / 03) -->
-    <section class="bg-white py-12 relative z-20">
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <section x-data="{ shown: false }" x-intersect.once="shown = true" :class="shown ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'" class="bg-white py-12 relative z-20 transition-all duration-700 ease-out">
+        <div class="mx-auto max-w-[90rem] px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 
                 <!-- Path 01: Direct Deals (New) -->
@@ -172,8 +172,8 @@
     </section>
 
     <!-- Trust Bar Strip -->
-    <div class="bg-brand-offwhite border-y border-gray-200 py-4">
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div x-data="{ shown: false }" x-intersect.once="shown = true" :class="shown ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'" class="bg-brand-offwhite border-y border-gray-200 py-4 transition-all duration-500 ease-out delay-200">
+        <div class="mx-auto max-w-[90rem] px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center font-mono text-xs font-bold text-brand-charcoal uppercase tracking-wider">
                 <div class="flex items-center justify-center space-x-2">
                     <span class="text-brand-red font-bold text-base">✓</span>
@@ -196,8 +196,8 @@
     </div>
 
     <!-- Featured Products Section -->
-    <section class="py-16 bg-white">
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <section x-data="{ shown: false }" x-intersect.once="shown = true" :class="shown ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'" class="py-16 bg-white transition-all duration-700 ease-out">
+        <div class="mx-auto max-w-[90rem] px-4 sm:px-6 lg:px-8">
             
             <!-- Section Header -->
             <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 pb-4 border-b border-gray-200 gap-4">
@@ -218,7 +218,7 @@
             <!-- Product Grid -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                 @forelse($featuredConditions as $condition)
-                    <div class="group card-glow-hover relative flex flex-col justify-between border border-gray-200 bg-white p-5">
+                    <a href="{{ route('products.show', $condition->product->slug) }}" class="group block card-glow-hover relative flex flex-col justify-between border border-gray-200 bg-white p-5 hover:-translate-y-1 hover:shadow-2xl hover:border-brand-red/50 transition-all duration-300">
                         
                         <!-- Top Header Tags -->
                         <div class="flex items-center justify-between mb-4">
@@ -264,9 +264,9 @@
                             <div class="font-mono text-xs text-brand-grey uppercase tracking-wider">
                                 {{ $condition->product->category->name ?? 'SMARTPHONE' }}
                             </div>
-                            <a href="{{ route('products.show', $condition->product->slug) }}" class="font-sans font-bold text-brand-charcoal text-lg group-hover:text-brand-red transition-colors leading-snug block">
+                            <h3 class="font-sans font-bold text-brand-charcoal text-lg group-hover:text-brand-red transition-colors leading-snug block">
                                 {{ $condition->product->name }}
-                            </a>
+                            </h3>
                             <p class="font-mono text-xs text-brand-grey">
                                 {{ $condition->product->brand }} • {{ strtoupper($condition->grade) }} CONDITION
                             </p>
@@ -288,12 +288,9 @@
                                 </div>
                             </div>
 
-                            <a href="{{ route('products.show', $condition->product->slug) }}" class="font-mono text-xs uppercase font-bold text-white bg-brand-charcoal group-hover:bg-brand-red px-3.5 py-2 transition-colors duration-150 shadow-sm">
-                                View
-                            </a>
                         </div>
 
-                    </div>
+                    </a>
                 @empty
                     <div class="col-span-full border border-dashed border-gray-300 p-12 text-center bg-brand-offwhite">
                         <p class="font-mono text-sm text-brand-grey uppercase">No featured product conditions found in database.</p>
@@ -307,7 +304,7 @@
     <section class="py-16 bg-brand-charcoal text-white relative overflow-hidden border-t-2 border-brand-red">
         <div class="absolute -right-20 top-0 h-96 w-96 bg-brand-red/30 blur-[130px] pointer-events-none"></div>
 
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
+        <div class="mx-auto max-w-[90rem] px-4 sm:px-6 lg:px-8 relative z-10">
             <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
                 
                 <div class="max-w-2xl space-y-4">

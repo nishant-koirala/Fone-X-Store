@@ -19,7 +19,7 @@
 
     <!-- Top Announcement Ticker Bar -->
     <div class="bg-brand-charcoal text-white font-mono text-[11px] font-semibold py-2 px-4 border-b border-white/10 overflow-hidden">
-        <div class="mx-auto max-w-7xl flex items-center justify-between">
+        <div class="mx-auto max-w-[90rem] flex items-center justify-between">
             <div class="flex items-center space-x-3 text-xs">
                 <span class="inline-flex items-center space-x-1.5 bg-brand-red text-white px-2 py-0.5 font-bold uppercase tracking-wider text-[10px]">
                     <span class="h-1.5 w-1.5 rounded-full bg-white animate-pulse"></span>
@@ -40,7 +40,7 @@
 
     <!-- Glassmorphism Sticky Navigation Header -->
     <header x-data="{ mobileMenuOpen: false }" class="glass-nav sticky top-0 z-50 border-b border-gray-200/80 shadow-sm transition-all">
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="mx-auto max-w-[90rem] px-4 sm:px-6 lg:px-8">
             <div class="flex h-20 items-center justify-between">
                 
                 <!-- Logo -->
@@ -216,7 +216,7 @@
 
     <!-- Footer -->
     <footer class="border-t border-gray-200 bg-brand-charcoal text-white pt-16 pb-12">
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="mx-auto max-w-[90rem] px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 gap-10 md:grid-cols-4">
                 
                 <!-- Column 1: Store Info & Mission -->

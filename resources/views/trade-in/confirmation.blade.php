@@ -6,7 +6,7 @@
 
     <!-- Confirmation Banner -->
     <div class="bg-brand-red text-white py-12">
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center space-y-3">
+        <div class="mx-auto max-w-[90rem] px-4 sm:px-6 lg:px-8 text-center space-y-3">
             <div class="inline-flex h-16 w-16 items-center justify-center rounded-full bg-white/20 text-white mb-2">
                 <svg class="h-10 w-10 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="square" d="M5 13l4 4L19 7" />

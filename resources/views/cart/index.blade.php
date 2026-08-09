@@ -6,7 +6,7 @@
 
     <!-- Cart Page Header -->
     <div class="bg-brand-offwhite border-b border-gray-200 py-8">
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="mx-auto max-w-[90rem] px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
                 <div>
                     <span class="font-mono text-xs font-bold uppercase tracking-widest text-brand-red">CHECKOUT FLOW</span>
@@ -22,7 +22,7 @@
     </div>
 
     <!-- Main Cart Container -->
-    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
+    <div class="mx-auto max-w-[90rem] px-4 sm:px-6 lg:px-8 py-12">
         @if(!empty($cartItems))
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
                 

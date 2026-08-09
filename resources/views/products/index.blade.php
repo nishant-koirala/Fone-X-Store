@@ -8,7 +8,7 @@
     <div x-data="catalogFilter()" class="bg-brand-charcoal text-white border-b border-white/10 py-12 relative overflow-hidden">
         <div class="absolute -right-20 -top-20 h-80 w-80 bg-brand-red/25 blur-[100px] pointer-events-none"></div>
 
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
+        <div class="mx-auto max-w-[90rem] px-4 sm:px-6 lg:px-8 relative z-10">
             <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
                 <div>
                     <span class="font-mono text-xs font-bold uppercase tracking-widest text-brand-red">STORE CATALOG</span>
@@ -24,7 +24,7 @@
     </div>
 
     <!-- Filter & Catalog Main Container -->
-    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
+    <div class="mx-auto max-w-[90rem] px-4 sm:px-6 lg:px-8 py-10">
 
         <!-- Mobile Filter Toggle Button -->
         <div class="lg:hidden mb-6">
@@ -119,11 +119,11 @@
 
                 <!-- Action Buttons -->
                 <div class="flex items-center space-x-2">
-                    <button type="submit" class="w-full font-mono text-xs uppercase font-bold text-white bg-brand-red hover:bg-brand-red-dark py-2.5 transition-colors shadow-sm">
+                    <button type="submit" class="w-full font-mono text-xs uppercase font-bold text-white bg-brand-red hover:bg-brand-red-dark py-2.5 transition-all active:scale-95 shadow-sm">
                         Filter Results
                     </button>
                     @if(request()->anyFilled(['category', 'brand', 'grade', 'sort', 'min_price', 'max_price']))
-                        <a href="{{ route('products.index') }}" @click.prevent="resetFilters" class="font-mono text-xs uppercase font-bold text-brand-charcoal border border-gray-300 bg-white hover:border-brand-red px-3 py-2.5 transition-colors whitespace-nowrap shadow-sm text-center">
+                        <a href="{{ route('products.index') }}" @click.prevent="resetFilters" class="font-mono text-xs uppercase font-bold text-brand-charcoal border border-gray-300 bg-white hover:border-brand-red px-3 py-2.5 transition-all active:scale-95 whitespace-nowrap shadow-sm text-center">
                             Reset
                         </a>
                     @endif
@@ -212,7 +212,7 @@
             <!-- Product Grid -->
             <div id="product-grid" :class="{ 'opacity-0': isLoading }" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 transition-opacity duration-200">
             @forelse($conditions as $condition)
-                <div class="group card-glow-hover relative flex flex-col justify-between border border-gray-200 bg-white p-5">
+                <a href="{{ route('products.show', $condition->product->slug) }}" class="group block card-glow-hover relative flex flex-col justify-between border border-gray-200 bg-white p-5 hover:-translate-y-1 hover:shadow-2xl hover:border-brand-red/50 transition-all duration-300">
                     
                     <!-- Condition & Stock Header -->
                     <div class="flex items-center justify-between mb-4">
@@ -258,9 +258,9 @@
                         <div class="font-mono text-xs text-brand-grey uppercase tracking-wider">
                             {{ $condition->product->category->name ?? 'SMARTPHONE' }}
                         </div>
-                        <a href="{{ route('products.show', $condition->product->slug) }}" class="font-sans font-bold text-brand-charcoal text-lg group-hover:text-brand-red transition-colors leading-snug block">
+                        <h3 class="font-sans font-bold text-brand-charcoal text-lg group-hover:text-brand-red transition-colors leading-snug block">
                             {{ $condition->product->name }}
-                        </a>
+                        </h3>
                         <p class="font-mono text-xs text-brand-grey">
                             {{ $condition->product->brand }} • {{ strtoupper($condition->grade) }} CONDITION
                         </p>
@@ -281,13 +281,9 @@
                                 @endif
                             </div>
                         </div>
-
-                        <a href="{{ route('products.show', $condition->product->slug) }}" class="font-mono text-xs uppercase font-bold text-white bg-brand-charcoal group-hover:bg-brand-red px-3.5 py-2 transition-colors duration-150 shadow-sm">
-                            View
-                        </a>
                     </div>
 
-                </div>
+                </a>
             @empty
                 <!-- Empty State Message -->
                 <div class="col-span-full border border-dashed border-gray-300 p-16 text-center bg-brand-offwhite">

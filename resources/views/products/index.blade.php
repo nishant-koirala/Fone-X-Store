@@ -220,8 +220,11 @@
 
             <!-- Product Grid -->
             <div id="product-grid" :class="{ 'opacity-0': isLoading }" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 transition-opacity duration-200">
-            @forelse($conditions as $condition)
-                <a href="{{ route('products.show', $condition->product->slug) }}" class="group block card-glow-hover relative flex flex-col justify-between border border-gray-200 bg-white p-5 hover:-translate-y-1 hover:shadow-2xl hover:border-brand-red/50 transition-all duration-300">
+            @forelse($conditions as $index => $condition)
+                <a href="{{ route('products.show', $condition->product->slug) }}" 
+                   data-aos="fade-up" 
+                   data-aos-delay="{{ $index * 50 }}"
+                   class="group block card-glow-hover relative flex flex-col justify-between border border-gray-200 bg-white p-5 hover:-translate-y-1 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgba(220,38,38,0.1)] hover:border-brand-red/50 transition-all duration-300">
                     
                     <!-- Condition & Stock Header -->
                     <div class="flex items-center justify-between mb-4">
@@ -249,7 +252,12 @@
                     <!-- Shine Container Placeholder -->
                     <div class="shine-container aspect-[4/3] flex items-center justify-center bg-brand-offwhite p-6 relative overflow-hidden mb-5 border border-gray-100">
                         @if($condition->product->image)
-                            <img src="{{ Storage::url($condition->product->image) }}" class="h-28 w-28 object-contain group-hover:scale-110 transition-transform duration-300" />
+                            <div x-data="{ loaded: false }" class="w-full h-full flex items-center justify-center">
+                                <img src="{{ Storage::url($condition->product->image) }}" 
+                                     @load="loaded = true"
+                                     :class="loaded ? 'opacity-100 blur-0 scale-100' : 'opacity-0 blur-sm scale-95'"
+                                     class="h-28 w-28 object-contain group-hover:scale-110 transition-all duration-700 ease-out" />
+                            </div>
                         @else
                             <x-product-icon :categorySlug="$condition->product->category->slug ?? ''" class="h-28 w-28 text-brand-charcoal/20 group-hover:text-brand-red/40 transition-colors duration-300 stroke-[1.5]" />
                         @endif

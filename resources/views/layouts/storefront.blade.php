@@ -6,11 +6,34 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>@yield('title', 'FoneX Store — Direct Imports & Certified Pre-Owned Phones')</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="@yield('meta_description', 'Fone-X-Store is Nepal\'s premier destination for high-quality, certified pre-owned smartphones and premium direct import accessories.')">
+    <meta name="keywords" content="@yield('meta_keywords', 'phones, smartphones, pre-owned, nepal, electronics, accessories, iphone, samsung')">
+    <meta name="author" content="Fone-X-Store">
+    <link rel="canonical" href="{{ url()->current() }}">
+
+    <!-- Open Graph (Facebook/LinkedIn) -->
+    <meta property="og:title" content="@yield('title', 'FoneX Store — Direct Imports & Certified Pre-Owned Phones')">
+    <meta property="og:description" content="@yield('meta_description', 'Nepal\'s premier destination for high-quality, certified pre-owned smartphones.')">
+    <meta property="og:image" content="@yield('og_image', asset('images/default-og.jpg'))">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:type" content="@yield('og_type', 'website')">
+    <meta property="og:site_name" content="Fone-X-Store">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="@yield('title', 'FoneX Store')">
+    <meta name="twitter:description" content="@yield('meta_description', 'Nepal\'s premier destination for high-quality, certified pre-owned smartphones.')">
+    <meta name="twitter:image" content="@yield('og_image', asset('images/default-og.jpg'))">
 
     <!-- Google Fonts: Archivo Black, Sora, IBM Plex Mono -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=IBM+Plex+Mono:wght@400;500;600;700&family=Sora:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- AOS Animation Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
     <!-- Compiled Assets via Vite -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -39,7 +62,7 @@
     </div>
 
     <!-- Glassmorphism Sticky Navigation Header -->
-    <header x-data="{ mobileMenuOpen: false }" class="glass-nav sticky top-0 z-50 border-b border-gray-200/80 shadow-sm transition-all">
+    <header x-data="{ mobileMenuOpen: false }" class="sticky top-0 z-50 bg-white/70 backdrop-blur-xl border-b border-gray-100/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all">
         <div class="mx-auto max-w-[90rem] px-4 sm:px-6 lg:px-8">
             <div class="flex h-20 items-center justify-between">
                 
@@ -103,6 +126,21 @@
                             Sign In
                         </a>
                     @endauth
+
+                    <!-- Wishlist Button -->
+                    @php $wishlistCount = count(session('wishlist', [])); @endphp
+                    <a href="{{ route('wishlist.index') }}" class="group relative hidden sm:inline-flex items-center justify-center p-2.5 text-brand-charcoal hover:text-brand-red transition-colors border border-gray-200 hover:border-brand-red bg-white shadow-sm" aria-label="Wishlist">
+                        <svg class="h-6 w-6 stroke-[2]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                        </svg>
+                        
+                        <!-- Badge -->
+                        @if($wishlistCount > 0)
+                            <span class="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center bg-brand-charcoal font-mono text-[11px] font-bold text-white shadow-md">
+                                {{ $wishlistCount }}
+                            </span>
+                        @endif
+                    </a>
 
                     <!-- Cart Button with Live Pulse Ring -->
                     @php $cartCount = array_sum(array_column(session('cart', []), 'quantity')); @endphp
@@ -173,6 +211,9 @@
                 </a>
                 <a href="{{ route('products.index') }}" class="block px-3 py-2.5 font-sans text-base font-bold text-brand-charcoal hover:bg-brand-offwhite hover:text-brand-red">
                     All Inventory
+                </a>
+                <a href="{{ route('blog.index') }}" class="block px-3 py-2.5 font-sans text-base font-bold text-brand-charcoal hover:bg-brand-offwhite hover:text-brand-red">
+                    Blog & News
                 </a>
                 <a href="{{ route('trade-in.create') }}" class="block px-3 py-2.5 font-sans text-base font-bold text-brand-red bg-brand-red/10 border border-brand-red/20 mt-2">
                     🔄 Trade-In & Upgrade Old Phone
@@ -280,6 +321,63 @@
             </div>
         </div>
     </footer>
+    <!-- Floating Speed Dial Widget -->
+    <div x-data="{ chatOpen: false }" class="fixed bottom-6 right-6 z-50 flex flex-col items-end">
+        
+        <!-- Speed Dial Items -->
+        <div class="flex flex-col items-end space-y-3 mb-4 origin-bottom"
+             x-show="chatOpen" 
+             @click.away="chatOpen = false"
+             x-transition:enter="transition-all cubic-bezier(0.4, 0, 0.2, 1) duration-300"
+             x-transition:enter-start="opacity-0 translate-y-8 scale-50"
+             x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+             x-transition:leave="transition-all ease-in duration-200"
+             x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+             x-transition:leave-end="opacity-0 translate-y-8 scale-50"
+             style="display: none;">
+            
+            <!-- Email -->
+            <div class="flex items-center space-x-4 group cursor-pointer">
+                <span class="bg-white text-brand-charcoal text-[13px] font-sans font-bold px-4 py-2 rounded-xl shadow-lg border border-gray-100 group-hover:text-brand-red transition-colors">Email Us</span>
+                <a href="mailto:support@fonexstore.com" class="flex items-center justify-center h-12 w-12 rounded-full bg-white text-brand-charcoal shadow-xl hover:shadow-2xl transition-all duration-300 group-hover:scale-110 border border-gray-100 group-hover:ring-4 group-hover:ring-gray-200/50">
+                    <svg class="w-5 h-5 group-hover:text-brand-red transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                </a>
+            </div>
 
+            <!-- WhatsApp -->
+            <div class="flex items-center space-x-4 group cursor-pointer">
+                <span class="bg-white text-brand-charcoal text-[13px] font-sans font-bold px-4 py-2 rounded-xl shadow-lg border border-gray-100 group-hover:text-[#25D366] transition-colors">WhatsApp Us</span>
+                <a href="https://wa.me/9779741661901" target="_blank" class="flex items-center justify-center h-12 w-12 rounded-full bg-[#25D366] text-white shadow-xl hover:shadow-2xl transition-all duration-300 group-hover:scale-110 group-hover:bg-[#20b858] group-hover:ring-4 group-hover:ring-[#25D366]/30">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M11.944 0A12 12 0 000 12a12 12 0 001.602 5.968L0 24l6.19-1.626A12 12 0 1011.944 0zm6.275 16.924c-.266.753-1.536 1.455-2.128 1.533-.55.074-1.258.14-3.612-.835-3.364-1.393-5.543-4.823-5.711-5.047-.168-.224-1.365-1.821-1.365-3.475 0-1.654.858-2.464 1.163-2.775.305-.31.666-.388.888-.388.222 0 .444.004.64.013.204.01.478-.077.747.57.283.678.97 2.37.1 2.37.1 1.056.241.134.346.368.591.233.245.474.521.724.887.678 1.576.993 1.93.993.354 0 1.25-.6 1.417-.806.168-.206.168-.382.118-.419-.05-.037-.184-.06-.388-.163-.205-.102-1.21-.598-1.399-.666-.188-.068-.326-.102-.464.102-.138.204-.531.666-.653.804-.122.138-.244.153-.448.051-.205-.102-.865-.319-1.648-1.018-.609-.543-1.02-1.214-1.142-1.419-.122-.204-.013-.315.089-.417.091-.091.205-.238.307-.357.102-.119.136-.204.204-.34.068-.136.034-.255-.017-.357-.051-.102-.464-1.121-.635-1.535-.166-.402-.335-.347-.464-.354-.122-.005-.262-.007-.403-.007-.14 0-.368.053-.56.262-.191.209-.73.713-.73 1.737s.748 2.015.852 2.155c.104.14 1.468 2.241 3.555 3.14.496.213.882.341 1.183.436.496.158.948.136 1.306.082.404-.06 1.21-.494 1.381-.971.17-.478.17-.889.119-.971-.051-.082-.187-.132-.392-.234z"/></svg>
+                </a>
+            </div>
+        </div>
+
+        <!-- Floating Button -->
+        <button @click="chatOpen = !chatOpen" 
+                class="flex h-14 w-14 items-center justify-center rounded-full bg-brand-charcoal text-white shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:shadow-[0_8px_30px_rgba(220,38,38,0.3)] hover:bg-brand-red transition-all duration-300 hover:scale-110 hover:-translate-y-1 focus:outline-none z-50">
+            <!-- Icon switches based on state -->
+            <svg x-show="!chatOpen" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="square" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+            </svg>
+            <svg x-show="chatOpen" class="h-6 w-6" style="display: none;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="square" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+    </div>
+
+    <!-- Initialize AOS -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            AOS.init({
+                duration: 800,
+                once: true,
+                offset: 50,
+            });
+        });
+    </script>
 </body>
 </html>

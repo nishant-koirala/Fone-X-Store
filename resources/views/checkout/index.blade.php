@@ -19,98 +19,156 @@
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
             
             <!-- Left Column: Customer & Delivery Details Form -->
-            <div class="lg:col-span-7 border border-gray-200 bg-white p-6 sm:p-8 space-y-6">
+            <div class="lg:col-span-7 border border-gray-200 bg-white p-6 sm:p-8 space-y-6" x-data="{ step: 1 }" data-aos="fade-right">
                 
-                <div>
-                    <h2 class="font-display text-2xl uppercase tracking-tight text-brand-charcoal">
-                        Delivery Information
-                    </h2>
-                    <p class="font-mono text-xs text-brand-grey mt-1">
-                        Please provide your contact details for phone verification and courier delivery.
-                    </p>
+                <!-- Progress Indicator -->
+                <div class="flex items-center justify-between mb-8 relative">
+                    <div class="absolute left-0 top-1/2 -translate-y-1/2 w-full h-0.5 bg-gray-100 z-0"></div>
+                    <div class="absolute left-0 top-1/2 -translate-y-1/2 h-0.5 bg-brand-charcoal z-0 transition-all duration-500" :style="`width: ${((step - 1) / 2) * 100}%`"></div>
+                    
+                    <button type="button" @click="step = 1" class="relative z-10 flex flex-col items-center gap-2">
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center font-mono text-xs font-bold transition-colors border-2" :class="step >= 1 ? 'bg-brand-charcoal border-brand-charcoal text-white' : 'bg-white border-gray-200 text-brand-grey'">1</div>
+                        <span class="font-mono text-[10px] uppercase tracking-wider hidden sm:block" :class="step >= 1 ? 'text-brand-charcoal font-bold' : 'text-brand-grey'">Details</span>
+                    </button>
+                    <button type="button" @click="step = 2" class="relative z-10 flex flex-col items-center gap-2">
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center font-mono text-xs font-bold transition-colors border-2" :class="step >= 2 ? 'bg-brand-charcoal border-brand-charcoal text-white' : 'bg-white border-gray-200 text-brand-grey'">2</div>
+                        <span class="font-mono text-[10px] uppercase tracking-wider hidden sm:block" :class="step >= 2 ? 'text-brand-charcoal font-bold' : 'text-brand-grey'">Shipping</span>
+                    </button>
+                    <button type="button" @click="step = 3" class="relative z-10 flex flex-col items-center gap-2">
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center font-mono text-xs font-bold transition-colors border-2" :class="step >= 3 ? 'bg-brand-charcoal border-brand-charcoal text-white' : 'bg-white border-gray-200 text-brand-grey'">3</div>
+                        <span class="font-mono text-[10px] uppercase tracking-wider hidden sm:block" :class="step >= 3 ? 'text-brand-charcoal font-bold' : 'text-brand-grey'">Payment</span>
+                    </button>
                 </div>
 
                 <form method="POST" action="{{ route('checkout.store') }}" class="space-y-6">
                     @csrf
 
-                    <!-- Full Name -->
-                    <div>
-                        <label for="name" class="font-mono text-xs font-bold uppercase tracking-wider text-brand-charcoal block mb-1.5">
-                            Full Name <span class="text-brand-red">*</span>
-                        </label>
-                        <input type="text" id="name" name="name" value="{{ old('name') }}" required 
-                               class="w-full font-sans text-sm border border-gray-300 bg-white text-brand-charcoal p-3 focus:border-brand-red focus:ring-0 @error('name') border-brand-red @enderror"
-                               placeholder="e.g. Ram Bahadur Shrestha">
-                        @error('name')
-                            <p class="font-mono text-xs text-brand-red mt-1">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <!-- Phone Number (Required in Nepal) -->
-                    <div>
-                        <label for="phone" class="font-mono text-xs font-bold uppercase tracking-wider text-brand-charcoal block mb-1.5">
-                            Primary Phone Number (Required) <span class="text-brand-red">*</span>
-                        </label>
-                        <input type="tel" id="phone" name="phone" value="{{ old('phone') }}" required 
-                               class="w-full font-sans text-sm border border-gray-300 bg-white text-brand-charcoal p-3 focus:border-brand-red focus:ring-0 @error('phone') border-brand-red @enderror"
-                               placeholder="e.g. 9841234567">
-                        <span class="font-mono text-[11px] text-brand-grey mt-1 block">
-                            Our team will call this phone number to confirm your order before dispatch.
-                        </span>
-                        @error('phone')
-                            <p class="font-mono text-xs text-brand-red mt-1">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <!-- Email Address (Optional) -->
-                    <div>
-                        <label for="email" class="font-mono text-xs font-bold uppercase tracking-wider text-brand-charcoal block mb-1.5">
-                            Email Address (Optional)
-                        </label>
-                        <input type="email" id="email" name="email" value="{{ old('email') }}" 
-                               class="w-full font-sans text-sm border border-gray-300 bg-white text-brand-charcoal p-3 focus:border-brand-red focus:ring-0 @error('email') border-brand-red @enderror"
-                               placeholder="e.g. ram@example.com">
-                        @error('email')
-                            <p class="font-mono text-xs text-brand-red mt-1">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <!-- Full Delivery Address -->
-                    <div>
-                        <label for="address" class="font-mono text-xs font-bold uppercase tracking-wider text-brand-charcoal block mb-1.5">
-                            Full Delivery Address <span class="text-brand-red">*</span>
-                        </label>
-                        <textarea id="address" name="address" rows="3" required 
-                                  class="w-full font-sans text-sm border border-gray-300 bg-white text-brand-charcoal p-3 focus:border-brand-red focus:ring-0 @error('address') border-brand-red @enderror"
-                                  placeholder="e.g. House No. 42, New Road, Ward 22, Kathmandu">{{ old('address') }}</textarea>
-                        @error('address')
-                            <p class="font-mono text-xs text-brand-red mt-1">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <!-- Payment Method Option -->
-                    <div class="border-t border-gray-200 pt-6 space-y-3">
-                        <label class="font-mono text-xs font-bold uppercase tracking-wider text-brand-charcoal block">Payment Method</label>
-                        <div class="border-2 border-brand-red bg-brand-offwhite p-4 flex items-center space-x-3">
-                            <input type="radio" checked readonly class="text-brand-red focus:ring-brand-red">
+                    <!-- STEP 1: Details -->
+                    <div x-show="step === 1" x-transition:enter="transition ease-out duration-300 delay-100" x-transition:enter-start="opacity-0 translate-x-4" x-transition:enter-end="opacity-100 translate-x-0" style="display: none;">
+                        <h2 class="font-display text-2xl uppercase tracking-tight text-brand-charcoal mb-4">
+                            Contact Details
+                        </h2>
+                        
+                        <div class="space-y-5">
                             <div>
-                                <span class="font-mono text-xs font-bold uppercase text-brand-charcoal block">Cash on Delivery / Pay on Pickup</span>
-                                <span class="font-sans text-xs text-brand-grey">Pay in cash or via mobile QR code upon delivery.</span>
+                                <label for="name" class="font-mono text-xs font-bold uppercase tracking-wider text-brand-charcoal block mb-1.5">
+                                    Full Name <span class="text-brand-red">*</span>
+                                </label>
+                                <input type="text" id="name" name="name" value="{{ old('name') }}" required 
+                                       class="w-full font-sans text-sm border border-gray-300 bg-white text-brand-charcoal p-3 focus:border-brand-charcoal focus:ring-1 focus:ring-brand-charcoal outline-none shadow-sm transition-all @error('name') border-brand-red @enderror"
+                                       placeholder="e.g. Ram Bahadur Shrestha">
+                                @error('name')
+                                    <p class="font-mono text-xs text-brand-red mt-1">{{ $message }}</p>
+                                @enderror
                             </div>
+
+                            <div>
+                                <label for="phone" class="font-mono text-xs font-bold uppercase tracking-wider text-brand-charcoal block mb-1.5">
+                                    Primary Phone Number <span class="text-brand-red">*</span>
+                                </label>
+                                <input type="tel" id="phone" name="phone" value="{{ old('phone') }}" required 
+                                       class="w-full font-sans text-sm border border-gray-300 bg-white text-brand-charcoal p-3 focus:border-brand-charcoal focus:ring-1 focus:ring-brand-charcoal outline-none shadow-sm transition-all @error('phone') border-brand-red @enderror"
+                                       placeholder="e.g. 9841234567">
+                                @error('phone')
+                                    <p class="font-mono text-xs text-brand-red mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <div>
+                                <label for="email" class="font-mono text-xs font-bold uppercase tracking-wider text-brand-charcoal block mb-1.5">
+                                    Email Address (Optional)
+                                </label>
+                                <input type="email" id="email" name="email" value="{{ old('email') }}" 
+                                       class="w-full font-sans text-sm border border-gray-300 bg-white text-brand-charcoal p-3 focus:border-brand-charcoal focus:ring-1 focus:ring-brand-charcoal outline-none shadow-sm transition-all @error('email') border-brand-red @enderror"
+                                       placeholder="e.g. ram@example.com">
+                            </div>
+
+                            <button type="button" @click="step = 2" class="w-full bg-brand-charcoal hover:bg-black text-white font-mono text-xs uppercase font-bold tracking-wider py-4 transition-colors flex items-center justify-center space-x-2 mt-8">
+                                <span>Continue to Shipping</span>
+                                <span>&rarr;</span>
+                            </button>
                         </div>
                     </div>
 
-                    <!-- Submit Action Button -->
-                    <div class="pt-4">
-                        <button type="submit" class="w-full bg-brand-red hover:bg-brand-red-dark text-white font-mono text-xs uppercase font-bold tracking-wider py-4 transition-colors flex items-center justify-center space-x-2">
-                            <span>Place Order & Confirm Delivery</span>
-                            <svg class="h-4 w-4 stroke-[2]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="square" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                            </svg>
-                        </button>
+                    <!-- STEP 2: Shipping -->
+                    <div x-show="step === 2" x-transition:enter="transition ease-out duration-300 delay-100" x-transition:enter-start="opacity-0 translate-x-4" x-transition:enter-end="opacity-100 translate-x-0" style="display: none;">
+                        <h2 class="font-display text-2xl uppercase tracking-tight text-brand-charcoal mb-4">
+                            Delivery Address
+                        </h2>
+                        
+                        <div>
+                            <label for="address" class="font-mono text-xs font-bold uppercase tracking-wider text-brand-charcoal block mb-1.5">
+                                Full Address <span class="text-brand-red">*</span>
+                            </label>
+                            <textarea id="address" name="address" rows="4" required 
+                                      class="w-full font-sans text-sm border border-gray-300 bg-white text-brand-charcoal p-3 focus:border-brand-charcoal focus:ring-1 focus:ring-brand-charcoal outline-none shadow-sm transition-all @error('address') border-brand-red @enderror"
+                                      placeholder="e.g. House No. 42, New Road, Ward 22, Kathmandu">{{ old('address') }}</textarea>
+                            <span class="font-mono text-[11px] text-brand-grey mt-1 block">
+                                Include landmarks for faster delivery. Our courier will call to confirm before dispatch.
+                            </span>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4 mt-8">
+                            <button type="button" @click="step = 1" class="w-full bg-gray-100 hover:bg-gray-200 text-brand-charcoal font-mono text-xs uppercase font-bold tracking-wider py-4 transition-colors">
+                                Back
+                            </button>
+                            <button type="button" @click="step = 3" class="w-full bg-brand-charcoal hover:bg-black text-white font-mono text-xs uppercase font-bold tracking-wider py-4 transition-colors flex items-center justify-center space-x-2">
+                                <span>Continue to Payment</span>
+                                <span>&rarr;</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- STEP 3: Payment & Confirm -->
+                    <div x-show="step === 3" x-transition:enter="transition ease-out duration-300 delay-100" x-transition:enter-start="opacity-0 translate-x-4" x-transition:enter-end="opacity-100 translate-x-0" style="display: none;">
+                        <h2 class="font-display text-2xl uppercase tracking-tight text-brand-charcoal mb-4">
+                            Payment Method
+                        </h2>
+                        
+                        <div class="border-2 border-brand-red bg-brand-red/5 p-5 relative overflow-hidden group hover:border-brand-red transition-all shadow-[0_8px_30px_rgba(220,38,38,0.1)]">
+                            <div class="flex items-start space-x-3 relative z-10">
+                                <div class="mt-0.5">
+                                    <div class="h-4 w-4 rounded-full border-4 border-brand-red flex items-center justify-center"></div>
+                                </div>
+                                <div>
+                                    <span class="font-mono text-sm font-bold uppercase text-brand-charcoal block">Cash on Delivery</span>
+                                    <span class="font-sans text-sm text-brand-grey block mt-1">Pay in cash or eSewa/FonePay QR upon delivery. Secure and hassle-free.</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Trust Badges -->
+                        <div class="grid grid-cols-3 gap-4 mt-8 pt-8 border-t border-gray-100">
+                            <div class="flex flex-col items-center text-center space-y-2">
+                                <svg class="w-8 h-8 text-brand-charcoal opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="square" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                </svg>
+                                <span class="font-mono text-[10px] font-bold uppercase text-brand-charcoal">Secure Checkout</span>
+                            </div>
+                            <div class="flex flex-col items-center text-center space-y-2">
+                                <svg class="w-8 h-8 text-brand-charcoal opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="square" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <span class="font-mono text-[10px] font-bold uppercase text-brand-charcoal">Verified Quality</span>
+                            </div>
+                            <div class="flex flex-col items-center text-center space-y-2">
+                                <svg class="w-8 h-8 text-brand-charcoal opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="square" stroke-linejoin="round" stroke-width="1.5" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                                </svg>
+                                <span class="font-mono text-[10px] font-bold uppercase text-brand-charcoal">Pay on Delivery</span>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4 mt-8">
+                            <button type="button" @click="step = 2" class="w-full bg-gray-100 hover:bg-gray-200 text-brand-charcoal font-mono text-xs uppercase font-bold tracking-wider py-4 transition-colors">
+                                Back
+                            </button>
+                            <button type="submit" class="w-full bg-brand-red hover:bg-brand-red-dark text-white font-mono text-xs uppercase font-bold tracking-wider py-4 shadow-[0_8px_30px_rgba(220,38,38,0.25)] hover:shadow-[0_8px_30px_rgba(220,38,38,0.4)] transition-all hover:scale-[1.02] flex items-center justify-center space-x-2">
+                                <span>Place Order</span>
+                            </button>
+                        </div>
                     </div>
                 </form>
-
             </div>
 
             <!-- Right Column: Order Summary Sidebar -->

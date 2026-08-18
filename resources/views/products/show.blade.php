@@ -1,6 +1,10 @@
 @extends('layouts.storefront')
 
-@section('title', $product->name . ' — FoneX Store')
+@section('title', $product->name . ' - Buy in Nepal | FoneX Store')
+@section('meta_description', Str::limit(strip_tags($product->description), 150))
+@section('meta_keywords', $product->brand . ', ' . $product->name . ', used ' . $product->name . ', buy phones in nepal')
+@section('og_image', $product->image ? url(Storage::url($product->image)) : asset('images/default-og.jpg'))
+@section('og_type', 'product')
 
 @section('content')
 
@@ -57,7 +61,7 @@
              @resize.window="checkSticky">
 
             <!-- Left Column: Interactive 3D Phone Presentation Stage -->
-            <div class="lg:col-span-6 relative lg:sticky lg:top-28 lg:h-max z-20 space-y-4">
+            <div class="lg:col-span-6 relative lg:sticky lg:top-28 lg:h-max z-20 space-y-4" data-aos="fade-right">
                 <div class="aspect-square flex items-center justify-center bg-brand-offwhite border border-gray-200 relative overflow-hidden shadow-sm transition-opacity duration-300 cursor-zoom-in"
                      @mousemove="handleZoom"
                      @mouseleave="resetZoom">
@@ -107,7 +111,7 @@
             </div>
 
             <!-- Right Column: Product Details & Dynamic Condition Tabs -->
-            <div class="lg:col-span-6 space-y-6">
+            <div class="lg:col-span-6 space-y-6" data-aos="fade-left">
                 
                 <!-- Category & Brand -->
                 <div class="flex items-center space-x-3">
@@ -179,10 +183,10 @@
                     </div>
                 </div>
 
-                <!-- Add to Cart Action Form -->
-                <div x-ref="addToCartContainer">
+                <!-- Actions Container -->
+                <div x-ref="addToCartContainer" class="flex flex-col sm:flex-row gap-4">
                     <template x-if="Number(activeCondition.quantity_in_stock) > 0">
-                        <form method="POST" action="{{ route('cart.add') }}">
+                        <form method="POST" action="{{ route('cart.add') }}" class="flex-1">
                             @csrf
                             <input type="hidden" name="product_condition_id" :value="activeCondition.id">
                             <input type="hidden" name="quantity" value="1">
@@ -196,10 +200,21 @@
                     </template>
 
                     <template x-if="Number(activeCondition.quantity_in_stock) <= 0">
-                        <button type="button" disabled class="w-full bg-gray-200 text-gray-400 border border-gray-300 font-mono text-xs uppercase font-bold tracking-wider py-4 cursor-not-allowed">
+                        <button type="button" disabled class="flex-1 bg-gray-200 text-gray-400 border border-gray-300 font-mono text-xs uppercase font-bold tracking-wider py-4 cursor-not-allowed">
                             OUT OF STOCK — CONDITION UNAVAILABLE
                         </button>
                     </template>
+
+                    <!-- Wishlist Toggle -->
+                    <form method="POST" action="{{ route('wishlist.toggle', $product) }}">
+                        @csrf
+                        @php $inWishlist = in_array($product->id, session('wishlist', [])); @endphp
+                        <button type="submit" class="h-full px-6 flex items-center justify-center border {{ $inWishlist ? 'border-brand-red bg-brand-red/5' : 'border-gray-300 bg-white hover:border-brand-charcoal hover:bg-gray-50' }} transition-colors" title="{{ $inWishlist ? 'Remove from Wishlist' : 'Add to Wishlist' }}">
+                            <svg class="h-5 w-5 {{ $inWishlist ? 'text-brand-red fill-current' : 'text-brand-charcoal' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                            </svg>
+                        </button>
+                    </form>
                 </div>
 
                 <!-- Description Block -->

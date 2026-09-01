@@ -159,6 +159,10 @@ class CheckoutController extends Controller
             session()->forget('cart');
             session(['last_order_id' => $order->id]);
 
+            if ($order->customer->email) {
+                \Illuminate\Support\Facades\Mail::to($order->customer->email)->send(new \App\Mail\OrderPlaced($order));
+            }
+
             return redirect()->route('orders.confirmation', $order)->with('success', 'Order placed successfully!');
 
         } catch (Exception $e) {

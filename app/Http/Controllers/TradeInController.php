@@ -31,6 +31,7 @@ class TradeInController extends Controller
             'physical_condition' => 'required|string|max:255',
             'customer_name' => 'required|string|max:255',
             'customer_phone' => 'required|string|max:50',
+            'customer_email' => 'nullable|email|max:255',
             'notes' => 'nullable|string|max:1000',
         ]);
 
@@ -48,12 +49,14 @@ class TradeInController extends Controller
             ['phone' => trim($request->input('customer_phone'))],
             [
                 'name' => trim($request->input('customer_name')),
+                'email' => $request->input('customer_email') ? trim($request->input('customer_email')) : null,
                 'address' => 'Trade-In Request Submission',
             ]
         );
 
         $customer->update([
             'name' => trim($request->input('customer_name')),
+            'email' => $request->input('customer_email') ? trim($request->input('customer_email')) : $customer->email,
         ]);
 
         // Create pending TradeInValuation record
@@ -67,6 +70,10 @@ class TradeInController extends Controller
         ]);
 
         session(['last_valuation_id' => $valuation->id]);
+
+        if ($customer->email) {
+            \Illuminate\Support\Facades\Mail::to($customer->email)->send(new \App\Mail\TradeInSubmitted($valuation));
+        }
 
         return redirect()->route('trade-in.confirmation', $valuation)
             ->with('success', 'Trade-in request submitted successfully!');

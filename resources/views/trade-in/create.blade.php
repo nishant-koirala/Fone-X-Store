@@ -157,7 +157,7 @@
                     <h2 class="font-display text-xl uppercase tracking-tight text-brand-charcoal">Your Contact Info</h2>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
                     <div>
                         <label for="customer_name" class="font-mono text-xs font-bold uppercase tracking-wider text-brand-charcoal block mb-1.5">
                             Full Name <span class="text-brand-red">*</span>
@@ -172,12 +172,24 @@
 
                     <div>
                         <label for="customer_phone" class="font-mono text-xs font-bold uppercase tracking-wider text-brand-charcoal block mb-1.5">
-                            Primary Phone Number (Required) <span class="text-brand-red">*</span>
+                            Primary Phone Number <span class="text-brand-red">*</span>
                         </label>
                         <input type="tel" id="customer_phone" name="customer_phone" value="{{ old('customer_phone') }}" required
                                class="w-full font-sans text-sm border border-gray-300 bg-white text-brand-charcoal p-3 focus:border-brand-red focus:ring-0 @error('customer_phone') border-brand-red @enderror"
                                placeholder="e.g. 9812345678">
                         @error('customer_phone')
+                            <p class="font-mono text-xs text-brand-red mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div>
+                        <label for="customer_email" class="font-mono text-xs font-bold uppercase tracking-wider text-brand-charcoal block mb-1.5">
+                            Email Address (Optional)
+                        </label>
+                        <input type="email" id="customer_email" name="customer_email" value="{{ old('customer_email') }}"
+                               class="w-full font-sans text-sm border border-gray-300 bg-white text-brand-charcoal p-3 focus:border-brand-red focus:ring-0 @error('customer_email') border-brand-red @enderror"
+                               placeholder="e.g. bikash@example.com">
+                        @error('customer_email')
                             <p class="font-mono text-xs text-brand-red mt-1">{{ $message }}</p>
                         @enderror
                     </div>

@@ -5,26 +5,26 @@
 @section('content')
 
     <!-- Catalog Page Header -->
-    <div x-data="catalogFilter()" class="bg-brand-charcoal text-white border-b border-white/10 py-12 relative overflow-hidden">
-        <div class="absolute -right-20 -top-20 h-80 w-80 bg-brand-red/25 blur-[100px] pointer-events-none"></div>
-
-        <div class="mx-auto max-w-[90rem] px-4 sm:px-6 lg:px-8 relative z-10">
+    <div x-data="catalogFilter()" class="bg-brand-charcoal text-brand-white border-b border-brand-charcoal py-12 lg:py-24">
+        <div class="mx-auto max-w-[90rem] px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
                 <div>
-                    <span class="font-mono text-xs font-bold uppercase tracking-widest text-brand-red">STORE CATALOG</span>
-                    <h1 class="font-display text-3xl sm:text-5xl uppercase tracking-tight text-white mt-1">
+                    <span class="inline-block border-2 border-brand-charcoal px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-widest text-brand-charcoal bg-brand-white shadow-[4px_4px_0px_0px_rgba(42,42,44,1)] mb-6">
+                        STORE CATALOG
+                    </span>
+                    <h1 class="font-display text-5xl sm:text-7xl uppercase tracking-tight text-brand-white leading-none">
                         Phone Inventory
                     </h1>
                 </div>
-                <div class="font-mono text-xs text-white/70">
-                    SHOWING <span id="result-count" class="font-bold text-white">{{ $conditions->total() }}</span> AVAILABLE LISTINGS
+                <div class="font-mono text-xs text-brand-white/70 tracking-widest">
+                    SHOWING <span id="result-count" class="font-bold text-brand-red">{{ $conditions->total() }}</span> AVAILABLE LISTINGS
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Filter & Catalog Main Container -->
-    <div class="mx-auto max-w-[90rem] px-4 sm:px-6 lg:px-8 py-10">
+    <div class="mx-auto max-w-[90rem] px-4 sm:px-6 lg:px-8 py-10 bg-brand-offwhite" x-data="catalogFilter()">
         <div class="flex flex-col lg:flex-row gap-8 items-start">
             
             <!-- Left Sidebar (Sticky on Desktop) -->
@@ -32,7 +32,7 @@
 
                 <!-- Mobile Filter Toggle Button -->
                 <div class="lg:hidden mb-6">
-                    <button type="button" @click="mobileFiltersOpen = true" class="w-full font-mono text-xs uppercase font-bold text-brand-charcoal bg-white border border-gray-300 py-3 shadow-sm hover:border-brand-red flex items-center justify-center space-x-2">
+                    <button type="button" @click="mobileFiltersOpen = true" class="w-full font-mono text-xs uppercase font-bold text-brand-charcoal bg-brand-white border-2 border-brand-charcoal py-4 shadow-[4px_4px_0px_0px_rgba(42,42,44,1)] hover:bg-brand-charcoal hover:text-brand-white transition-colors flex items-center justify-center space-x-2">
                         <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="square" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
                         </svg>
@@ -40,15 +40,15 @@
                     </button>
                 </div>
 
-                <!-- Glassmorphism Filter Bar (Slide-over on Mobile) -->
+                <!-- Stark Filter Sidebar -->
                 <form x-ref="filterForm" @submit.prevent="applyFilters" @change="applyFilters" method="GET" action="{{ route('products.index') }}" 
-                      :class="mobileFiltersOpen ? 'fixed inset-0 z-[100] flex flex-col justify-end bg-brand-charcoal/50 backdrop-blur-sm' : 'hidden lg:block'"
+                      :class="mobileFiltersOpen ? 'fixed inset-0 z-[100] flex flex-col justify-end bg-brand-charcoal/80 backdrop-blur-sm' : 'hidden lg:block'"
                       class="lg:block">
             
             <!-- Mobile Overlay Click-to-Close -->
             <div x-show="mobileFiltersOpen" @click="mobileFiltersOpen = false" class="absolute inset-0 lg:hidden"></div>
 
-            <div :class="mobileFiltersOpen ? 'relative bg-white w-full rounded-t-3xl p-6 shadow-2xl max-h-[85vh] overflow-y-auto transform transition-transform' : 'glass-panel p-6 border border-gray-200 shadow-sm'"
+            <div :class="mobileFiltersOpen ? 'relative bg-brand-white w-full border-t-2 border-brand-charcoal p-6 max-h-[85vh] overflow-y-auto transform transition-transform' : 'bg-brand-white p-6 border-2 border-brand-charcoal shadow-[8px_8px_0px_0px_rgba(42,42,44,1)]'"
                  x-transition:enter="transition ease-out duration-300"
                  x-transition:enter-start="translate-y-full"
                  x-transition:enter-end="translate-y-0"
@@ -57,21 +57,21 @@
                  x-transition:leave-end="translate-y-full">
                 
                 <!-- Mobile Header -->
-                <div class="flex items-center justify-between mb-6 lg:hidden">
-                    <h2 class="font-display text-xl uppercase tracking-tight text-brand-charcoal">Filters</h2>
-                    <button type="button" @click="mobileFiltersOpen = false" class="p-2 text-brand-grey hover:text-brand-red">
+                <div class="flex items-center justify-between mb-8 lg:hidden pb-4 border-b-2 border-brand-charcoal">
+                    <h2 class="font-display text-2xl uppercase tracking-tight text-brand-charcoal">Filters</h2>
+                    <button type="button" @click="mobileFiltersOpen = false" class="p-2 border-2 border-brand-charcoal hover:bg-brand-red hover:text-brand-white hover:border-brand-red transition-colors">
                         <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="square" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                         </svg>
                     </button>
                 </div>
 
-                <div class="flex flex-col gap-5">
+                <div class="flex flex-col gap-6">
                 
                 <!-- Category Filter -->
                 <div>
-                    <label for="filter-category" class="font-mono text-xs font-bold uppercase tracking-wider text-brand-charcoal block mb-1.5">Category</label>
-                    <select id="filter-category" name="category" class="w-full font-sans text-xs border border-gray-300 bg-white text-brand-charcoal px-3 py-2.5 focus:border-brand-red focus:ring-2 focus:ring-brand-red/20 shadow-sm">
+                    <label for="filter-category" class="font-mono text-[10px] font-bold uppercase tracking-widest text-brand-charcoal block mb-2">Category</label>
+                    <select id="filter-category" name="category" class="w-full font-mono font-bold text-xs border-2 border-brand-charcoal bg-brand-white text-brand-charcoal px-3 py-3 focus:border-brand-red focus:ring-0 appearance-none rounded-none cursor-pointer">
                         <option value="">All Categories</option>
                         @foreach($categories as $cat)
                             @php
@@ -79,7 +79,7 @@
                                 $name = is_object($cat) ? $cat->name : ($cat['name'] ?? $cat);
                             @endphp
                             <option value="{{ $slug }}" {{ request('category') == $slug ? 'selected' : '' }}>
-                                {{ $name }}
+                                {{ strtoupper($name) }}
                             </option>
                         @endforeach
                     </select>
@@ -87,12 +87,12 @@
 
                 <!-- Brand Filter -->
                 <div>
-                    <label for="filter-brand" class="font-mono text-xs font-bold uppercase tracking-wider text-brand-charcoal block mb-1.5">Brand</label>
-                    <select id="filter-brand" name="brand" class="w-full font-sans text-xs border border-gray-300 bg-white text-brand-charcoal px-3 py-2.5 focus:border-brand-red focus:ring-2 focus:ring-brand-red/20 shadow-sm">
+                    <label for="filter-brand" class="font-mono text-[10px] font-bold uppercase tracking-widest text-brand-charcoal block mb-2">Brand</label>
+                    <select id="filter-brand" name="brand" class="w-full font-mono font-bold text-xs border-2 border-brand-charcoal bg-brand-white text-brand-charcoal px-3 py-3 focus:border-brand-red focus:ring-0 appearance-none rounded-none cursor-pointer">
                         <option value="">All Brands</option>
                         @foreach($brands as $brand)
                             <option value="{{ $brand }}" {{ request('brand') == $brand ? 'selected' : '' }}>
-                                {{ $brand }}
+                                {{ strtoupper($brand) }}
                             </option>
                         @endforeach
                     </select>
@@ -100,21 +100,21 @@
 
                 <!-- Condition Grade Filter -->
                 <div>
-                    <label for="filter-grade" class="font-mono text-xs font-bold uppercase tracking-wider text-brand-charcoal block mb-1.5">Condition</label>
-                    <select id="filter-grade" name="grade" class="w-full font-sans text-xs border border-gray-300 bg-white text-brand-charcoal px-3 py-2.5 focus:border-brand-red focus:ring-2 focus:ring-brand-red/20 shadow-sm">
+                    <label for="filter-grade" class="font-mono text-[10px] font-bold uppercase tracking-widest text-brand-charcoal block mb-2">Condition</label>
+                    <select id="filter-grade" name="grade" class="w-full font-mono font-bold text-xs border-2 border-brand-charcoal bg-brand-white text-brand-charcoal px-3 py-3 focus:border-brand-red focus:ring-0 appearance-none rounded-none cursor-pointer">
                         <option value="">All Conditions</option>
                         <option value="new" {{ request('grade') == 'new' ? 'selected' : '' }}>New Only</option>
-                        <option value="used" {{ request('grade') == 'used' ? 'selected' : '' }}>All Pre-Owned (A/B/C)</option>
-                        <option value="A" {{ request('grade') == 'A' ? 'selected' : '' }}>Grade A (Excellent)</option>
-                        <option value="B" {{ request('grade') == 'B' ? 'selected' : '' }}>Grade B (Good)</option>
-                        <option value="C" {{ request('grade') == 'C' ? 'selected' : '' }}>Grade C (Fair)</option>
+                        <option value="used" {{ request('grade') == 'used' ? 'selected' : '' }}>All Pre-Owned</option>
+                        <option value="A" {{ request('grade') == 'A' ? 'selected' : '' }}>Grade A</option>
+                        <option value="B" {{ request('grade') == 'B' ? 'selected' : '' }}>Grade B</option>
+                        <option value="C" {{ request('grade') == 'C' ? 'selected' : '' }}>Grade C</option>
                     </select>
                 </div>
 
                 <!-- Sort Filter -->
                 <div>
-                    <label for="filter-sort" class="font-mono text-xs font-bold uppercase tracking-wider text-brand-charcoal block mb-1.5">Sort By</label>
-                    <select id="filter-sort" name="sort" class="w-full font-sans text-xs border border-gray-300 bg-white text-brand-charcoal px-3 py-2.5 focus:border-brand-red focus:ring-2 focus:ring-brand-red/20 shadow-sm">
+                    <label for="filter-sort" class="font-mono text-[10px] font-bold uppercase tracking-widest text-brand-charcoal block mb-2">Sort By</label>
+                    <select id="filter-sort" name="sort" class="w-full font-mono font-bold text-xs border-2 border-brand-charcoal bg-brand-white text-brand-charcoal px-3 py-3 focus:border-brand-red focus:ring-0 appearance-none rounded-none cursor-pointer">
                         <option value="newest" {{ request('sort') == 'newest' ? 'selected' : '' }}>Newest Listed</option>
                         <option value="price_asc" {{ request('sort') == 'price_asc' ? 'selected' : '' }}>Price: Low to High</option>
                         <option value="price_desc" {{ request('sort') == 'price_desc' ? 'selected' : '' }}>Price: High to Low</option>
@@ -122,26 +122,26 @@
                 </div>
 
                 <!-- Action Buttons -->
-                <div class="flex items-center space-x-2">
-                    <button type="submit" class="w-full font-mono text-xs uppercase font-bold text-white bg-brand-red hover:bg-brand-red-dark py-2.5 transition-all active:scale-95 shadow-sm">
-                        Filter Results
+                <div class="flex flex-col gap-2 pt-4 border-t-2 border-brand-charcoal">
+                    <button type="submit" class="w-full font-mono text-xs uppercase font-bold text-brand-white bg-brand-charcoal hover:bg-brand-red py-4 transition-colors">
+                        Apply Filters
                     </button>
-                    @if(request()->anyFilled(['category', 'brand', 'grade', 'sort', 'min_price', 'max_price']))
-                        <a href="{{ route('products.index') }}" @click.prevent="resetFilters" class="font-mono text-xs uppercase font-bold text-brand-charcoal border border-gray-300 bg-white hover:border-brand-red px-3 py-2.5 transition-all active:scale-95 whitespace-nowrap shadow-sm text-center">
-                            Reset
+                    @if(request()->anyFilled(['category', 'brand', 'grade', 'sort', 'min_price', 'max_price', 'search']))
+                        <a href="{{ route('products.index') }}" @click.prevent="resetFilters" class="w-full font-mono text-xs uppercase font-bold text-brand-charcoal border-2 border-brand-charcoal bg-brand-white hover:bg-brand-charcoal hover:text-brand-white py-3 transition-colors text-center">
+                            Clear All
                         </a>
                     @endif
                 </div>
 
                 <!-- Mobile Apply Button -->
-                <div class="mt-6 lg:hidden">
-                    <button type="button" @click="mobileFiltersOpen = false" class="w-full font-mono text-xs uppercase font-bold text-white bg-brand-charcoal hover:bg-brand-red py-3 shadow-sm transition-colors">
+                <div class="mt-4 lg:hidden">
+                    <button type="button" @click="mobileFiltersOpen = false" class="w-full font-mono text-xs uppercase font-bold text-brand-white bg-brand-red hover:bg-brand-charcoal py-4 transition-colors border-2 border-brand-red hover:border-brand-charcoal">
                         Show Results
                     </button>
                 </div>
 
             </div>
-            </div> <!-- End glass-panel -->
+            </div> <!-- End panel -->
         </form>
         </div> <!-- End Left Sidebar -->
 
@@ -149,14 +149,13 @@
         <div class="flex-grow min-w-0">
 
         <!-- Active Filter Chips -->
-        <div id="active-filters-container" class="mb-6 flex flex-wrap items-center gap-2 min-h-[28px]">
+        <div id="active-filters-container" class="mb-8 flex flex-wrap items-center gap-3 min-h-[28px]">
             @if(request()->anyFilled(['category', 'brand', 'grade', 'search']))
-                <span class="font-mono text-[10px] uppercase text-brand-grey mr-2 tracking-wider">Active Filters:</span>
                 
                 @if(request('search'))
-                    <span class="inline-flex items-center bg-brand-charcoal text-white font-mono text-[10px] uppercase px-2 py-1 space-x-1">
-                        <span>Search: {{ request('search') }}</span>
-                        <button type="button" @click="removeFilter('search')" class="hover:text-brand-red ml-1">×</button>
+                    <span class="inline-flex items-center bg-brand-white border-2 border-brand-charcoal text-brand-charcoal font-mono text-[10px] font-bold uppercase tracking-widest pl-3 pr-1 py-1 space-x-2">
+                        <span>SEARCH: {{ request('search') }}</span>
+                        <button type="button" @click="removeFilter('search')" class="hover:bg-brand-red hover:text-brand-white border-l-2 border-brand-charcoal pl-2 p-1">✕</button>
                     </span>
                 @endif
 
@@ -167,29 +166,25 @@
                         });
                         $catName = $cat ? (is_object($cat) ? $cat->name : $cat['name']) : request('category');
                     @endphp
-                    <span class="inline-flex items-center bg-brand-charcoal text-white font-mono text-[10px] uppercase px-2 py-1 space-x-1">
-                        <span>Category: {{ $catName }}</span>
-                        <button type="button" @click="removeFilter('category')" class="hover:text-brand-red ml-1">×</button>
+                    <span class="inline-flex items-center bg-brand-white border-2 border-brand-charcoal text-brand-charcoal font-mono text-[10px] font-bold uppercase tracking-widest pl-3 pr-1 py-1 space-x-2">
+                        <span>CAT: {{ $catName }}</span>
+                        <button type="button" @click="removeFilter('category')" class="hover:bg-brand-red hover:text-brand-white border-l-2 border-brand-charcoal pl-2 p-1">✕</button>
                     </span>
                 @endif
 
                 @if(request('brand'))
-                    <span class="inline-flex items-center bg-brand-charcoal text-white font-mono text-[10px] uppercase px-2 py-1 space-x-1">
-                        <span>Brand: {{ request('brand') }}</span>
-                        <button type="button" @click="removeFilter('brand')" class="hover:text-brand-red ml-1">×</button>
+                    <span class="inline-flex items-center bg-brand-white border-2 border-brand-charcoal text-brand-charcoal font-mono text-[10px] font-bold uppercase tracking-widest pl-3 pr-1 py-1 space-x-2">
+                        <span>BRAND: {{ request('brand') }}</span>
+                        <button type="button" @click="removeFilter('brand')" class="hover:bg-brand-red hover:text-brand-white border-l-2 border-brand-charcoal pl-2 p-1">✕</button>
                     </span>
                 @endif
 
                 @if(request('grade'))
-                    <span class="inline-flex items-center bg-brand-charcoal text-white font-mono text-[10px] uppercase px-2 py-1 space-x-1">
-                        <span>Condition: {{ request('grade') }}</span>
-                        <button type="button" @click="removeFilter('grade')" class="hover:text-brand-red ml-1">×</button>
+                    <span class="inline-flex items-center bg-brand-white border-2 border-brand-charcoal text-brand-charcoal font-mono text-[10px] font-bold uppercase tracking-widest pl-3 pr-1 py-1 space-x-2">
+                        <span>GRADE: {{ request('grade') }}</span>
+                        <button type="button" @click="removeFilter('grade')" class="hover:bg-brand-red hover:text-brand-white border-l-2 border-brand-charcoal pl-2 p-1">✕</button>
                     </span>
                 @endif
-
-                <button type="button" @click="resetFilters" class="text-[10px] font-mono uppercase font-bold text-brand-red hover:underline ml-2">
-                    Clear All
-                </button>
             @endif
         </div>
 
@@ -197,12 +192,12 @@
         <div class="relative min-h-[400px]">
 
             <!-- Skeleton Overlay -->
-            <div x-show="isLoading" style="display: none;" class="absolute inset-0 z-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 bg-white">
-                @for($i = 0; $i < 4; $i++)
-                    <div class="border border-gray-200 p-5 flex flex-col justify-between animate-pulse">
+            <div x-show="isLoading" style="display: none;" class="absolute inset-0 z-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 bg-brand-offwhite">
+                @for($i = 0; $i < 6; $i++)
+                    <div class="border-2 border-gray-200 bg-white p-5 flex flex-col justify-between animate-pulse">
                         <div class="flex justify-between mb-4">
-                            <div class="h-4 w-16 bg-gray-200"></div>
-                            <div class="h-4 w-20 bg-gray-200"></div>
+                            <div class="h-6 w-16 bg-gray-200"></div>
+                            <div class="h-6 w-20 bg-gray-200"></div>
                         </div>
                         <div class="aspect-[4/3] bg-gray-100 mb-5"></div>
                         <div class="space-y-2 mb-6">
@@ -211,128 +206,30 @@
                             <div class="h-3 w-32 bg-gray-200"></div>
                         </div>
                         <div class="pt-4 border-t border-gray-100 flex justify-between">
-                            <div class="h-6 w-24 bg-gray-200"></div>
-                            <div class="h-8 w-16 bg-gray-200"></div>
+                            <div class="h-8 w-24 bg-gray-200"></div>
                         </div>
                     </div>
                 @endfor
             </div>
 
             <!-- Product Grid -->
-            <div id="product-grid" :class="{ 'opacity-0': isLoading }" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 transition-opacity duration-200">
+            <div id="product-grid" :class="{ 'opacity-0': isLoading }" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 transition-opacity duration-200">
             @forelse($conditions as $index => $condition)
-                <a href="{{ route('products.show', $condition->product->slug) }}" 
-                   data-aos="fade-up" 
-                   data-aos-delay="{{ $index * 50 }}"
-                   class="group block card-glow-hover relative flex flex-col justify-between border border-gray-200 bg-white p-5 hover:-translate-y-1 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgba(220,38,38,0.1)] hover:border-brand-red/50 transition-all duration-300">
-                    
-                    <!-- Condition & Stock Header -->
-                    <div class="flex items-center justify-between mb-4">
-                        @if(strtolower($condition->grade) === 'new')
-                            <span class="border-2 border-brand-red text-brand-red font-mono text-[11px] font-bold uppercase tracking-wider px-2 py-0.5">
-                                NEW
-                            </span>
-                        @else
-                            <span class="bg-brand-red text-white font-mono text-[11px] font-bold uppercase tracking-wider px-2 py-0.5">
-                                GRADE {{ strtoupper($condition->grade) }}
-                            </span>
-                        @endif
-
-                        @if($condition->quantity_in_stock > 0)
-                            <span class="font-mono text-[10px] text-emerald-700 font-semibold uppercase bg-emerald-50 px-2 py-0.5 border border-emerald-200">
-                                IN STOCK ({{ $condition->quantity_in_stock }})
-                            </span>
-                        @else
-                            <span class="font-mono text-[10px] text-amber-700 font-semibold uppercase bg-amber-50 px-2 py-0.5 border border-amber-200">
-                                OUT OF STOCK
-                            </span>
-                        @endif
-                    </div>
-
-                    <!-- Shine Container Placeholder -->
-                    <div class="shine-container aspect-[4/3] flex items-center justify-center bg-brand-offwhite p-6 relative overflow-hidden mb-5 border border-gray-100">
-                        @if($condition->product->image)
-                            <div x-data="{ loaded: false }" class="w-full h-full flex items-center justify-center">
-                                <img src="{{ Storage::url($condition->product->image) }}" 
-                                     @load="loaded = true"
-                                     :class="loaded ? 'opacity-100 blur-0 scale-100' : 'opacity-0 blur-sm scale-95'"
-                                     class="h-28 w-28 object-contain group-hover:scale-110 transition-all duration-700 ease-out" />
-                            </div>
-                        @else
-                            <x-product-icon :categorySlug="$condition->product->category->slug ?? ''" class="h-28 w-28 text-brand-charcoal/20 group-hover:text-brand-red/40 transition-colors duration-300 stroke-[1.5]" />
-                        @endif
-
-                        <span class="absolute bottom-2 left-2 font-mono text-[10px] uppercase tracking-wider text-brand-grey">
-                            {{ strtoupper($condition->product->brand) }}
-                        </span>
-
-                        @if($condition->original_price && $condition->original_price > $condition->price)
-                            @php $savings = round((($condition->original_price - $condition->price) / $condition->original_price) * 100); @endphp
-                            <span class="absolute top-2 right-2 bg-brand-red text-white font-mono text-[10px] font-bold px-1.5 py-0.5 shadow">
-                                SAVE {{ $savings }}%
-                            </span>
-                        @endif
-                    </div>
-
-                    <!-- Product Specs & Ratings -->
-                    <div class="space-y-1">
-                        <div class="font-mono text-xs text-brand-grey uppercase tracking-wider">
-                            {{ $condition->product->category->name ?? 'SMARTPHONE' }}
-                        </div>
-                        <h3 class="font-sans font-bold text-brand-charcoal text-lg group-hover:text-brand-red transition-colors leading-snug block">
-                            {{ $condition->product->name }}
-                        </h3>
-                        
-                        <div class="flex items-center space-x-1 py-1">
-                            <div class="flex items-center text-brand-red">
-                                @php $rating = round($condition->product->reviews_avg_rating ?? 0); @endphp
-                                @for($i = 1; $i <= 5; $i++)
-                                    @if($i <= $rating)
-                                        <svg class="w-3 h-3 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
-                                    @else
-                                        <svg class="w-3 h-3 text-gray-300 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
-                                    @endif
-                                @endfor
-                            </div>
-                            <span class="font-mono text-[10px] text-brand-grey">({{ $condition->product->reviews_count ?? 0 }})</span>
-                        </div>
-
-                        <p class="font-mono text-xs text-brand-grey mt-1">
-                            {{ $condition->product->brand }} • {{ strtoupper($condition->grade) }} CONDITION
-                        </p>
-                    </div>
-
-                    <!-- Price & Action -->
-                    <div class="mt-6 pt-4 border-t border-gray-100 flex items-baseline justify-between">
-                        <div>
-                            <span class="font-mono text-xs text-brand-grey uppercase block">Price</span>
-                            <div class="flex items-baseline space-x-2">
-                                <span class="font-mono font-bold text-brand-charcoal text-xl">
-                                    Rs {{ number_format($condition->price) }}
-                                </span>
-                                @if($condition->original_price && $condition->original_price > $condition->price)
-                                    <span class="font-mono text-xs text-brand-grey line-through">
-                                        Rs {{ number_format($condition->original_price) }}
-                                    </span>
-                                @endif
-                            </div>
-                        </div>
-                    </div>
-
-                </a>
+                <x-product-card :condition="$condition" />
             @empty
                 <!-- Empty State Message -->
-                <div class="col-span-full border border-dashed border-gray-300 p-16 text-center bg-brand-offwhite">
-                    <svg class="mx-auto h-12 w-12 text-brand-grey stroke-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div class="col-span-full border-4 border-brand-charcoal p-16 text-center bg-brand-white shadow-[8px_8px_0px_0px_rgba(42,42,44,1)]">
+                    <svg class="mx-auto h-16 w-16 text-brand-charcoal stroke-[1.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="square" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                     </svg>
-                    <h3 class="mt-4 font-display text-xl uppercase tracking-tight text-brand-charcoal">No Matching Phone Conditions Found</h3>
-                    <p class="mt-2 font-sans text-sm text-brand-grey max-w-md mx-auto">
-                        No product listings match your selected category, brand, or condition filters. Try adjusting your filter choices or resetting them.
+                    <h3 class="mt-6 font-display text-3xl uppercase tracking-tight text-brand-charcoal">Zero Matches Found</h3>
+                    <p class="mt-4 font-sans text-brand-charcoal/80 max-w-md mx-auto">
+                        We couldn't find any devices matching your exact filter combination. 
                     </p>
-                    <div class="mt-6">
-                        <a href="{{ route('products.index') }}" class="inline-flex items-center space-x-2 font-mono text-xs uppercase font-bold text-white bg-brand-red hover:bg-brand-red-dark px-6 py-3 transition-colors shadow">
-                            <span>Clear All Filters</span>
+                    <div class="mt-8">
+                        <a href="{{ route('products.index') }}" class="inline-flex items-center space-x-2 font-mono text-xs uppercase font-bold text-brand-white bg-brand-red hover:bg-brand-charcoal px-8 py-4 transition-colors">
+                            <span>Clear Filters</span>
+                            <span>&rarr;</span>
                         </a>
                     </div>
                 </div>
@@ -343,7 +240,7 @@
         <!-- Pagination -->
         <div id="pagination-container">
             @if($conditions->hasPages())
-                <div class="mt-12" @click="handlePaginationClick">
+                <div class="mt-16 border-t-2 border-brand-charcoal pt-8" @click="handlePaginationClick">
                     {{ $conditions->links() }}
                 </div>
             @endif
@@ -400,7 +297,6 @@
                 },
                 resetFilters() {
                     this.$refs.filterForm.reset();
-                    // Dispatch change event to update Alpine/native selects
                     const selects = this.$refs.filterForm.querySelectorAll('select');
                     selects.forEach(select => {
                         select.value = '';

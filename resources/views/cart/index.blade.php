@@ -4,180 +4,150 @@
 
 @section('content')
 
-    <!-- Cart Page Header -->
-    <div class="bg-brand-offwhite border-b border-gray-200 py-8">
+    <!-- Stark Page Header -->
+    <div class="bg-brand-charcoal text-brand-white border-b border-brand-charcoal py-12">
         <div class="mx-auto max-w-[90rem] px-4 sm:px-6 lg:px-8">
-            <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
-                <div>
-                    <span class="font-mono text-xs font-bold uppercase tracking-widest text-brand-red">CHECKOUT FLOW</span>
-                    <h1 class="font-display text-3xl sm:text-4xl uppercase tracking-tight text-brand-charcoal mt-1">
-                        Your Shopping Cart
-                    </h1>
-                </div>
-                <div class="font-mono text-xs text-brand-grey">
-                    ITEMS IN CART: <span class="font-bold text-brand-charcoal">{{ count($cartItems) }}</span>
-                </div>
-            </div>
+            <h1 class="font-display text-4xl sm:text-6xl uppercase tracking-tight text-brand-white leading-none">
+                Shopping Cart
+            </h1>
         </div>
     </div>
 
-    <!-- Main Cart Container -->
-    <div class="mx-auto max-w-[90rem] px-4 sm:px-6 lg:px-8 py-12">
-        @if(!empty($cartItems))
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+    <div class="mx-auto max-w-[90rem] px-4 sm:px-6 lg:px-8 py-16 bg-brand-white min-h-[60vh]">
+        
+        @if(count($cartItems) > 0)
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
                 
-                <!-- Left Column: Cart Line Items -->
-                <div class="lg:col-span-8 border border-gray-200 bg-white">
-                    <div class="border-b border-gray-200 bg-brand-offwhite px-6 py-4 font-mono text-xs font-bold uppercase tracking-wider text-brand-charcoal hidden sm:grid sm:grid-cols-12 gap-4">
-                        <div class="sm:col-span-6">Product Item</div>
-                        <div class="sm:col-span-2 text-center">Unit Price</div>
-                        <div class="sm:col-span-2 text-center">Quantity</div>
-                        <div class="sm:col-span-2 text-right">Line Total</div>
+                <!-- Left: Cart Items (List) -->
+                <div class="lg:col-span-8">
+                    
+                    <div class="flex items-center space-x-4 mb-8">
+                        <span class="flex items-center justify-center h-8 w-8 bg-brand-charcoal text-brand-white font-mono text-sm font-bold">1</span>
+                        <h2 class="font-display text-2xl uppercase tracking-tight text-brand-charcoal">Review Your Items</h2>
                     </div>
 
-                    <div class="divide-y divide-gray-200">
-                        @foreach($cartItems as $item)
-                            @php 
-                                $cond = $item['condition']; 
-                                $prod = $cond->product;
-                            @endphp
-                            <div class="p-6 grid grid-cols-1 sm:grid-cols-12 gap-4 items-center">
+                    <div class="border-t-2 border-brand-charcoal">
+                        @foreach($cartItems as $index => $item)
+                            <div class="py-8 border-b-2 border-brand-charcoal flex flex-col sm:flex-row gap-6 relative group">
                                 
-                                <!-- Product Details & SVG Silhouette Icon -->
-                                <div class="sm:col-span-6 flex items-center space-x-4">
-                                    <div class="h-16 w-16 flex-shrink-0 bg-brand-offwhite border border-gray-100 flex items-center justify-center p-2">
-                                        @if($prod->image)
-                                            <img src="{{ Storage::url($prod->image) }}" class="h-12 w-12 object-contain" />
-                                        @else
-                                            <x-product-icon :categorySlug="$prod->category->slug ?? ''" class="h-8 w-8 text-brand-charcoal/30 stroke-[1.5]" />
-                                        @endif
-                                    </div>
+                                <!-- Remove Button -->
+                                <form action="{{ route('cart.remove', $index) }}" method="POST" class="absolute top-8 right-0 sm:right-2">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="text-brand-grey hover:text-brand-red p-2 transition-colors">
+                                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="square" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
+                                </form>
+
+                                <!-- Image -->
+                                <div class="w-full sm:w-40 h-40 bg-brand-offwhite border-2 border-brand-charcoal flex items-center justify-center flex-shrink-0 p-4">
+                                    @if($item['product']->image)
+                                        <img src="{{ Storage::url($item['product']->image) }}" class="max-h-full w-auto object-contain mix-blend-multiply" />
+                                    @else
+                                        <x-product-icon :categorySlug="$item['product']->category->slug ?? ''" class="h-16 text-brand-charcoal stroke-[1]" />
+                                    @endif
+                                </div>
+
+                                <!-- Details -->
+                                <div class="flex-grow flex flex-col justify-between pr-10 sm:pr-12">
                                     <div>
-                                        <div class="flex items-center space-x-2">
-                                            @if(strtolower($cond->grade) === 'new')
-                                                <span class="border border-brand-red text-brand-red font-mono text-[10px] font-bold uppercase px-1.5 py-0.5">
-                                                    NEW
-                                                </span>
-                                            @else
-                                                <span class="bg-brand-red text-white font-mono text-[10px] font-bold uppercase px-1.5 py-0.5">
-                                                    GRADE {{ strtoupper($cond->grade) }}
-                                                </span>
-                                            @endif
-                                            <span class="font-mono text-[10px] text-brand-grey uppercase">
-                                                {{ $prod->brand }}
-                                            </span>
+                                        <div class="font-mono text-[10px] font-bold uppercase tracking-widest text-brand-grey mb-1">
+                                            {{ $item['product']->brand }}
                                         </div>
-                                        <a href="{{ route('products.show', $prod->slug) }}" class="font-sans font-bold text-brand-charcoal text-base hover:text-brand-red transition-colors block mt-1">
-                                            {{ $prod->name }}
-                                        </a>
-                                        <p class="font-mono text-[11px] text-brand-grey">
-                                            Max available: {{ $cond->quantity_in_stock }} units
-                                        </p>
+                                        <h3 class="font-display text-2xl uppercase tracking-tight text-brand-charcoal mb-2">
+                                            <a href="{{ route('products.show', $item['product']->slug) }}" class="hover:text-brand-red transition-colors">{{ $item['product']->name }}</a>
+                                        </h3>
+                                        <div class="inline-block border border-brand-charcoal px-2 py-0.5 font-mono text-[10px] font-bold uppercase tracking-widest text-brand-charcoal bg-brand-white">
+                                            CONDITION: {{ strtoupper($item['condition']->grade === 'new' ? 'Brand New' : 'Grade ' . $item['condition']->grade) }}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="flex items-end justify-between mt-6">
+                                        <form action="{{ route('cart.update', $index) }}" method="POST" class="flex items-center border-2 border-brand-charcoal bg-brand-white w-24">
+                                            @csrf
+                                            <input type="number" name="quantity" value="{{ $item['quantity'] }}" min="1" max="{{ $item['condition']->quantity_in_stock }}" class="w-full text-center font-mono font-bold border-none focus:ring-0 p-2" onchange="this.form.submit()">
+                                        </form>
+                                        
+                                        <div class="text-right">
+                                            <div class="font-mono text-xl font-bold text-brand-charcoal">
+                                                Rs {{ number_format($item['condition']->price * $item['quantity']) }}
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-
-                                <!-- Unit Price -->
-                                <div class="sm:col-span-2 text-left sm:text-center font-mono text-sm font-semibold text-brand-charcoal">
-                                    <span class="sm:hidden font-bold text-brand-grey text-xs">Unit: </span>
-                                    Rs {{ number_format($cond->price) }}
-                                </div>
-
-                                <!-- Quantity Selector Form -->
-                                <div class="sm:col-span-2 flex items-center justify-start sm:justify-center">
-                                    <form method="POST" action="{{ route('cart.update', $cond->id) }}" class="flex items-center space-x-1">
-                                        @csrf
-                                        @method('PATCH')
-                                        <select name="quantity" onchange="this.form.submit()" class="font-mono text-xs border border-gray-300 bg-white text-brand-charcoal px-2 py-1 focus:border-brand-red focus:ring-0">
-                                            @for($i = 1; $i <= min(10, $cond->quantity_in_stock); $i++)
-                                                <option value="{{ $i }}" {{ $item['quantity'] == $i ? 'selected' : '' }}>
-                                                    {{ $i }}
-                                                </option>
-                                            @endfor
-                                        </select>
-                                    </form>
-                                </div>
-
-                                <!-- Line Total & Remove Action -->
-                                <div class="sm:col-span-2 flex items-center justify-between sm:justify-end space-x-4">
-                                    <span class="font-mono font-bold text-brand-charcoal text-base">
-                                        Rs {{ number_format($item['line_total']) }}
-                                    </span>
-                                    <form method="POST" action="{{ route('cart.destroy', $cond->id) }}">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="text-brand-grey hover:text-brand-red transition-colors p-1" title="Remove Item">
-                                            <svg class="h-5 w-5 stroke-[2]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="square" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                            </svg>
-                                        </button>
-                                    </form>
-                                </div>
-
                             </div>
                         @endforeach
                     </div>
-                </div>
-
-                <!-- Right Column: Order Summary Card -->
-                <div class="lg:col-span-4 border border-gray-200 bg-white p-6 space-y-6">
-                    <h2 class="font-display text-xl uppercase tracking-tight text-brand-charcoal border-b border-gray-200 pb-3">
-                        Order Summary
-                    </h2>
-
-                    <div class="space-y-3 font-mono text-xs">
-                        <div class="flex items-center justify-between text-brand-grey">
-                            <span>Subtotal</span>
-                            <span class="font-bold text-brand-charcoal text-sm">Rs {{ number_format($subtotal) }}</span>
-                        </div>
-                        <div class="flex items-center justify-between text-brand-grey">
-                            <span>Standard Delivery</span>
-                            <span class="font-bold text-emerald-600">FREE</span>
-                        </div>
-                        <div class="flex items-center justify-between text-brand-grey">
-                            <span>7-Day Check Guarantee</span>
-                            <span class="font-bold text-emerald-600">INCLUDED</span>
-                        </div>
-                        <div class="border-t border-gray-200 pt-3 flex items-baseline justify-between text-brand-charcoal">
-                            <span class="font-bold uppercase">Total Payable</span>
-                            <span class="font-bold text-2xl text-brand-charcoal">Rs {{ number_format($subtotal) }}</span>
-                        </div>
-                    </div>
-
-                    <div class="pt-2">
-                        <a href="{{ route('checkout.index') }}" class="w-full bg-brand-red hover:bg-brand-red-dark text-white font-mono text-xs uppercase font-bold tracking-wider py-4 transition-colors flex items-center justify-center space-x-2">
-                            <span>Proceed to Checkout</span>
-                            <svg class="h-4 w-4 stroke-[2]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="square" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                            </svg>
+                    
+                    <div class="mt-8 flex justify-between items-center">
+                        <a href="{{ route('products.index') }}" class="font-mono text-xs uppercase font-bold text-brand-grey hover:text-brand-charcoal underline decoration-brand-grey hover:decoration-brand-charcoal underline-offset-4 transition-all">
+                            &larr; Continue Shopping
                         </a>
                     </div>
+                </div>
 
-                    <div class="border-t border-gray-100 pt-4 text-center font-mono text-[11px] text-brand-grey">
-                        Payment collected via Cash on Delivery or Pay on Pickup in Nepal.
+                <!-- Right: Order Summary (Sticky) -->
+                <div class="lg:col-span-4">
+                    <div class="sticky top-28 bg-brand-offwhite border-2 border-brand-charcoal p-8 shadow-[8px_8px_0px_0px_rgba(42,42,44,1)]">
+                        <h3 class="font-display text-2xl uppercase tracking-tight text-brand-charcoal mb-6 pb-4 border-b-2 border-brand-charcoal">Order Summary</h3>
+                        
+                        <div class="space-y-4 font-mono text-sm font-bold text-brand-charcoal">
+                            <div class="flex justify-between">
+                                <span class="text-brand-grey">Subtotal ({{ collect($cartItems)->sum('quantity') }} items)</span>
+                                <span>Rs {{ number_format($total) }}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-brand-grey">Shipping Estimate</span>
+                                <span>Calculated at checkout</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-brand-grey">Taxes</span>
+                                <span>Included</span>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 pt-6 border-t-2 border-brand-charcoal flex justify-between items-end">
+                            <span class="font-mono text-sm font-bold uppercase tracking-widest text-brand-charcoal">Total</span>
+                            <span class="font-mono text-3xl font-bold text-brand-red">Rs {{ number_format($total) }}</span>
+                        </div>
+
+                        <div class="mt-8">
+                            <a href="{{ route('checkout.index') }}" class="block w-full text-center bg-brand-red hover:bg-brand-charcoal text-brand-white font-mono text-sm uppercase tracking-widest font-bold px-6 py-5 transition-colors duration-300 shadow-[4px_4px_0px_0px_rgba(42,42,44,1)] hover:shadow-none translate-y-0 hover:translate-y-1 hover:translate-x-1">
+                                Proceed to Checkout &rarr;
+                            </a>
+                        </div>
+                        
+                        <div class="mt-6 pt-6 border-t-2 border-brand-charcoal">
+                            <div class="flex items-center space-x-2 text-brand-charcoal">
+                                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="square" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                </svg>
+                                <span class="font-mono text-[10px] font-bold uppercase tracking-widest">Secure Cash on Delivery</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
             </div>
         @else
             <!-- Empty Cart State -->
-            <div class="border border-dashed border-gray-300 p-16 text-center bg-brand-offwhite max-w-2xl mx-auto">
-                <svg class="mx-auto h-16 w-16 text-brand-grey stroke-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="square" stroke-linejoin="miter" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+            <div class="max-w-2xl mx-auto border-4 border-brand-charcoal p-16 text-center bg-brand-offwhite shadow-[12px_12px_0px_0px_rgba(42,42,44,1)]">
+                <svg class="mx-auto h-20 w-20 text-brand-charcoal stroke-[1]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="square" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
-                <h2 class="mt-4 font-display text-2xl uppercase tracking-tight text-brand-charcoal">Your Shopping Cart is Empty</h2>
-                <p class="mt-2 font-sans text-sm text-brand-grey max-w-md mx-auto">
-                    You have not added any phones to your shopping cart yet. Browse our inventory of brand-new and certified pre-owned smartphones.
-                </p>
-                <div class="mt-8">
-                    <a href="{{ route('products.index') }}" class="inline-flex items-center space-x-2 bg-brand-red hover:bg-brand-red-dark text-white font-mono text-xs uppercase font-bold tracking-wider px-8 py-4 transition-colors">
-                        <span>Browse Phones Catalog</span>
-                        <svg class="h-4 w-4 stroke-[2]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="square" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                        </svg>
+                <h2 class="mt-6 font-display text-4xl uppercase tracking-tight text-brand-charcoal">Your cart is empty.</h2>
+                <p class="mt-4 font-sans text-brand-charcoal/80">Looks like you haven't made your choice yet.</p>
+                <div class="mt-10">
+                    <a href="{{ route('products.index') }}" class="inline-flex items-center space-x-3 bg-brand-red hover:bg-brand-charcoal text-brand-white font-mono text-xs uppercase font-bold tracking-widest px-8 py-5 transition-colors duration-300">
+                        <span>Shop Inventory</span>
+                        <span>&rarr;</span>
                     </a>
                 </div>
             </div>
         @endif
+
     </div>
 
 @endsection

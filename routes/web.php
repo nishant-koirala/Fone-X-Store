@@ -48,9 +48,8 @@ Route::get('/trade-in', [TradeInController::class, 'create'])->name('trade-in.cr
 Route::post('/trade-in', [TradeInController::class, 'store'])->name('trade-in.store');
 Route::get('/trade-in/confirmation/{valuation}', [TradeInController::class, 'confirmation'])->name('trade-in.confirmation');
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+use App\Http\Controllers\DashboardController;
+Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

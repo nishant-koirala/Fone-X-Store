@@ -1,98 +1,144 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-display font-semibold text-2xl text-brand-charcoal leading-tight">
-            {{ __('My Dashboard') }}
-        </h2>
-    </x-slot>
+@extends('layouts.storefront')
 
-    <div class="py-12">
-        <div class="max-w-[90rem] mx-auto sm:px-6 lg:px-8 space-y-8">
+@section('title', 'My Dashboard — FoneX Store')
+
+@section('content')
+
+    <!-- Stark Page Header -->
+    <div class="bg-brand-charcoal text-brand-white border-b border-brand-charcoal py-12">
+        <div class="mx-auto max-w-[90rem] px-4 sm:px-6 lg:px-8">
+            <h1 class="font-display text-4xl sm:text-6xl uppercase tracking-tight text-brand-white leading-none">
+                Welcome, {{ auth()->user()->name }}
+            </h1>
+            <p class="mt-4 font-mono text-xs font-bold uppercase tracking-widest text-brand-white/70">
+                Manage your orders and trade-ins
+            </p>
+        </div>
+    </div>
+
+    <div class="mx-auto max-w-[90rem] px-4 sm:px-6 lg:px-8 py-16 bg-brand-white min-h-[60vh]">
+        
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
             
-            <!-- Order History Section -->
-            <div class="bg-white overflow-hidden shadow-sm border border-gray-200">
-                <div class="px-6 py-4 border-b border-gray-200 bg-brand-offwhite flex justify-between items-center">
-                    <h3 class="font-display text-lg uppercase tracking-tight text-brand-charcoal">Order History</h3>
-                </div>
-                <div class="p-6">
-                    @if($orders->isEmpty())
-                        <p class="text-gray-500 font-sans text-sm">You haven't placed any orders yet.</p>
-                    @else
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200">
-                                <thead>
-                                    <tr>
-                                        <th class="px-6 py-3 text-left text-xs font-mono font-bold text-gray-500 uppercase tracking-wider">Order ID</th>
-                                        <th class="px-6 py-3 text-left text-xs font-mono font-bold text-gray-500 uppercase tracking-wider">Date</th>
-                                        <th class="px-6 py-3 text-left text-xs font-mono font-bold text-gray-500 uppercase tracking-wider">Total</th>
-                                        <th class="px-6 py-3 text-left text-xs font-mono font-bold text-gray-500 uppercase tracking-wider">Status</th>
-                                        <th class="px-6 py-3 text-left text-xs font-mono font-bold text-gray-500 uppercase tracking-wider">Items</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="bg-white divide-y divide-gray-200">
-                                    @foreach($orders as $order)
-                                        <tr>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-brand-charcoal">#{{ $order->id }}</td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $order->created_at->format('M d, Y') }}</td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-semibold">${{ number_format($order->total, 2) }}</td>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-{{ $order->status == 'completed' ? 'green' : ($order->status == 'pending' ? 'yellow' : 'gray') }}-100 text-{{ $order->status == 'completed' ? 'green' : ($order->status == 'pending' ? 'yellow' : 'gray') }}-800 uppercase">
-                                                    {{ $order->status }}
-                                                </span>
-                                            </td>
-                                            <td class="px-6 py-4 text-sm text-gray-500">
-                                                <ul class="list-disc pl-4">
-                                                    @foreach($order->items as $item)
-                                                        <li>{{ $item->productCondition->product->name ?? 'Unknown Product' }} (x{{ $item->quantity }})</li>
-                                                    @endforeach
-                                                </ul>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                    @endif
+            <!-- Sidebar Navigation/Actions -->
+            <div class="lg:col-span-3 space-y-8">
+                <div class="border-2 border-brand-charcoal bg-brand-offwhite p-6 shadow-[8px_8px_0px_0px_rgba(42,42,44,1)]">
+                    <h3 class="font-mono text-sm font-bold uppercase tracking-widest text-brand-charcoal mb-4 pb-4 border-b-2 border-brand-charcoal">Account</h3>
+                    <ul class="space-y-4">
+                        <li>
+                            <a href="{{ route('profile.edit') }}" class="font-mono text-xs font-bold uppercase tracking-widest text-brand-grey hover:text-brand-red transition-colors flex items-center justify-between group">
+                                <span>Profile Settings</span>
+                                <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
+                            </a>
+                        </li>
+                        <li>
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <button type="submit" class="font-mono text-xs font-bold uppercase tracking-widest text-brand-grey hover:text-brand-red transition-colors flex items-center justify-between group w-full text-left">
+                                    <span>Log Out</span>
+                                    <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
                 </div>
             </div>
 
-            <!-- Trade-In Valuations Section -->
-            <div class="bg-white overflow-hidden shadow-sm border border-gray-200">
-                <div class="px-6 py-4 border-b border-gray-200 bg-brand-offwhite flex justify-between items-center">
-                    <h3 class="font-display text-lg uppercase tracking-tight text-brand-charcoal">Trade-In Requests</h3>
-                    <a href="{{ route('trade-in.create') }}" class="text-xs font-mono uppercase tracking-wider font-bold text-brand-red hover:text-brand-red-dark">Submit New Device</a>
-                </div>
-                <div class="p-6">
-                    @if($tradeIns->isEmpty())
-                        <p class="text-gray-500 font-sans text-sm">You haven't submitted any trade-in requests.</p>
-                    @else
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            @foreach($tradeIns as $trade)
-                                <div class="border border-gray-200 p-4 rounded-md shadow-sm relative">
-                                    <div class="flex justify-between items-start mb-2">
-                                        <h4 class="font-bold text-brand-charcoal text-lg">{{ $trade->device_brand }} {{ $trade->device_model }}</h4>
-                                        <span class="px-2 py-1 text-xs font-bold uppercase tracking-wider rounded-full bg-{{ $trade->status == 'approved' ? 'green' : ($trade->status == 'pending' ? 'yellow' : 'red') }}-100 text-{{ $trade->status == 'approved' ? 'green' : ($trade->status == 'pending' ? 'yellow' : 'red') }}-800">
-                                            {{ $trade->status }}
-                                        </span>
+            <!-- Main Content -->
+            <div class="lg:col-span-9 space-y-16">
+                
+                <!-- Order History -->
+                <section>
+                    <div class="flex items-center space-x-4 mb-8">
+                        <span class="flex items-center justify-center h-8 w-8 bg-brand-charcoal text-brand-white font-mono text-sm font-bold">1</span>
+                        <h2 class="font-display text-2xl uppercase tracking-tight text-brand-charcoal">Order History</h2>
+                    </div>
+
+                    @if($orders->count() > 0)
+                        <div class="space-y-6">
+                            @foreach($orders as $order)
+                                <div class="border-2 border-brand-charcoal bg-brand-offwhite p-6 hover:shadow-[8px_8px_0px_0px_rgba(42,42,44,1)] transition-shadow">
+                                    <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b-2 border-brand-charcoal pb-4 mb-4 gap-4">
+                                        <div>
+                                            <span class="font-mono text-xs font-bold uppercase tracking-widest text-brand-grey block mb-1">Order ID</span>
+                                            <span class="font-mono text-lg font-bold text-brand-charcoal">#{{ str_pad($order->id, 6, '0', STR_PAD_LEFT) }}</span>
+                                        </div>
+                                        <div>
+                                            <span class="font-mono text-xs font-bold uppercase tracking-widest text-brand-grey block mb-1">Date</span>
+                                            <span class="font-mono font-bold text-brand-charcoal">{{ $order->created_at->format('M d, Y') }}</span>
+                                        </div>
+                                        <div>
+                                            <span class="font-mono text-xs font-bold uppercase tracking-widest text-brand-grey block mb-1">Total</span>
+                                            <span class="font-mono font-bold text-brand-red">Rs {{ number_format($order->total) }}</span>
+                                        </div>
+                                        <div class="text-right">
+                                            <span class="font-mono text-xs font-bold uppercase tracking-widest text-brand-grey block mb-1">Status</span>
+                                            <span class="inline-block border-2 border-brand-charcoal px-3 py-1 font-mono text-xs font-bold uppercase tracking-widest bg-brand-white {{ $order->status === 'pending' ? 'text-brand-red' : 'text-brand-charcoal' }}">
+                                                {{ $order->status }}
+                                            </span>
+                                        </div>
                                     </div>
-                                    <p class="text-xs text-gray-500 mb-4">{{ $trade->created_at->format('M d, Y') }}</p>
                                     
-                                    <div class="bg-gray-50 p-3 rounded text-sm mb-4">
-                                        <p class="text-gray-700 truncate" title="{{ $trade->condition_description }}">{{ $trade->condition_description }}</p>
-                                    </div>
-                                    
-                                    <div class="border-t border-gray-100 pt-3 flex justify-between items-center">
-                                        <span class="text-xs font-mono text-gray-500 uppercase">Est. Value</span>
-                                        <span class="font-bold text-brand-charcoal {{ $trade->estimated_value ? 'text-green-600' : 'text-gray-400' }}">
-                                            {{ $trade->estimated_value ? '$' . number_format($trade->estimated_value, 2) : 'Pending Evaluation' }}
-                                        </span>
+                                    <div class="space-y-2">
+                                        @foreach($order->items as $item)
+                                            <div class="flex justify-between items-center text-sm font-mono font-bold">
+                                                <span>{{ $item->quantity }}x {{ $item->productCondition->product->name ?? 'Unknown Product' }} (Grade {{ $item->productCondition->grade ?? 'N/A' }})</span>
+                                                <span>Rs {{ number_format($item->price_at_purchase * $item->quantity) }}</span>
+                                            </div>
+                                        @endforeach
                                     </div>
                                 </div>
                             @endforeach
                         </div>
+                    @else
+                        <div class="border-2 border-dashed border-brand-charcoal p-12 text-center bg-brand-offwhite">
+                            <p class="font-mono text-sm font-bold uppercase tracking-widest text-brand-grey">No orders found.</p>
+                            <a href="{{ route('products.index') }}" class="inline-block mt-4 text-brand-red hover:text-brand-charcoal font-mono text-xs font-bold uppercase tracking-widest underline decoration-brand-red hover:decoration-brand-charcoal underline-offset-4 transition-colors">Start Shopping</a>
+                        </div>
                     @endif
-                </div>
-            </div>
+                </section>
 
+                <!-- Trade-In Valuations -->
+                <section>
+                    <div class="flex items-center space-x-4 mb-8 border-t-2 border-brand-charcoal pt-16">
+                        <span class="flex items-center justify-center h-8 w-8 bg-brand-charcoal text-brand-white font-mono text-sm font-bold">2</span>
+                        <h2 class="font-display text-2xl uppercase tracking-tight text-brand-charcoal">Trade-In Valuations</h2>
+                    </div>
+
+                    @if($tradeIns->count() > 0)
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            @foreach($tradeIns as $tradeIn)
+                                <div class="border-2 border-brand-charcoal bg-brand-white p-6 shadow-[4px_4px_0px_0px_rgba(42,42,44,1)]">
+                                    <div class="flex justify-between items-start mb-4">
+                                        <h4 class="font-display text-xl uppercase tracking-tight text-brand-charcoal">{{ $tradeIn->device_brand }} {{ $tradeIn->device_model }}</h4>
+                                        <span class="inline-block border border-brand-charcoal px-2 py-0.5 font-mono text-xs font-bold uppercase tracking-widest {{ $tradeIn->status === 'approved' ? 'bg-green-100 text-green-800' : 'bg-brand-offwhite text-brand-grey' }}">
+                                            {{ $tradeIn->status }}
+                                        </span>
+                                    </div>
+                                    <p class="font-sans text-sm text-brand-grey mb-6">{{ $tradeIn->condition_description }}</p>
+                                    
+                                    <div class="border-t-2 border-brand-charcoal pt-4 flex justify-between items-center">
+                                        <span class="font-mono text-xs font-bold uppercase tracking-widest text-brand-grey">Estimated Value</span>
+                                        @if($tradeIn->estimated_value)
+                                            <span class="font-mono text-xl font-bold text-brand-red">Rs {{ number_format($tradeIn->estimated_value) }}</span>
+                                        @else
+                                            <span class="font-mono text-sm font-bold text-brand-charcoal uppercase">Pending</span>
+                                        @endif
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <div class="border-2 border-dashed border-brand-charcoal p-12 text-center bg-brand-offwhite">
+                            <p class="font-mono text-sm font-bold uppercase tracking-widest text-brand-grey">No trade-in requests found.</p>
+                            <a href="{{ route('trade-in.create') }}" class="inline-block mt-4 text-brand-red hover:text-brand-charcoal font-mono text-xs font-bold uppercase tracking-widest underline decoration-brand-red hover:decoration-brand-charcoal underline-offset-4 transition-colors">Request Valuation</a>
+                        </div>
+                    @endif
+                </section>
+
+            </div>
         </div>
+
     </div>
-</x-app-layout>
+
+@endsection

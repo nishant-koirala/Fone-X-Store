@@ -6,6 +6,8 @@ use App\Filament\Resources\PostResource\Pages;
 use App\Models\Post;
 use Filament\Forms;
 use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Group;
+use Filament\Schemas\Components\Section;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -23,9 +25,9 @@ class PostResource extends Resource
     {
         return $schema
             ->components([
-                Forms\Components\Group::make()
+                Group::make()
                     ->schema([
-                        Forms\Components\Section::make('Post Details')
+                        Section::make('Post Details')
                             ->schema([
                                 Forms\Components\TextInput::make('title')
                                     ->required()
@@ -44,9 +46,9 @@ class PostResource extends Resource
                             ])->columns(2),
                     ])->columnSpan(['lg' => 2]),
 
-                Forms\Components\Group::make()
+                Group::make()
                     ->schema([
-                        Forms\Components\Section::make('Publishing')
+                        Section::make('Publishing')
                             ->schema([
                                 Forms\Components\Toggle::make('is_published')
                                     ->label('Published')
@@ -56,7 +58,7 @@ class PostResource extends Resource
                                     ->label('Publish Date'),
                             ]),
                             
-                        Forms\Components\Section::make('Image')
+                        Section::make('Image')
                             ->schema([
                                 Forms\Components\SpatieMediaLibraryFileUpload::make('thumbnail')
                                     ->collection('thumbnail')

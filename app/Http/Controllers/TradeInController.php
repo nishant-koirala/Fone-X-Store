@@ -68,6 +68,10 @@ class TradeInController extends Controller
             \Illuminate\Support\Facades\Mail::to($customer->email)->send(new \App\Mail\TradeInSubmitted($valuation));
         }
 
+        // Send alert to Admin
+        $adminEmail = env('ADMIN_EMAIL', 'admin@fonex.com');
+        \Illuminate\Support\Facades\Mail::to($adminEmail)->send(new \App\Mail\AdminTradeInAlert($valuation));
+
         return redirect()->route('trade-in.confirmation', $valuation)
             ->with('success', 'Trade-in request submitted successfully!');
     }

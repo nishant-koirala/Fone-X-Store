@@ -1,6 +1,8 @@
 @extends('layouts.storefront')
 
 @section('title', 'Shopping Cart — FoneX Store')
+@section('meta_description', 'View and manage your shopping cart at Fone-X-Store. Checkout securely.')
+@section('meta_keywords', 'cart, shopping cart, checkout, fonex store')
 
 @section('content')
 

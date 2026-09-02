@@ -10,7 +10,7 @@
     }
 @endphp
 
-<a href="{{ route('products.show', $product->slug) }}" class="group block border border-gray-200 bg-white rounded-2xl p-5 hover:border-brand-red hover:shadow-xl transition-all duration-300 relative flex flex-col justify-between h-full">
+<a href="{{ route('products.show', $product->slug) }}" class="group block border-2 border-brand-charcoal bg-brand-white p-5 hover:bg-brand-charcoal hover:text-brand-white shadow-[4px_4px_0px_0px_rgba(42,42,44,1)] hover:shadow-[0px_0px_0px_0px_rgba(42,42,44,1)] hover:translate-x-1 hover:translate-y-1 transition-all duration-200 relative flex flex-col justify-between h-full">
     <!-- Condition & Stock Header -->
     <div class="flex items-center justify-between mb-4">
         @if($isNew)
@@ -31,7 +31,7 @@
     </div>
 
     <!-- Image Area -->
-    <div class="aspect-[4/3] flex items-center justify-center bg-brand-offwhite p-6 relative overflow-hidden mb-5 border border-gray-100 rounded-xl">
+    <div class="aspect-[4/3] flex items-center justify-center bg-brand-offwhite p-6 relative overflow-hidden mb-5 border-2 border-brand-charcoal">
         @if($product->image)
             <img src="{{ Storage::url($product->image) }}" alt="{{ $product->name }} image" class="h-40 w-auto object-contain group-hover:scale-110 transition-transform duration-500 ease-out mix-blend-multiply" />
         @else
@@ -78,7 +78,7 @@
     </div>
 
     <!-- Price Area (Bottom aligned) -->
-    <div class="mt-6 pt-4 border-t border-gray-100 flex items-baseline justify-between">
+    <div class="mt-6 pt-4 border-t-2 border-brand-charcoal flex items-baseline justify-between">
         <div>
             <span class="font-mono text-xs text-brand-grey uppercase tracking-widest font-bold block mb-1">PRICE</span>
             <div class="flex items-baseline space-x-2">

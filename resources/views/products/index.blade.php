@@ -1,6 +1,8 @@
 @extends('layouts.storefront')
 
 @section('title', 'Phone Inventory & Catalog — FoneX Store')
+@section('meta_description', 'Browse Fone-X-Store\'s complete inventory of certified pre-owned and new smartphones. Filter by brand, condition, and price.')
+@section('meta_keywords', 'smartphones, inventory, phones, iphone, samsung, used phones, buy phones nepal')
 
 @section('content')
 

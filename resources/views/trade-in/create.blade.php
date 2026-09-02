@@ -1,6 +1,8 @@
 @extends('layouts.storefront')
 
-@section('title', 'Trade-In Valuation — FoneX Store')
+@section('title', 'Trade-In Your Device — FoneX Store')
+@section('meta_description', 'Trade-in your old smartphone for cash or credit at Fone-X-Store. Get a free valuation today.')
+@section('meta_keywords', 'trade in, sell phone, sell used phone, phone valuation, fonex store')
 
 @section('content')
 

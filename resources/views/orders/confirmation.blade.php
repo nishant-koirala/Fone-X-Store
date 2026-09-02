@@ -74,7 +74,7 @@
                     <div class="flex items-center justify-between pt-2">
                         <div>
                             <div class="flex items-center space-x-2">
-                                <span class="font-mono text-[10px] font-bold uppercase bg-brand-red text-white px-1.5 py-0.5">
+                                <span class="font-mono text-xs font-bold uppercase bg-brand-red text-white px-1.5 py-0.5">
                                     GRADE {{ strtoupper($cond->grade) }}
                                 </span>
                                 <span class="font-sans font-bold text-brand-charcoal text-base">

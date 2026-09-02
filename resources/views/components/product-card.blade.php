@@ -10,7 +10,7 @@
     }
 @endphp
 
-<a href="{{ route('products.show', $product->slug) }}" class="group block border border-gray-200 bg-white p-5 hover:border-brand-red hover:shadow-xl transition-all duration-300 relative flex flex-col justify-between h-full">
+<a href="{{ route('products.show', $product->slug) }}" class="group block border border-gray-200 bg-white rounded-2xl p-5 hover:border-brand-red hover:shadow-xl transition-all duration-300 relative flex flex-col justify-between h-full">
     <!-- Condition & Stock Header -->
     <div class="flex items-center justify-between mb-4">
         @if($isNew)
@@ -20,30 +20,30 @@
         @endif
 
         @if($condition->quantity_in_stock > 0)
-            <span class="font-mono text-[10px] font-bold uppercase text-brand-charcoal tracking-wider">
+            <span class="font-mono text-xs font-bold uppercase text-brand-charcoal tracking-wider">
                 IN STOCK ({{ $condition->quantity_in_stock }})
             </span>
         @else
-            <span class="font-mono text-[10px] font-bold uppercase text-brand-grey tracking-wider">
+            <span class="font-mono text-xs font-bold uppercase text-brand-grey tracking-wider">
                 OUT OF STOCK
             </span>
         @endif
     </div>
 
     <!-- Image Area -->
-    <div class="aspect-[4/3] flex items-center justify-center bg-brand-offwhite p-6 relative overflow-hidden mb-5 border border-gray-100">
+    <div class="aspect-[4/3] flex items-center justify-center bg-brand-offwhite p-6 relative overflow-hidden mb-5 border border-gray-100 rounded-xl">
         @if($product->image)
-            <img src="{{ Storage::url($product->image) }}" class="h-28 w-28 object-contain group-hover:scale-110 transition-transform duration-500 ease-out mix-blend-multiply" />
+            <img src="{{ Storage::url($product->image) }}" alt="{{ $product->name }} image" class="h-40 w-auto object-contain group-hover:scale-110 transition-transform duration-500 ease-out mix-blend-multiply" />
         @else
-            <x-product-icon :categorySlug="$category->slug ?? ''" class="h-28 w-28 text-brand-charcoal/20 group-hover:text-brand-red/40 transition-colors duration-300 stroke-[1.5]" />
+            <x-product-icon :categorySlug="$category->slug ?? ''" class="h-40 w-auto text-brand-charcoal/20 group-hover:text-brand-red/40 transition-colors duration-300 stroke-[1.5]" />
         @endif
 
-        <span class="absolute bottom-2 left-2 font-mono text-[10px] uppercase tracking-widest text-brand-grey font-bold">
+        <span class="absolute bottom-2 left-2 font-mono text-xs uppercase tracking-widest text-brand-grey font-bold">
             {{ strtoupper($product->brand) }}
         </span>
 
         @if($savings > 0)
-            <span class="absolute top-2 right-2 bg-brand-charcoal text-white font-mono text-[10px] font-bold px-1.5 py-0.5">
+            <span class="absolute top-2 right-2 bg-brand-charcoal text-white font-mono text-xs font-bold px-1.5 py-0.5">
                 SAVE {{ $savings }}%
             </span>
         @endif
@@ -51,7 +51,7 @@
 
     <!-- Info Area -->
     <div class="space-y-1 flex-grow">
-        <div class="font-mono text-[10px] text-brand-grey uppercase tracking-widest font-bold">
+        <div class="font-mono text-xs text-brand-grey uppercase tracking-widest font-bold">
             {{ $category->name ?? 'SMARTPHONE' }}
         </div>
         <h3 class="font-sans font-bold text-brand-charcoal text-lg group-hover:text-brand-red transition-colors leading-snug block">
@@ -71,7 +71,7 @@
                         @endif
                     @endfor
                 </div>
-                <span class="font-mono text-[10px] text-brand-grey font-bold">({{ $product->reviews_count }})</span>
+                <span class="font-mono text-xs text-brand-grey font-bold">({{ $product->reviews_count }})</span>
             </div>
         @endif
 
@@ -80,13 +80,13 @@
     <!-- Price Area (Bottom aligned) -->
     <div class="mt-6 pt-4 border-t border-gray-100 flex items-baseline justify-between">
         <div>
-            <span class="font-mono text-[10px] text-brand-grey uppercase tracking-widest font-bold block mb-1">PRICE</span>
+            <span class="font-mono text-xs text-brand-grey uppercase tracking-widest font-bold block mb-1">PRICE</span>
             <div class="flex items-baseline space-x-2">
                 <span class="font-mono font-bold text-brand-charcoal text-xl">
                     Rs {{ number_format($condition->price) }}
                 </span>
                 @if($savings > 0)
-                    <span class="font-mono text-[10px] text-brand-grey line-through font-bold">
+                    <span class="font-mono text-xs text-brand-grey line-through font-bold">
                         Rs {{ number_format($condition->original_price) }}
                     </span>
                 @endif

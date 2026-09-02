@@ -4,13 +4,36 @@
 
 @section('content')
 
+@push('head')
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org/",
+  "@type": "Product",
+  "name": "{{ $product->name }}",
+  "image": "{{ $product->image ? url(Storage::url($product->image)) : asset('images/default-og.jpg') }}",
+  "description": "{{ Str::limit(strip_tags($product->description), 150) }}",
+  "brand": {
+    "@type": "Brand",
+    "name": "{{ $product->brand }}"
+  },
+  "offers": {
+    "@type": "AggregateOffer",
+    "url": "{{ url()->current() }}",
+    "priceCurrency": "NPR",
+    "lowPrice": "{{ $product->conditions->min('price') ?? 0 }}",
+    "highPrice": "{{ $product->conditions->max('price') ?? 0 }}",
+    "offerCount": "{{ $product->conditions->count() }}"
+  }
+}
+</script>
+@endpush
 <!-- Alpine State for the single product page -->
 <div x-data="productDetail({ conditions: {{ \Illuminate\Support\Js::from($product->conditions) }} })" class="bg-brand-white">
 
     <!-- Breadcrumb (Minimal) -->
     <div class="border-b-2 border-brand-charcoal py-4 bg-brand-white">
         <div class="mx-auto max-w-[90rem] px-4 sm:px-6 lg:px-8">
-            <nav class="flex font-mono text-[10px] font-bold uppercase tracking-widest text-brand-grey space-x-2">
+            <nav class="flex font-mono text-xs font-bold uppercase tracking-widest text-brand-grey space-x-2">
                 <a href="{{ route('home') }}" class="hover:text-brand-charcoal transition-colors">Home</a>
                 <span>/</span>
                 <a href="{{ route('products.index', ['category' => $product->category->slug ?? '']) }}" class="hover:text-brand-charcoal transition-colors">
@@ -42,7 +65,7 @@
 
                 <!-- Brand tag -->
                 <div class="absolute bottom-6 left-6">
-                    <span class="font-mono text-[10px] font-bold uppercase tracking-widest text-brand-charcoal bg-brand-white px-3 py-1 border-2 border-brand-charcoal shadow-[2px_2px_0px_0px_rgba(200,32,45,1)]">
+                    <span class="font-mono text-xs font-bold uppercase tracking-widest text-brand-charcoal bg-brand-white px-3 py-1 border-2 border-brand-charcoal shadow-[2px_2px_0px_0px_rgba(200,32,45,1)]">
                         {{ $product->brand }}
                     </span>
                 </div>
@@ -77,14 +100,14 @@
 
                 <!-- Price Display -->
                 <div class="mb-10 p-6 border-2 border-brand-charcoal bg-brand-offwhite">
-                    <span class="font-mono text-[10px] font-bold uppercase tracking-widest text-brand-charcoal block mb-2">Selected Configuration Price</span>
+                    <span class="font-mono text-xs font-bold uppercase tracking-widest text-brand-charcoal block mb-2">Selected Configuration Price</span>
                     <div class="flex items-end space-x-4">
                         <span class="font-mono text-4xl sm:text-5xl font-bold text-brand-red" x-text="'Rs ' + Number(selectedCondition.price).toLocaleString()"></span>
                         
                         <template x-if="savings > 0">
                             <div class="flex flex-col pb-1">
                                 <span class="font-mono text-lg text-brand-grey line-through font-bold" x-text="'Rs ' + Number(selectedCondition.original_price).toLocaleString()"></span>
-                                <span class="font-mono text-[10px] font-bold uppercase tracking-widest text-brand-charcoal bg-brand-white border border-brand-charcoal px-2 py-0.5 inline-block mt-1">
+                                <span class="font-mono text-xs font-bold uppercase tracking-widest text-brand-charcoal bg-brand-white border border-brand-charcoal px-2 py-0.5 inline-block mt-1">
                                     SAVE <span x-text="savings + '%'"></span>
                                 </span>
                             </div>
@@ -96,12 +119,13 @@
                 <div class="mb-10">
                     <div class="flex items-center justify-between mb-4">
                         <span class="font-mono text-xs font-bold uppercase tracking-widest text-brand-charcoal">Select Condition</span>
-                        <a href="#" class="font-mono text-[10px] uppercase font-bold text-brand-grey hover:text-brand-red underline decoration-brand-grey underline-offset-4">Condition Guide</a>
+                        <a href="#" class="font-mono text-xs uppercase font-bold text-brand-grey hover:text-brand-red underline decoration-brand-grey underline-offset-4">Condition Guide</a>
                     </div>
                     
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <template x-for="c in conditions" :key="c.id">
                             <button type="button" @click="selectCondition(c)" 
+                                :aria-pressed="selectedCondition.id === c.id"
                                 :class="{
                                     'border-brand-red bg-brand-white shadow-[4px_4px_0px_0px_rgba(200,32,45,1)]': selectedCondition.id === c.id,
                                     'border-brand-charcoal bg-brand-offwhite hover:bg-brand-white hover:border-brand-red opacity-60': selectedCondition.id !== c.id,
@@ -115,7 +139,7 @@
                                     </template>
                                 </div>
                                 <div class="font-mono text-xs font-bold text-brand-charcoal mt-1" x-text="'Rs ' + Number(c.price).toLocaleString()"></div>
-                                <div class="font-mono text-[10px] uppercase text-brand-grey mt-2 tracking-widest" x-text="c.quantity_in_stock > 0 ? c.quantity_in_stock + ' IN STOCK' : 'OUT OF STOCK'"></div>
+                                <div class="font-mono text-xs uppercase text-brand-grey mt-2 tracking-widest" x-text="c.quantity_in_stock > 0 ? c.quantity_in_stock + ' IN STOCK' : 'OUT OF STOCK'"></div>
                             </button>
                         </template>
                     </div>
@@ -150,13 +174,13 @@
                         <svg class="h-6 w-6 flex-shrink-0 text-brand-red" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="square" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
-                        <span class="font-mono text-[10px] font-bold uppercase tracking-widest text-brand-charcoal">Verified Quality Guarantee</span>
+                        <span class="font-mono text-xs font-bold uppercase tracking-widest text-brand-charcoal">Verified Quality Guarantee</span>
                     </div>
                     <div class="flex items-start space-x-3">
                         <svg class="h-6 w-6 flex-shrink-0 text-brand-red" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="square" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
-                        <span class="font-mono text-[10px] font-bold uppercase tracking-widest text-brand-charcoal">7-Day Checking Warranty</span>
+                        <span class="font-mono text-xs font-bold uppercase tracking-widest text-brand-charcoal">7-Day Checking Warranty</span>
                     </div>
                 </div>
 

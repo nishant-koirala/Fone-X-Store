@@ -31,7 +31,7 @@
                             <div class="py-8 border-b-2 border-brand-charcoal flex flex-col sm:flex-row gap-6 relative group">
                                 
                                 <!-- Remove Button -->
-                                <form action="{{ route('cart.remove', $index) }}" method="POST" class="absolute top-8 right-0 sm:right-2">
+                                <form action="{{ route('cart.destroy', $item['condition']->id) }}" method="POST" class="absolute top-8 right-0 sm:right-2">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="text-brand-grey hover:text-brand-red p-2 transition-colors">
@@ -43,29 +43,29 @@
 
                                 <!-- Image -->
                                 <div class="w-full sm:w-40 h-40 bg-brand-offwhite border-2 border-brand-charcoal flex items-center justify-center flex-shrink-0 p-4">
-                                    @if($item['product']->image)
-                                        <img src="{{ Storage::url($item['product']->image) }}" class="max-h-full w-auto object-contain mix-blend-multiply" />
+                                    @if($item['condition']->product->image)
+                                        <img src="{{ Storage::url($item['condition']->product->image) }}" alt="{{ $item['condition']->product->name }} image" class="max-h-full w-auto object-contain mix-blend-multiply" />
                                     @else
-                                        <x-product-icon :categorySlug="$item['product']->category->slug ?? ''" class="h-16 text-brand-charcoal stroke-[1]" />
+                                        <x-product-icon :categorySlug="$item['condition']->product->category->slug ?? ''" class="h-16 text-brand-charcoal stroke-[1]" />
                                     @endif
                                 </div>
 
                                 <!-- Details -->
                                 <div class="flex-grow flex flex-col justify-between pr-10 sm:pr-12">
                                     <div>
-                                        <div class="font-mono text-[10px] font-bold uppercase tracking-widest text-brand-grey mb-1">
-                                            {{ $item['product']->brand }}
+                                        <div class="font-mono text-xs font-bold uppercase tracking-widest text-brand-grey mb-1">
+                                            {{ $item['condition']->product->brand }}
                                         </div>
                                         <h3 class="font-display text-2xl uppercase tracking-tight text-brand-charcoal mb-2">
-                                            <a href="{{ route('products.show', $item['product']->slug) }}" class="hover:text-brand-red transition-colors">{{ $item['product']->name }}</a>
+                                            <a href="{{ route('products.show', $item['condition']->product->slug) }}" class="hover:text-brand-red transition-colors">{{ $item['condition']->product->name }}</a>
                                         </h3>
-                                        <div class="inline-block border border-brand-charcoal px-2 py-0.5 font-mono text-[10px] font-bold uppercase tracking-widest text-brand-charcoal bg-brand-white">
+                                        <div class="inline-block border border-brand-charcoal px-2 py-0.5 font-mono text-xs font-bold uppercase tracking-widest text-brand-charcoal bg-brand-white">
                                             CONDITION: {{ strtoupper($item['condition']->grade === 'new' ? 'Brand New' : 'Grade ' . $item['condition']->grade) }}
                                         </div>
                                     </div>
                                     
                                     <div class="flex items-end justify-between mt-6">
-                                        <form action="{{ route('cart.update', $index) }}" method="POST" class="flex items-center border-2 border-brand-charcoal bg-brand-white w-24">
+                                        <form action="{{ route('cart.update', $item['condition']->id) }}" method="POST" class="flex items-center border-2 border-brand-charcoal bg-brand-white w-24">
                                             @csrf
                                             <input type="number" name="quantity" value="{{ $item['quantity'] }}" min="1" max="{{ $item['condition']->quantity_in_stock }}" class="w-full text-center font-mono font-bold border-none focus:ring-0 p-2" onchange="this.form.submit()">
                                         </form>
@@ -124,7 +124,7 @@
                                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="square" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                                 </svg>
-                                <span class="font-mono text-[10px] font-bold uppercase tracking-widest">Secure Cash on Delivery</span>
+                                <span class="font-mono text-xs font-bold uppercase tracking-widest">Secure Cash on Delivery</span>
                             </div>
                         </div>
                     </div>

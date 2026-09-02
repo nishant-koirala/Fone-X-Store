@@ -31,7 +31,7 @@
                         @endif
                     </div>
                     <div class="p-6 flex-1 flex flex-col">
-                        <div class="font-mono text-[10px] uppercase text-brand-grey mb-3">
+                        <div class="font-mono text-xs uppercase text-brand-grey mb-3">
                             {{ $post->published_at ? $post->published_at->format('M d, Y') : $post->created_at->format('M d, Y') }}
                         </div>
                         <h2 class="font-sans font-bold text-xl text-brand-charcoal group-hover:text-brand-red transition-colors mb-3">

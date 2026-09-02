@@ -7,7 +7,7 @@
     <!-- Stark Page Header -->
     <div class="bg-brand-charcoal text-brand-white border-b border-brand-charcoal py-12 lg:py-24">
         <div class="mx-auto max-w-[90rem] px-4 sm:px-6 lg:px-8 text-center">
-            <span class="inline-block border-2 border-brand-charcoal px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-widest text-brand-charcoal bg-brand-white shadow-[4px_4px_0px_0px_rgba(42,42,44,1)] mb-6">
+            <span class="inline-block border-2 border-brand-charcoal px-3 py-1 font-mono text-xs font-bold uppercase tracking-widest text-brand-charcoal bg-brand-white shadow-[4px_4px_0px_0px_rgba(42,42,44,1)] mb-6">
                 INSTANT VALUATION
             </span>
             <h1 class="font-display text-5xl sm:text-7xl uppercase tracking-tight text-brand-white leading-none">
@@ -32,7 +32,7 @@
                         :class="step >= i ? 'border-brand-charcoal bg-brand-charcoal text-brand-white' : 'border-gray-300 bg-brand-white text-gray-400'">
                         <span x-text="i"></span>
                     </div>
-                    <span class="font-mono text-[10px] uppercase font-bold mt-2 tracking-widest"
+                    <span class="font-mono text-xs uppercase font-bold mt-2 tracking-widest"
                         :class="step >= i ? 'text-brand-charcoal' : 'text-gray-400'"
                         x-text="i === 1 ? 'Device' : (i === 2 ? 'Condition' : 'Contact')"></span>
                 </div>
@@ -51,17 +51,17 @@
                     
                     <div class="space-y-6">
                         <div>
-                            <label for="device_brand" class="font-mono text-[10px] font-bold uppercase tracking-widest text-brand-charcoal block mb-2">Device Brand</label>
+                            <label for="device_brand" class="font-mono text-xs font-bold uppercase tracking-widest text-brand-charcoal block mb-2">Device Brand</label>
                             <input type="text" id="device_brand" name="device_brand" required placeholder="e.g. Apple, Samsung"
                                 class="w-full bg-brand-offwhite border-2 border-brand-charcoal px-4 py-4 font-mono font-bold text-sm focus:border-brand-red focus:ring-0">
-                            @error('device_brand') <p class="text-brand-red font-mono text-[10px] mt-1 font-bold">{{ $message }}</p> @enderror
+                            @error('device_brand') <p class="text-brand-red font-mono text-xs mt-1 font-bold">{{ $message }}</p> @enderror
                         </div>
 
                         <div>
-                            <label for="device_model" class="font-mono text-[10px] font-bold uppercase tracking-widest text-brand-charcoal block mb-2">Device Model & Storage</label>
+                            <label for="device_model" class="font-mono text-xs font-bold uppercase tracking-widest text-brand-charcoal block mb-2">Device Model & Storage</label>
                             <input type="text" id="device_model" name="device_model" required placeholder="e.g. iPhone 13 Pro 256GB"
                                 class="w-full bg-brand-offwhite border-2 border-brand-charcoal px-4 py-4 font-mono font-bold text-sm focus:border-brand-red focus:ring-0">
-                            @error('device_model') <p class="text-brand-red font-mono text-[10px] mt-1 font-bold">{{ $message }}</p> @enderror
+                            @error('device_model') <p class="text-brand-red font-mono text-xs mt-1 font-bold">{{ $message }}</p> @enderror
                         </div>
                     </div>
 
@@ -78,7 +78,7 @@
                     <h2 class="font-display text-3xl uppercase tracking-tight text-brand-charcoal mb-8 pb-4 border-b-2 border-brand-charcoal">Assess Condition</h2>
                     
                     <div>
-                        <label class="font-mono text-[10px] font-bold uppercase tracking-widest text-brand-charcoal block mb-4">Select the best match for your device</label>
+                        <label class="font-mono text-xs font-bold uppercase tracking-widest text-brand-charcoal block mb-4">Select the best match for your device</label>
                         
                         <div class="space-y-4">
                             <!-- Option Flawless -->
@@ -114,7 +114,7 @@
                                 </div>
                             </label>
                         </div>
-                        @error('condition') <p class="text-brand-red font-mono text-[10px] mt-1 font-bold">{{ $message }}</p> @enderror
+                        @error('condition') <p class="text-brand-red font-mono text-xs mt-1 font-bold">{{ $message }}</p> @enderror
                     </div>
 
                     <div class="mt-12 flex justify-between">
@@ -134,24 +134,24 @@
                     
                     <div class="space-y-6">
                         <div>
-                            <label for="customer_name" class="font-mono text-[10px] font-bold uppercase tracking-widest text-brand-charcoal block mb-2">Full Name</label>
+                            <label for="customer_name" class="font-mono text-xs font-bold uppercase tracking-widest text-brand-charcoal block mb-2">Full Name</label>
                             <input type="text" id="customer_name" name="customer_name" required
                                 class="w-full bg-brand-offwhite border-2 border-brand-charcoal px-4 py-4 font-mono font-bold text-sm focus:border-brand-red focus:ring-0">
-                            @error('customer_name') <p class="text-brand-red font-mono text-[10px] mt-1 font-bold">{{ $message }}</p> @enderror
+                            @error('customer_name') <p class="text-brand-red font-mono text-xs mt-1 font-bold">{{ $message }}</p> @enderror
                         </div>
 
                         <div>
-                            <label for="customer_phone" class="font-mono text-[10px] font-bold uppercase tracking-widest text-brand-charcoal block mb-2">Phone Number</label>
+                            <label for="customer_phone" class="font-mono text-xs font-bold uppercase tracking-widest text-brand-charcoal block mb-2">Phone Number</label>
                             <input type="tel" id="customer_phone" name="customer_phone" required
                                 class="w-full bg-brand-offwhite border-2 border-brand-charcoal px-4 py-4 font-mono font-bold text-sm focus:border-brand-red focus:ring-0">
-                            @error('customer_phone') <p class="text-brand-red font-mono text-[10px] mt-1 font-bold">{{ $message }}</p> @enderror
+                            @error('customer_phone') <p class="text-brand-red font-mono text-xs mt-1 font-bold">{{ $message }}</p> @enderror
                         </div>
 
                         <div>
-                            <label for="additional_notes" class="font-mono text-[10px] font-bold uppercase tracking-widest text-brand-charcoal block mb-2">Additional Notes (Optional)</label>
+                            <label for="additional_notes" class="font-mono text-xs font-bold uppercase tracking-widest text-brand-charcoal block mb-2">Additional Notes (Optional)</label>
                             <textarea id="additional_notes" name="additional_notes" rows="3" placeholder="Any other details we should know?"
                                 class="w-full bg-brand-offwhite border-2 border-brand-charcoal px-4 py-4 font-mono font-bold text-sm focus:border-brand-red focus:ring-0 resize-none"></textarea>
-                            @error('additional_notes') <p class="text-brand-red font-mono text-[10px] mt-1 font-bold">{{ $message }}</p> @enderror
+                            @error('additional_notes') <p class="text-brand-red font-mono text-xs mt-1 font-bold">{{ $message }}</p> @enderror
                         </div>
                     </div>
 

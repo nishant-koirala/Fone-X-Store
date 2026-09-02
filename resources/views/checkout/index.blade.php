@@ -15,7 +15,7 @@
 
     <div class="mx-auto max-w-[90rem] px-4 sm:px-6 lg:px-8 py-16 bg-brand-white">
         
-        <form action="{{ route('checkout.process') }}" method="POST">
+        <form action="{{ route('checkout.store') }}" method="POST">
             @csrf
             
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
@@ -32,31 +32,31 @@
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div class="md:col-span-2">
-                                <label for="customer_name" class="font-mono text-[10px] font-bold uppercase tracking-widest text-brand-charcoal block mb-2">Full Name</label>
-                                <input type="text" id="customer_name" name="customer_name" required value="{{ old('customer_name') }}"
+                                <label for="name" class="font-mono text-xs font-bold uppercase tracking-widest text-brand-charcoal block mb-2">Full Name</label>
+                                <input type="text" id="name" name="name" required value="{{ old('name') }}"
                                     class="w-full bg-brand-white border-2 border-brand-charcoal px-4 py-3 font-mono font-bold text-sm focus:border-brand-red focus:ring-0">
-                                @error('customer_name') <p class="text-brand-red font-mono text-[10px] mt-1 font-bold">{{ $message }}</p> @enderror
+                                @error('name') <p class="text-brand-red font-mono text-xs mt-1 font-bold">{{ $message }}</p> @enderror
                             </div>
 
                             <div>
-                                <label for="customer_email" class="font-mono text-[10px] font-bold uppercase tracking-widest text-brand-charcoal block mb-2">Email Address</label>
-                                <input type="email" id="customer_email" name="customer_email" required value="{{ old('customer_email') }}"
+                                <label for="email" class="font-mono text-xs font-bold uppercase tracking-widest text-brand-charcoal block mb-2">Email Address</label>
+                                <input type="email" id="email" name="email" value="{{ old('email') }}"
                                     class="w-full bg-brand-white border-2 border-brand-charcoal px-4 py-3 font-mono font-bold text-sm focus:border-brand-red focus:ring-0">
-                                @error('customer_email') <p class="text-brand-red font-mono text-[10px] mt-1 font-bold">{{ $message }}</p> @enderror
+                                @error('email') <p class="text-brand-red font-mono text-xs mt-1 font-bold">{{ $message }}</p> @enderror
                             </div>
 
                             <div>
-                                <label for="customer_phone" class="font-mono text-[10px] font-bold uppercase tracking-widest text-brand-charcoal block mb-2">Phone Number</label>
-                                <input type="tel" id="customer_phone" name="customer_phone" required value="{{ old('customer_phone') }}"
+                                <label for="phone" class="font-mono text-xs font-bold uppercase tracking-widest text-brand-charcoal block mb-2">Phone Number</label>
+                                <input type="tel" id="phone" name="phone" required value="{{ old('phone') }}"
                                     class="w-full bg-brand-white border-2 border-brand-charcoal px-4 py-3 font-mono font-bold text-sm focus:border-brand-red focus:ring-0">
-                                @error('customer_phone') <p class="text-brand-red font-mono text-[10px] mt-1 font-bold">{{ $message }}</p> @enderror
+                                @error('phone') <p class="text-brand-red font-mono text-xs mt-1 font-bold">{{ $message }}</p> @enderror
                             </div>
 
                             <div class="md:col-span-2">
-                                <label for="shipping_address" class="font-mono text-[10px] font-bold uppercase tracking-widest text-brand-charcoal block mb-2">Full Shipping Address (Nepal)</label>
-                                <textarea id="shipping_address" name="shipping_address" required rows="3"
-                                    class="w-full bg-brand-white border-2 border-brand-charcoal px-4 py-3 font-mono font-bold text-sm focus:border-brand-red focus:ring-0 resize-none">{{ old('shipping_address') }}</textarea>
-                                @error('shipping_address') <p class="text-brand-red font-mono text-[10px] mt-1 font-bold">{{ $message }}</p> @enderror
+                                <label for="address" class="font-mono text-xs font-bold uppercase tracking-widest text-brand-charcoal block mb-2">Full Shipping Address (Nepal)</label>
+                                <textarea id="address" name="address" required rows="3"
+                                    class="w-full bg-brand-white border-2 border-brand-charcoal px-4 py-3 font-mono font-bold text-sm focus:border-brand-red focus:ring-0 resize-none">{{ old('address') }}</textarea>
+                                @error('address') <p class="text-brand-red font-mono text-xs mt-1 font-bold">{{ $message }}</p> @enderror
                             </div>
                         </div>
                     </div>
@@ -92,8 +92,8 @@
                             @foreach($cartItems as $item)
                                 <div class="flex justify-between items-start gap-4">
                                     <div class="flex-grow">
-                                        <div class="font-mono text-xs font-bold">{{ $item['product']->name }}</div>
-                                        <div class="font-mono text-[10px] text-brand-white/50 uppercase">
+                                        <div class="font-mono text-xs font-bold">{{ $item['condition']->product->name }}</div>
+                                        <div class="font-mono text-xs text-brand-white/50 uppercase">
                                             Cond: {{ $item['condition']->grade }} • Qty: {{ $item['quantity'] }}
                                         </div>
                                     </div>

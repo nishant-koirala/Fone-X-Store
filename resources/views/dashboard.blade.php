@@ -70,7 +70,7 @@
                                 <div class="border border-gray-200 p-4 rounded-md shadow-sm relative">
                                     <div class="flex justify-between items-start mb-2">
                                         <h4 class="font-bold text-brand-charcoal text-lg">{{ $trade->device_brand }} {{ $trade->device_model }}</h4>
-                                        <span class="px-2 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full bg-{{ $trade->status == 'approved' ? 'green' : ($trade->status == 'pending' ? 'yellow' : 'red') }}-100 text-{{ $trade->status == 'approved' ? 'green' : ($trade->status == 'pending' ? 'yellow' : 'red') }}-800">
+                                        <span class="px-2 py-1 text-xs font-bold uppercase tracking-wider rounded-full bg-{{ $trade->status == 'approved' ? 'green' : ($trade->status == 'pending' ? 'yellow' : 'red') }}-100 text-{{ $trade->status == 'approved' ? 'green' : ($trade->status == 'pending' ? 'yellow' : 'red') }}-800">
                                             {{ $trade->status }}
                                         </span>
                                     </div>

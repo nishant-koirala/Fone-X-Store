@@ -37,14 +37,16 @@
 
     <!-- Compiled Assets via Vite -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @stack('head')
 </head>
 <body class="flex min-h-full flex-col font-sans bg-white text-brand-charcoal selection:bg-brand-red selection:text-white">
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:z-[100] focus:p-4 focus:bg-white focus:text-brand-charcoal focus:font-bold">Skip to content</a>
 
     <!-- Top Announcement Ticker Bar -->
     <div class="bg-brand-charcoal text-white font-mono text-[11px] font-semibold py-2 px-4 border-b border-white/10 overflow-hidden">
         <div class="mx-auto max-w-[90rem] flex items-center justify-between">
             <div class="flex items-center space-x-3 text-xs">
-                <span class="inline-flex items-center space-x-1.5 bg-brand-red text-white px-2 py-0.5 font-bold uppercase tracking-wider text-[10px]">
+                <span class="inline-flex items-center space-x-1.5 bg-brand-red text-white px-2 py-0.5 font-bold uppercase tracking-wider text-xs">
                     <span class="h-1.5 w-1.5 rounded-full bg-white animate-pulse"></span>
                     <span>OFFICIAL STORE</span>
                 </span>
@@ -71,7 +73,7 @@
                     <a href="{{ route('home') }}" class="group flex items-center space-x-1 focus:outline-none">
                         <span class="font-display text-3xl tracking-tight text-brand-charcoal">Fone</span>
                         <span class="font-display text-3xl tracking-tight text-brand-red group-hover:scale-105 transition-transform">X</span>
-                        <span class="ml-2 font-mono text-[10px] uppercase tracking-widest text-brand-grey border border-gray-200 px-1.5 py-0.5 bg-brand-offwhite">STORE</span>
+                        <span class="ml-2 font-mono text-xs uppercase tracking-widest text-brand-grey border border-gray-200 px-1.5 py-0.5 bg-brand-offwhite">STORE</span>
                     </a>
                 </div>
 
@@ -105,8 +107,9 @@
                     
                     <!-- Search Input (Desktop) -->
                     <form method="GET" action="{{ route('products.index') }}" class="hidden lg:flex relative items-center">
-                        <input type="text" name="search" placeholder="Search phones..." value="{{ request('search') }}" class="font-sans text-xs border border-gray-300 bg-white text-brand-charcoal pl-3 pr-8 py-2 focus:border-brand-red focus:ring-1 focus:ring-brand-red outline-none shadow-sm placeholder-gray-400 w-48 transition-all focus:w-64">
-                        <button type="submit" class="absolute right-2 text-brand-charcoal hover:text-brand-red">
+                        <label for="desktop-search" class="sr-only">Search phones</label>
+                        <input type="text" id="desktop-search" name="search" placeholder="Search phones..." value="{{ request('search') }}" class="font-sans text-xs border border-gray-300 bg-white text-brand-charcoal pl-3 pr-8 py-2 focus:border-brand-red focus:ring-1 focus:ring-brand-red outline-none shadow-sm placeholder-gray-400 w-48 transition-all focus:w-64">
+                        <button type="submit" aria-label="Search" class="absolute right-2 text-brand-charcoal hover:text-brand-red">
                             <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="square" stroke-linejoin="miter" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                             </svg>
@@ -190,8 +193,9 @@
             <!-- Search Input (Mobile) -->
             <div class="px-4 pt-4 pb-2">
                 <form method="GET" action="{{ route('products.index') }}" class="relative flex items-center">
-                    <input type="text" name="search" placeholder="Search phones..." value="{{ request('search') }}" class="w-full font-sans text-base border border-gray-300 bg-white text-brand-charcoal pl-4 pr-10 py-3 focus:border-brand-red focus:ring-1 focus:ring-brand-red outline-none shadow-sm placeholder-gray-400">
-                    <button type="submit" class="absolute right-3 text-brand-charcoal hover:text-brand-red">
+                    <label for="mobile-search" class="sr-only">Search phones</label>
+                    <input type="text" id="mobile-search" name="search" placeholder="Search phones..." value="{{ request('search') }}" class="w-full font-sans text-base border border-gray-300 bg-white text-brand-charcoal pl-4 pr-10 py-3 focus:border-brand-red focus:ring-1 focus:ring-brand-red outline-none shadow-sm placeholder-gray-400">
+                    <button type="submit" aria-label="Search" class="absolute right-3 text-brand-charcoal hover:text-brand-red">
                         <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="square" stroke-linejoin="miter" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>
@@ -235,7 +239,7 @@
     </header>
 
     <!-- Main Content Area with Flash Alert Notifications -->
-    <main class="flex-grow">
+    <main id="main-content" class="flex-grow">
         @if(session('success'))
             <div class="bg-emerald-600 text-white font-mono text-xs font-bold uppercase tracking-wider py-3.5 px-4 text-center shadow-md animate-fade-in">
                 ✓ {{ session('success') }}
@@ -265,7 +269,7 @@
                     <div class="flex items-center space-x-1">
                         <span class="font-display text-3xl tracking-tight text-white">Fone</span>
                         <span class="font-display text-3xl tracking-tight text-brand-red">X</span>
-                        <span class="ml-2 font-mono text-[10px] uppercase tracking-widest text-white/70 border border-white/20 px-1.5 py-0.5">STORE NEPAL</span>
+                        <span class="ml-2 font-mono text-xs uppercase tracking-widest text-white/70 border border-white/20 px-1.5 py-0.5">STORE NEPAL</span>
                     </div>
                     <p class="font-sans text-sm text-white/70 max-w-md leading-relaxed">
                         Kathmandu's premier store for factory-sealed smartphones, certified pre-owned devices, and instant device trade-ins. Every phone is backed by our 100-point diagnostic inspection and 7-day checking guarantee.

@@ -10,7 +10,7 @@
             <!-- Left: Typography & Action -->
             <div class="px-6 py-16 lg:p-24 flex flex-col justify-center">
                 <div class="mb-8">
-                    <span class="inline-block border-2 border-brand-charcoal px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-widest text-brand-charcoal bg-brand-white shadow-[4px_4px_0px_0px_rgba(42,42,44,1)]">
+                    <span class="inline-block border-2 border-brand-charcoal px-3 py-1 font-mono text-xs font-bold uppercase tracking-widest text-brand-charcoal bg-brand-white shadow-[4px_4px_0px_0px_rgba(42,42,44,1)]">
                         DIRECT IMPORTS & CERTIFIED PRE-OWNED
                     </span>
                 </div>
@@ -47,14 +47,14 @@
                     @php $hero = $heroConditions->first(); @endphp
                     <div class="relative z-10 text-center flex flex-col items-center">
                         @if($hero->product->image)
-                            <img src="{{ Storage::url($hero->product->image) }}" class="h-64 sm:h-80 object-contain drop-shadow-2xl mix-blend-multiply" />
+                            <img src="{{ Storage::url($hero->product->image) }}" alt="{{ $hero->product->name }}" class="h-64 sm:h-80 object-contain drop-shadow-2xl mix-blend-multiply" />
                         @else
                             <x-product-icon :categorySlug="$hero->product->category->slug ?? ''" class="h-64 sm:h-80 text-brand-charcoal stroke-[1] drop-shadow-2xl" />
                         @endif
                         
                         <!-- Floating Spec Box -->
                         <div class="mt-8 bg-brand-white border-2 border-brand-charcoal px-6 py-4 shadow-[8px_8px_0px_0px_rgba(200,32,45,1)]">
-                            <div class="font-mono text-[10px] font-bold uppercase tracking-widest text-brand-grey mb-1">{{ $hero->product->brand }} • NEW IN STOCK</div>
+                            <div class="font-mono text-xs font-bold uppercase tracking-widest text-brand-grey mb-1">{{ $hero->product->brand }} • NEW IN STOCK</div>
                             <div class="font-display text-2xl uppercase tracking-tight text-brand-charcoal">{{ $hero->product->name }}</div>
                             <div class="font-mono font-bold text-brand-red text-xl mt-2">Rs {{ number_format($hero->price) }}</div>
                         </div>
@@ -67,7 +67,7 @@
     <!-- Trust Bar Strip (Minimal) -->
     <div class="bg-brand-charcoal py-4 border-b-4 border-brand-red">
         <div class="mx-auto max-w-[90rem] px-4 sm:px-6 lg:px-8">
-            <div class="flex flex-col sm:flex-row justify-between items-center text-center font-mono text-[10px] sm:text-xs font-bold text-brand-white uppercase tracking-widest gap-4">
+            <div class="flex flex-col sm:flex-row justify-between items-center text-center font-mono text-xs sm:text-xs font-bold text-brand-white uppercase tracking-widest gap-4">
                 <div class="flex items-center space-x-2">
                     <span class="text-brand-red text-lg leading-none">✓</span>
                     <span>100-Point Diagnostic Test</span>
@@ -134,7 +134,7 @@
 
                     <a href="{{ route('trade-in.create') }}" class="group flex-1 bg-brand-red border-2 border-brand-charcoal p-8 hover:bg-brand-red-dark transition-colors duration-300 flex flex-col justify-between">
                         <div class="flex items-start justify-between mb-8">
-                            <span class="font-mono text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 border-2 border-brand-charcoal text-brand-charcoal bg-brand-white">03 / INSTANT EXCHANGE</span>
+                            <span class="font-mono text-xs font-bold uppercase tracking-widest px-2 py-0.5 border-2 border-brand-charcoal text-brand-charcoal bg-brand-white">03 / INSTANT EXCHANGE</span>
                         </div>
                         <div>
                             <h3 class="font-display text-3xl uppercase tracking-tight text-brand-white">

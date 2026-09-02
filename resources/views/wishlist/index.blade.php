@@ -39,10 +39,10 @@
                         </form>
 
                         <div class="flex items-center justify-between mb-4 mt-2">
-                            <span class="border border-brand-red text-brand-red font-mono text-[10px] font-bold uppercase px-2 py-0.5">
+                            <span class="border border-brand-red text-brand-red font-mono text-xs font-bold uppercase px-2 py-0.5">
                                 {{ strtoupper($firstCond->grade) }}
                             </span>
-                            <span class="font-mono text-[10px] text-brand-grey uppercase">
+                            <span class="font-mono text-xs text-brand-grey uppercase">
                                 {{ $product->brand }}
                             </span>
                         </div>

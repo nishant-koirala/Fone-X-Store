@@ -1,7 +1,7 @@
 @props(['color' => 'red', 'outline' => false])
 
 @php
-    $baseClasses = 'font-mono text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 border-2';
+    $baseClasses = 'font-mono text-xs font-bold uppercase tracking-widest px-2 py-0.5 border-2';
     
     $colorClasses = match($color) {
         'charcoal' => $outline 

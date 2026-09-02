@@ -9,7 +9,7 @@
         <div class="mx-auto max-w-[90rem] px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
                 <div>
-                    <span class="inline-block border-2 border-brand-charcoal px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-widest text-brand-charcoal bg-brand-white shadow-[4px_4px_0px_0px_rgba(42,42,44,1)] mb-6">
+                    <span class="inline-block border-2 border-brand-charcoal px-3 py-1 font-mono text-xs font-bold uppercase tracking-widest text-brand-charcoal bg-brand-white shadow-[4px_4px_0px_0px_rgba(42,42,44,1)] mb-6">
                         STORE CATALOG
                     </span>
                     <h1 class="font-display text-5xl sm:text-7xl uppercase tracking-tight text-brand-white leading-none">
@@ -70,7 +70,7 @@
                 
                 <!-- Category Filter -->
                 <div>
-                    <label for="filter-category" class="font-mono text-[10px] font-bold uppercase tracking-widest text-brand-charcoal block mb-2">Category</label>
+                    <label for="filter-category" class="font-mono text-xs font-bold uppercase tracking-widest text-brand-charcoal block mb-2">Category</label>
                     <select id="filter-category" name="category" class="w-full font-mono font-bold text-xs border-2 border-brand-charcoal bg-brand-white text-brand-charcoal px-3 py-3 focus:border-brand-red focus:ring-0 appearance-none rounded-none cursor-pointer">
                         <option value="">All Categories</option>
                         @foreach($categories as $cat)
@@ -87,7 +87,7 @@
 
                 <!-- Brand Filter -->
                 <div>
-                    <label for="filter-brand" class="font-mono text-[10px] font-bold uppercase tracking-widest text-brand-charcoal block mb-2">Brand</label>
+                    <label for="filter-brand" class="font-mono text-xs font-bold uppercase tracking-widest text-brand-charcoal block mb-2">Brand</label>
                     <select id="filter-brand" name="brand" class="w-full font-mono font-bold text-xs border-2 border-brand-charcoal bg-brand-white text-brand-charcoal px-3 py-3 focus:border-brand-red focus:ring-0 appearance-none rounded-none cursor-pointer">
                         <option value="">All Brands</option>
                         @foreach($brands as $brand)
@@ -100,7 +100,7 @@
 
                 <!-- Condition Grade Filter -->
                 <div>
-                    <label for="filter-grade" class="font-mono text-[10px] font-bold uppercase tracking-widest text-brand-charcoal block mb-2">Condition</label>
+                    <label for="filter-grade" class="font-mono text-xs font-bold uppercase tracking-widest text-brand-charcoal block mb-2">Condition</label>
                     <select id="filter-grade" name="grade" class="w-full font-mono font-bold text-xs border-2 border-brand-charcoal bg-brand-white text-brand-charcoal px-3 py-3 focus:border-brand-red focus:ring-0 appearance-none rounded-none cursor-pointer">
                         <option value="">All Conditions</option>
                         <option value="new" {{ request('grade') == 'new' ? 'selected' : '' }}>New Only</option>
@@ -113,7 +113,7 @@
 
                 <!-- Sort Filter -->
                 <div>
-                    <label for="filter-sort" class="font-mono text-[10px] font-bold uppercase tracking-widest text-brand-charcoal block mb-2">Sort By</label>
+                    <label for="filter-sort" class="font-mono text-xs font-bold uppercase tracking-widest text-brand-charcoal block mb-2">Sort By</label>
                     <select id="filter-sort" name="sort" class="w-full font-mono font-bold text-xs border-2 border-brand-charcoal bg-brand-white text-brand-charcoal px-3 py-3 focus:border-brand-red focus:ring-0 appearance-none rounded-none cursor-pointer">
                         <option value="newest" {{ request('sort') == 'newest' ? 'selected' : '' }}>Newest Listed</option>
                         <option value="price_asc" {{ request('sort') == 'price_asc' ? 'selected' : '' }}>Price: Low to High</option>
@@ -153,7 +153,7 @@
             @if(request()->anyFilled(['category', 'brand', 'grade', 'search']))
                 
                 @if(request('search'))
-                    <span class="inline-flex items-center bg-brand-white border-2 border-brand-charcoal text-brand-charcoal font-mono text-[10px] font-bold uppercase tracking-widest pl-3 pr-1 py-1 space-x-2">
+                    <span class="inline-flex items-center bg-brand-white border-2 border-brand-charcoal text-brand-charcoal font-mono text-xs font-bold uppercase tracking-widest pl-3 pr-1 py-1 space-x-2">
                         <span>SEARCH: {{ request('search') }}</span>
                         <button type="button" @click="removeFilter('search')" class="hover:bg-brand-red hover:text-brand-white border-l-2 border-brand-charcoal pl-2 p-1">✕</button>
                     </span>
@@ -166,21 +166,21 @@
                         });
                         $catName = $cat ? (is_object($cat) ? $cat->name : $cat['name']) : request('category');
                     @endphp
-                    <span class="inline-flex items-center bg-brand-white border-2 border-brand-charcoal text-brand-charcoal font-mono text-[10px] font-bold uppercase tracking-widest pl-3 pr-1 py-1 space-x-2">
+                    <span class="inline-flex items-center bg-brand-white border-2 border-brand-charcoal text-brand-charcoal font-mono text-xs font-bold uppercase tracking-widest pl-3 pr-1 py-1 space-x-2">
                         <span>CAT: {{ $catName }}</span>
                         <button type="button" @click="removeFilter('category')" class="hover:bg-brand-red hover:text-brand-white border-l-2 border-brand-charcoal pl-2 p-1">✕</button>
                     </span>
                 @endif
 
                 @if(request('brand'))
-                    <span class="inline-flex items-center bg-brand-white border-2 border-brand-charcoal text-brand-charcoal font-mono text-[10px] font-bold uppercase tracking-widest pl-3 pr-1 py-1 space-x-2">
+                    <span class="inline-flex items-center bg-brand-white border-2 border-brand-charcoal text-brand-charcoal font-mono text-xs font-bold uppercase tracking-widest pl-3 pr-1 py-1 space-x-2">
                         <span>BRAND: {{ request('brand') }}</span>
                         <button type="button" @click="removeFilter('brand')" class="hover:bg-brand-red hover:text-brand-white border-l-2 border-brand-charcoal pl-2 p-1">✕</button>
                     </span>
                 @endif
 
                 @if(request('grade'))
-                    <span class="inline-flex items-center bg-brand-white border-2 border-brand-charcoal text-brand-charcoal font-mono text-[10px] font-bold uppercase tracking-widest pl-3 pr-1 py-1 space-x-2">
+                    <span class="inline-flex items-center bg-brand-white border-2 border-brand-charcoal text-brand-charcoal font-mono text-xs font-bold uppercase tracking-widest pl-3 pr-1 py-1 space-x-2">
                         <span>GRADE: {{ request('grade') }}</span>
                         <button type="button" @click="removeFilter('grade')" class="hover:bg-brand-red hover:text-brand-white border-l-2 border-brand-charcoal pl-2 p-1">✕</button>
                     </span>
@@ -213,7 +213,7 @@
             </div>
 
             <!-- Product Grid -->
-            <div id="product-grid" :class="{ 'opacity-0': isLoading }" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 transition-opacity duration-200">
+            <div id="product-grid" aria-live="polite" :class="{ 'opacity-0': isLoading }" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 transition-opacity duration-200">
             @forelse($conditions as $index => $condition)
                 <x-product-card :condition="$condition" />
             @empty

@@ -26,22 +26,17 @@ class TradeInController extends Controller
         $request->validate([
             'device_brand' => 'required|string|max:100',
             'device_model' => 'required|string|max:255',
-            'screen_condition' => 'required|string|max:255',
-            'battery_health' => 'required|string|max:255',
-            'physical_condition' => 'required|string|max:255',
+            'condition' => 'required|string|in:flawless,good,broken',
             'customer_name' => 'required|string|max:255',
             'customer_phone' => 'required|string|max:50',
-            'customer_email' => 'nullable|email|max:255',
-            'notes' => 'nullable|string|max:1000',
+            'additional_notes' => 'nullable|string|max:1000',
         ]);
 
         // Compile structured condition details string
         $description = sprintf(
-            "Screen: %s | Battery: %s | Body: %s%s",
-            $request->input('screen_condition'),
-            $request->input('battery_health'),
-            $request->input('physical_condition'),
-            $request->filled('notes') ? " | Notes: " . trim($request->input('notes')) : ""
+            "Overall Condition: %s%s",
+            ucfirst($request->input('condition')),
+            $request->filled('additional_notes') ? " | Notes: " . trim($request->input('additional_notes')) : ""
         );
 
         // Find or create customer record by phone number
@@ -49,14 +44,12 @@ class TradeInController extends Controller
             ['phone' => trim($request->input('customer_phone'))],
             [
                 'name' => trim($request->input('customer_name')),
-                'email' => $request->input('customer_email') ? trim($request->input('customer_email')) : null,
                 'address' => 'Trade-In Request Submission',
             ]
         );
 
         $customer->update([
             'name' => trim($request->input('customer_name')),
-            'email' => $request->input('customer_email') ? trim($request->input('customer_email')) : $customer->email,
         ]);
 
         // Create pending TradeInValuation record

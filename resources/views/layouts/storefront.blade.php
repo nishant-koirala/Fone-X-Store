@@ -43,8 +43,8 @@
     <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:z-[100] focus:p-4 focus:bg-white focus:text-brand-charcoal focus:font-bold">Skip to content</a>
 
     <!-- Top Announcement Ticker Bar -->
-    <div class="bg-brand-charcoal text-white font-mono text-[11px] font-semibold py-2 px-4 border-b border-white/10 overflow-hidden">
-        <div class="mx-auto max-w-[90rem] flex items-center justify-between">
+    <div class="bg-brand-charcoal text-white font-mono text-[11px] font-semibold h-9 px-4 border-b border-white/10 overflow-hidden flex items-center">
+        <div class="mx-auto max-w-[90rem] w-full flex items-center justify-between">
             <div class="flex items-center space-x-3 text-xs">
                 <span class="inline-flex items-center space-x-1.5 bg-brand-red text-white px-2 py-0.5 font-bold uppercase tracking-wider text-xs">
                     <span class="h-1.5 w-1.5 rounded-full bg-white animate-pulse"></span>
@@ -66,7 +66,7 @@
     <!-- Glassmorphism Sticky Navigation Header -->
     <header x-data="{ mobileMenuOpen: false }" class="sticky top-0 z-50 bg-white/70 backdrop-blur-xl border-b border-gray-100/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all">
         <div class="mx-auto max-w-[90rem] px-4 sm:px-6 lg:px-8">
-            <div class="flex h-20 items-center justify-between">
+            <div class="flex h-16 items-center justify-between">
                 
                 <!-- Logo -->
                 <div class="flex items-center space-x-4">
@@ -275,7 +275,7 @@
                         Kathmandu's premier store for factory-sealed smartphones, certified pre-owned devices, and instant device trade-ins. Every phone is backed by our 100-point diagnostic inspection and 7-day checking guarantee.
                     </p>
                     <div class="font-mono text-xs text-white/50 space-y-1">
-                        <p>📍 Store Address: New Road, Kathmandu, Nepal</p>
+                        <p>📍 Store Address: <a href="https://maps.app.goo.gl/ofXysJJNMjXPPYiEA" target="_blank" rel="noopener noreferrer" class="hover:text-brand-red underline underline-offset-2 transition-colors">Fone X Store, Kathmandu, Nepal &nearr;</a></p>
                         <p>📞 Phone Contact: +977-9841234567 | Support Hours: 10 AM - 7 PM</p>
                     </div>
                 </div>

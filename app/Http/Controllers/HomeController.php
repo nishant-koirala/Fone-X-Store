@@ -27,12 +27,30 @@ class HomeController extends Controller
             return Category::whereIn('slug', ['chargers-cables', 'cases-covers', 'audio-speakers', 'power-banks', 'accessories'])->get();
         });
 
+        // Fetch products marked as "Featured Phone" in the admin panel
         $heroConditions = ProductCondition::with(['product', 'product.category'])
+            ->whereHas('product', function ($q) {
+                $q->where('is_visible', true)
+                  ->where('is_featured', true);
+            })
             ->where('quantity_in_stock', '>', 0)
-            ->where('grade', 'new')
             ->latest()
-            ->take(3)
             ->get();
+
+        // Fallback gracefully to latest available products if none are marked as featured yet
+        if ($heroConditions->isEmpty()) {
+            $heroConditions = ProductCondition::with(['product', 'product.category'])
+                ->whereHas('product', function ($q) {
+                    $q->where('is_visible', true);
+                })
+                ->where('quantity_in_stock', '>', 0)
+                ->latest()
+                ->take(5)
+                ->get();
+        }
+
+        // Ensure each phone appears once in the rotating slider
+        $heroConditions = $heroConditions->unique('product_id')->values();
 
         return view('home', compact('featuredConditions', 'accessoryCategories', 'heroConditions'));
     }

@@ -21,6 +21,7 @@ class Product extends Model
         'base_price',
         'is_new',
         'is_visible',
+        'is_featured',
         'gallery',
     ];
 
@@ -28,6 +29,7 @@ class Product extends Model
         'base_price' => 'decimal:2',
         'is_new' => 'boolean',
         'is_visible' => 'boolean',
+        'is_featured' => 'boolean',
         'gallery' => 'array',
     ];
 

@@ -69,6 +69,11 @@ class ProductResource extends Resource
                             ->label('Show on Storefront')
                             ->default(true),
 
+                        Forms\Components\Toggle::make('is_featured')
+                            ->label('Featured Phone')
+                            ->helperText('Feature in the moving hero slider on the homepage')
+                            ->default(false),
+
                         Forms\Components\Textarea::make('description')
                             ->columnSpanFull(),
 
@@ -155,6 +160,7 @@ class ProductResource extends Resource
                 Tables\Columns\TextColumn::make('base_price')->money('USD')->sortable(),
                 Tables\Columns\IconColumn::make('is_new')->boolean(),
                 Tables\Columns\ToggleColumn::make('is_visible')->label('Visible on Store'),
+                Tables\Columns\ToggleColumn::make('is_featured')->label('Featured Phone'),
                 Tables\Columns\TextColumn::make('conditions_count')
                     ->counts('conditions')
                     ->label('Condition Listings'),
@@ -164,6 +170,7 @@ class ProductResource extends Resource
                 Tables\Filters\SelectFilter::make('category')
                     ->relationship('category', 'name'),
                 Tables\Filters\TernaryFilter::make('is_new'),
+                Tables\Filters\TernaryFilter::make('is_featured')->label('Featured Phone'),
             ])
             ->actions([
                 EditAction::make(),

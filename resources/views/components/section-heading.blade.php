@@ -1,6 +1,6 @@
-@props(['eyebrow', 'title', 'actionText' => null, 'actionUrl' => null])
+@props(['eyebrow' => null, 'title', 'actionText' => null, 'actionUrl' => null])
 
-<div class="flex flex-col md:flex-row md:items-end justify-between mb-10 pb-4 border-b-2 border-brand-charcoal gap-4">
+<div class="flex flex-col md:flex-row md:items-end justify-between mb-6 sm:mb-8 pb-3 border-b-2 border-brand-charcoal gap-4">
     <div>
         @if($eyebrow)
             <span class="font-mono text-xs font-bold uppercase tracking-widest text-brand-red block mb-2">{{ $eyebrow }}</span>

@@ -15,35 +15,29 @@ class HomeController extends Controller
     public function index(): View
     {
         $featuredConditions = ProductCondition::with(['product', 'product.category'])
-            ->whereHas('product', function ($q) {
-                $q->where('is_visible', true);
-            })
-            ->where('quantity_in_stock', '>', 0)
+            ->visibleProduct()
+            ->inStock()
             ->latest()
             ->take(8)
             ->get();
 
         $accessoryCategories = Cache::remember('home_accessory_categories', 3600, function () {
-            return Category::whereIn('slug', ['chargers-cables', 'cases-covers', 'audio-speakers', 'power-banks', 'accessories'])->get();
+            return Category::whereIn('slug', config('shop.accessory_category_slugs', []))->get();
         });
 
         // Fetch products marked as "Featured Phone" in the admin panel
         $heroConditions = ProductCondition::with(['product', 'product.category'])
-            ->whereHas('product', function ($q) {
-                $q->where('is_visible', true)
-                    ->where('is_featured', true);
-            })
-            ->where('quantity_in_stock', '>', 0)
+            ->visibleProduct()
+            ->inStock()
+            ->whereHas('product', fn ($q) => $q->where('is_featured', true))
             ->latest()
             ->get();
 
         // Fallback gracefully to latest available products if none are marked as featured yet
         if ($heroConditions->isEmpty()) {
             $heroConditions = ProductCondition::with(['product', 'product.category'])
-                ->whereHas('product', function ($q) {
-                    $q->where('is_visible', true);
-                })
-                ->where('quantity_in_stock', '>', 0)
+                ->visibleProduct()
+                ->inStock()
                 ->latest()
                 ->take(5)
                 ->get();

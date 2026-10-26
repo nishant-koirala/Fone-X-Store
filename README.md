@@ -75,9 +75,33 @@ php artisan serve
 
 ---
 
+## Production Deployment & Optimization
+
+When deploying FoneX Store to production, execute the following commands to warm caches, optimize routing, and maximize performance:
+
+```bash
+# 1. Optimize framework configuration, route registrations, and compiled blade views
+php artisan optimize
+
+# 2. Optimize Filament panel resources, pages, and components
+php artisan filament:optimize
+
+# 3. Cache Blade Icons for zero runtime disk IO
+php artisan icons:cache
+
+# 4. Migrate product images to Spatie Media Library with pre-generated thumbnails
+php artisan products:convert-images
+
+# 5. Production Environment Safety
+# Ensure debug mode is strictly disabled in your production .env file:
+APP_DEBUG=false
+```
+
+---
+
 ## Security & Architecture Notes
 
 - **CSRF Protection:** Strictly enforced on all order checkout, cart modification, and trade-in submission endpoints.
 - **IDOR Protection:** Customer order confirmations and trade-in receipts verify the requesting session token to prevent unauthorized access.
-- **Filament User Gate:** Admin access outside `local` environment requires an authorized `@fonexstore.test` or `@fonex.com` staff email via `FilamentUser::canAccessPanel()`.
+- **Filament User Gate:** Admin access requires an explicit administrator account (`is_admin = true`) via `FilamentUser::canAccessPanel()`. In production, promote administrators via `php artisan user:make-admin {email}`.
 - **Negative Inventory Guard:** Stock decrement operations automatically validate that remaining stock cannot fall below zero, throwing `InvalidArgumentException` before database writes.

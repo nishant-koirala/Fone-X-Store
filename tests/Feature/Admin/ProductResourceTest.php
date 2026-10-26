@@ -26,6 +26,7 @@ class ProductResourceTest extends TestCase
         $products = Product::factory()->count(2)->create();
 
         Livewire::test(ListProducts::class)
+            ->call('loadTable')
             ->assertSuccessful()
             ->assertCanSeeTableRecords($products);
     }

@@ -23,16 +23,14 @@ class ProductController extends Controller
                 },
                 'product.category',
             ])
-            ->whereHas('product', function ($q) {
-                $q->where('is_visible', true);
-            });
+            ->visibleProduct();
 
         // Filter by Category Slug
         if ($request->filled('category')) {
             $catSlug = $request->input('category');
             if ($catSlug === 'accessories') {
                 $query->whereHas('product.category', function ($q) {
-                    $q->whereIn('slug', ['accessories', 'chargers-cables', 'cases-covers', 'audio-speakers', 'power-banks']);
+                    $q->whereIn('slug', config('shop.accessory_category_slugs', []));
                 });
             } else {
                 $query->whereHas('product.category', function ($q) use ($catSlug) {
@@ -42,7 +40,7 @@ class ProductController extends Controller
         } else {
             // If no category is selected, exclude all accessories so they only show on their dedicated page
             $query->whereHas('product.category', function ($q) {
-                $q->whereNotIn('slug', ['accessories', 'chargers-cables', 'cases-covers', 'audio-speakers', 'power-banks']);
+                $q->whereNotIn('slug', config('shop.accessory_category_slugs', []));
             });
         }
 

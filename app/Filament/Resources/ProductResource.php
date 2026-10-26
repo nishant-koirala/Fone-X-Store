@@ -101,6 +101,10 @@ class ProductResource extends Resource
                             ->disk('public')
                             ->directory('products')
                             ->visibility('public')
+                            ->maxSize(2048)
+                            ->imageResizeMode('contain')
+                            ->imageResizeTargetWidth('1200')
+                            ->imageResizeTargetHeight('1200')
                             ->formatStateUsing(fn () => null)
                             ->dehydrated(fn ($state) => filled($state))
                             ->columnSpanFull(),
@@ -112,6 +116,10 @@ class ProductResource extends Resource
                             ->disk('public')
                             ->directory('products/gallery')
                             ->visibility('public')
+                            ->maxSize(2048)
+                            ->imageResizeMode('contain')
+                            ->imageResizeTargetWidth('1200')
+                            ->imageResizeTargetHeight('1200')
                             ->columnSpanFull(),
                     ])->columns(2),
 
@@ -158,9 +166,14 @@ class ProductResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->deferLoading()
+            ->defaultSort('created_at', 'desc')
             ->columns([
                 Tables\Columns\TextColumn::make('id')->sortable(),
-                Tables\Columns\ImageColumn::make('image')->disk('public'),
+                Tables\Columns\SpatieMediaLibraryImageColumn::make('image')
+                    ->collection('images')
+                    ->conversion('thumb')
+                    ->defaultImageUrl(fn ($record) => $record?->image ? Storage::disk('public')->url($record->image) : null),
                 Tables\Columns\TextColumn::make('name')->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('brand')->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('category.name')->sortable(),

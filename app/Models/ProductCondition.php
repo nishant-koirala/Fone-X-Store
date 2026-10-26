@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -49,6 +50,28 @@ class ProductCondition extends Model
     public function orderItems(): HasMany
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    /**
+     * Scope a query to only include conditions that have positive stock.
+     *
+     * @param  Builder<ProductCondition>  $query
+     * @return Builder<ProductCondition>
+     */
+    public function scopeInStock($query)
+    {
+        return $query->where('quantity_in_stock', '>', 0);
+    }
+
+    /**
+     * Scope a query to only include conditions of visible products.
+     *
+     * @param  Builder<ProductCondition>  $query
+     * @return Builder<ProductCondition>
+     */
+    public function scopeVisibleProduct($query)
+    {
+        return $query->whereHas('product', fn ($q) => $q->visible());
     }
 
     /**

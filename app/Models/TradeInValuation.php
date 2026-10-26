@@ -12,6 +12,7 @@ class TradeInValuation extends Model
 
     protected $fillable = [
         'customer_id',
+        'user_id',
         'device_brand',
         'device_model',
         'condition_description',
@@ -23,6 +24,17 @@ class TradeInValuation extends Model
         'estimated_value' => 'decimal:2',
     ];
 
+    /**
+     * @return BelongsTo<User, $this>
+     */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    /**
+     * @return BelongsTo<Customer, $this>
+     */
     public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class);

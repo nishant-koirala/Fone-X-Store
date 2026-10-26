@@ -31,6 +31,7 @@ class OrderPlaced extends Mailable implements ShouldQueue
     public function envelope(): Envelope
     {
         return new Envelope(
+            to: $this->order->shipping_email ? [$this->order->shipping_email] : [],
             subject: 'Order Confirmation #'.$this->order->id,
         );
     }

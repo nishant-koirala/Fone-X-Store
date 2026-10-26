@@ -2,15 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\InsufficientStockException;
 use App\Mail\OrderPlaced;
 use App\Models\Customer;
 use App\Models\Order;
 use App\Models\ProductCondition;
-use Exception;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
 class CheckoutController extends Controller
@@ -90,7 +91,7 @@ class CheckoutController extends Controller
                 // 1. Re-verify stock for every line item
                 foreach ($cartSession as $condId => $item) {
                     if (! isset($conditions[$condId])) {
-                        throw new Exception('One of the selected items is no longer available.');
+                        throw new InsufficientStockException('One of the selected items is no longer available.');
                     }
 
                     $condition = $conditions[$condId];
@@ -98,7 +99,7 @@ class CheckoutController extends Controller
 
                     $prodName = $condition->product->name;
                     if ($condition->quantity_in_stock < $requestedQty) {
-                        throw new Exception("Stock for {$prodName} (Grade ".strtoupper($condition->grade).") is insufficient. Only {$condition->quantity_in_stock} items remaining in stock.");
+                        throw new InsufficientStockException("Stock for {$prodName} (Grade ".strtoupper($condition->grade).") is insufficient. Only {$condition->quantity_in_stock} items remaining in stock.");
                     }
 
                     $lineTotal = $condition->price * $requestedQty;
@@ -111,30 +112,37 @@ class CheckoutController extends Controller
                     ];
                 }
 
-                // 2. Create or match Customer by primary phone contact number
+                // 2. Create or match Customer by primary phone number without overwriting existing data
+                $phone = trim($request->input('phone'));
+                $shippingName = trim($request->input('name'));
+                $shippingEmail = $request->filled('email') ? trim((string) $request->input('email')) : null;
+                $shippingAddress = trim($request->input('address'));
+
                 $customer = Customer::firstOrCreate(
-                    ['phone' => trim($request->input('phone'))],
+                    ['phone' => $phone],
                     [
-                        'name' => trim($request->input('name')),
-                        'email' => $request->input('email') ? trim($request->input('email')) : null,
-                        'address' => trim($request->input('address')),
+                        'name' => $shippingName,
+                        'email' => $shippingEmail,
+                        'address' => $shippingAddress,
                     ]
                 );
 
-                $customer->update([
-                    'name' => trim($request->input('name')),
-                    'email' => $request->input('email') ? trim($request->input('email')) : $customer->email,
-                    'address' => trim($request->input('address')),
-                ]);
+                // 3. Link user_id only if authenticated user is email-verified
+                $verifiedUserId = (auth()->check() && auth()->user()?->hasVerifiedEmail()) ? auth()->id() : null;
 
-                // 3. Create Order record with pending status (Cash on Delivery)
+                // 4. Create Order record with shipping snapshot
                 $order = Order::create([
                     'customer_id' => $customer->id,
+                    'user_id' => $verifiedUserId,
                     'status' => 'pending',
                     'total' => $orderTotal,
+                    'shipping_name' => $shippingName,
+                    'shipping_phone' => $phone,
+                    'shipping_email' => $shippingEmail,
+                    'shipping_address' => $shippingAddress,
                 ]);
 
-                // 4. Create OrderItems & deduct stock via transactional stock movement helper
+                // 5. Create OrderItems & deduct stock via transactional stock movement helper
                 foreach ($orderItemsData as $itemData) {
                     /** @var ProductCondition $condition */
                     $condition = $itemData['condition'];
@@ -162,14 +170,28 @@ class CheckoutController extends Controller
             session()->forget('cart');
             session(['last_order_id' => $order->id]);
 
-            if ($order->customer?->email) {
-                Mail::to($order->customer->email)->send(new OrderPlaced($order));
+            // Dispatch OrderPlaced mail to the order's shipping_email snapshot wrapped in try-catch
+            if ($order->shipping_email) {
+                try {
+                    Mail::to($order->shipping_email)->send(new OrderPlaced($order));
+                } catch (\Throwable $mailException) {
+                    Log::error("Failed sending OrderPlaced email for order #{$order->id}: {$mailException->getMessage()}", [
+                        'exception' => $mailException,
+                    ]);
+                }
             }
 
             return redirect()->route('orders.confirmation', $order)->with('success', 'Order placed successfully!');
 
-        } catch (Exception $e) {
+        } catch (InsufficientStockException $e) {
             return back()->withInput()->with('error', $e->getMessage());
+        } catch (\Throwable $e) {
+            Log::error('Order checkout failed: '.$e->getMessage(), [
+                'exception' => $e,
+                'payload' => $request->except(['_token']),
+            ]);
+
+            return back()->withInput()->with('error', 'An unexpected error occurred while processing your order. Please try again.');
         }
     }
 

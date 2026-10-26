@@ -13,13 +13,26 @@ class Order extends Model
 
     protected $fillable = [
         'customer_id',
+        'user_id',
         'status',
         'total',
+        'shipping_name',
+        'shipping_phone',
+        'shipping_email',
+        'shipping_address',
     ];
 
     protected $casts = [
         'total' => 'decimal:2',
     ];
+
+    /**
+     * @return BelongsTo<User, $this>
+     */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
 
     /**
      * @return BelongsTo<Customer, $this>

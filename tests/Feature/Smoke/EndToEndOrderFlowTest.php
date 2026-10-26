@@ -130,7 +130,7 @@ class EndToEndOrderFlowTest extends TestCase
         });
 
         // 11. Step: Admin panel access - Admin views the order in Filament
-        $admin = User::factory()->create([
+        $admin = User::factory()->admin()->create([
             'email' => 'store-manager@fonexstore.test',
         ]);
 

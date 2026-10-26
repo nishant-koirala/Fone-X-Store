@@ -47,6 +47,11 @@
             <form action="{{ route('trade-in.store') }}" method="POST">
                 @csrf
 
+                {{-- Honeypot field for bot protection --}}
+                <div style="display:none;" aria-hidden="true">
+                    <input type="text" name="secondary_address" value="" autocomplete="off" tabindex="-1">
+                </div>
+
                 <!-- STEP 1: Device Details -->
                 <div x-show="step === 1" x-transition.opacity.duration.300ms>
                     <h2 class="font-display text-3xl uppercase tracking-tight text-brand-charcoal mb-8 pb-4 border-b-2 border-brand-charcoal">What are you trading in?</h2>

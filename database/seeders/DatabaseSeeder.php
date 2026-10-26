@@ -22,6 +22,13 @@ class DatabaseSeeder extends Seeder
             'email' => 'test@example.com',
         ]);
 
+        if (app()->environment('local')) {
+            User::factory()->admin()->create([
+                'name' => 'Admin User',
+                'email' => 'admin@fonex.com',
+            ]);
+        }
+
         $this->call([
             IphoneCatalogSeeder::class,
         ]);

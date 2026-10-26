@@ -1,7 +1,7 @@
 <x-mail::message>
 # Order Confirmation
 
-Hi {{ $order->customer->name }},
+Hi {{ $order->shipping_name ?? $order->customer->name }},
 
 Thank you for your order! We have received your order (#{{ $order->id }}) and it is currently being processed.
 
@@ -11,9 +11,9 @@ Thank you for your order! We have received your order (#{{ $order->id }}) and it
 | Item | Grade | Quantity | Price |
 | :--- | :--- | :---: | :--- |
 @foreach($order->items as $item)
-| {{ $item->productCondition->product->name }} | {{ strtoupper($item->productCondition->grade) }} | {{ $item->quantity }} | ${{ number_format($item->price_at_purchase, 2) }} |
+| {{ $item->productCondition->product->name }} | {{ strtoupper($item->productCondition->grade) }} | {{ $item->quantity }} | Rs {{ number_format($item->price_at_purchase) }} |
 @endforeach
-| **Total** | | | **${{ number_format($order->total, 2) }}** |
+| **Total** | | | **Rs {{ number_format($order->total) }}** |
 </x-mail::table>
 
 If you have any questions, feel free to reply to this email.

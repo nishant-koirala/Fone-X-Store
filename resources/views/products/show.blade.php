@@ -660,8 +660,13 @@
                                 </h3>
                                 <p class="font-sans text-xs text-brand-grey mb-4">Share your feedback to help fellow buyers in Kathmandu & across Nepal.</p>
 
-                                <form action="{{ route('products.reviews.store', $product->slug) }}" method="POST" class="space-y-3 font-mono text-xs">
+                                <form action="{{ route('products.reviews.store', $product) }}" method="POST" class="space-y-3 font-mono text-xs">
                                     @csrf
+
+                                    {{-- Honeypot field for bot protection --}}
+                                    <div style="display:none;" aria-hidden="true">
+                                        <input type="text" name="author_notes" value="" autocomplete="off" tabindex="-1">
+                                    </div>
                                     <div>
                                         <label for="review_name" class="block font-bold uppercase mb-1 text-brand-charcoal">Your Full Name</label>
                                         <input type="text" id="review_name" name="name" required placeholder="e.g. Ramesh Shrestha" class="w-full bg-white border-2 border-brand-charcoal px-3 py-2 text-xs font-sans focus:border-brand-red focus:ring-0 outline-none rounded-none" />

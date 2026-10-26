@@ -126,6 +126,10 @@ class ProductController extends Controller
      */
     public function storeReview(Request $request, Product $product)
     {
+        if ($request->filled('author_notes')) {
+            return back()->with('success', 'Thank you! Your review has been submitted and is pending approval.');
+        }
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'rating' => 'required|integer|min:1|max:5',

@@ -56,10 +56,15 @@ trait InteractsWithShop
      */
     public function loginAsAdmin(?User $user = null): User
     {
-        $user ??= User::factory()->create([
-            'name' => 'Admin User',
-            'email' => 'admin@fonexstore.test',
-        ]);
+        if ($user === null) {
+            $user = User::factory()->admin()->create([
+                'name' => 'Admin User',
+                'email' => 'admin@fonexstore.test',
+            ]);
+        } else {
+            $user->is_admin = true;
+            $user->save();
+        }
 
         $this->actingAs($user);
 

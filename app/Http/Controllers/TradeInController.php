@@ -26,6 +26,11 @@ class TradeInController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
+        // Honeypot spam check - redirect as if successful without processing or emailing
+        if ($request->filled('secondary_address')) {
+            return redirect()->route('home')->with('success', 'Trade-in request submitted successfully!');
+        }
+
         $request->validate([
             'device_brand' => 'required|string|max:100',
             'device_model' => 'required|string|max:255',
@@ -55,9 +60,13 @@ class TradeInController extends Controller
             'name' => trim($request->input('customer_name')),
         ]);
 
+        // Link user_id only if authenticated user is verified
+        $verifiedUserId = (auth()->check() && auth()->user()?->hasVerifiedEmail()) ? auth()->id() : null;
+
         // Create pending TradeInValuation record
         $valuation = TradeInValuation::create([
             'customer_id' => $customer->id,
+            'user_id' => $verifiedUserId,
             'device_brand' => trim($request->input('device_brand')),
             'device_model' => trim($request->input('device_model')),
             'condition_description' => $description,

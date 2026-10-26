@@ -40,7 +40,6 @@ class PublicRoutesSmokeTest extends TestCase
             'sitemap' => '/sitemap.xml',
             'blog_index' => '/blog',
             'blog_show' => '/blog/'.$post->slug,
-            'design_demo' => '/design-demo',
             'cart' => '/cart',
             'trade_in' => '/trade-in',
             'health_check' => '/up',

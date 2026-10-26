@@ -19,6 +19,10 @@ class OrderFactory extends Factory
             'customer_id' => Customer::factory(),
             'status' => 'pending',
             'total' => fake()->numberBetween(300, 2500) * 100,
+            'shipping_name' => fake()->name(),
+            'shipping_phone' => '98'.fake()->numerify('########'),
+            'shipping_email' => fake()->safeEmail(),
+            'shipping_address' => fake()->streetAddress().', Kathmandu, Nepal',
         ];
     }
 

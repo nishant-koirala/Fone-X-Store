@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Customer;
 use App\Models\Order;
 use App\Models\TradeInValuation;
 use Illuminate\Http\Request;
@@ -16,16 +15,14 @@ class DashboardController extends Controller
     {
         $user = $request->user();
 
-        // We link guest checkouts to this user by matching their registered email address
-        $customerIds = Customer::where('email', $user->email)->pluck('id');
-
+        // Orders and trade-ins are linked strictly by verified user account ID
         $orders = Order::with(['items.productCondition.product'])
-            ->whereIn('customer_id', $customerIds)
+            ->where('user_id', $user->id)
             ->latest()
             ->get();
 
         $tradeIns = TradeInValuation::with('customer')
-            ->whereIn('customer_id', $customerIds)
+            ->where('user_id', $user->id)
             ->latest()
             ->get();
 

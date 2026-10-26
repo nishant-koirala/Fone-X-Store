@@ -4,7 +4,6 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\CustomerResource\Pages;
 use App\Models\Customer;
-use BackedEnum;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
@@ -17,7 +16,10 @@ class CustomerResource extends Resource
 {
     protected static ?string $model = Customer::class;
 
-    public static function getNavigationIcon(): ?string { return 'heroicon-o-users'; }
+    public static function getNavigationIcon(): ?string
+    {
+        return 'heroicon-o-users';
+    }
 
     public static function getNavigationGroup(): ?string
     {

@@ -5,8 +5,8 @@ namespace App\Filament\Resources\Reviews\Tables;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
 
 class ReviewsTable
@@ -22,7 +22,7 @@ class ReviewsTable
                 TextColumn::make('rating')
                     ->numeric()
                     ->sortable(),
-                \Filament\Tables\Columns\ToggleColumn::make('is_approved'),
+                ToggleColumn::make('is_approved'),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

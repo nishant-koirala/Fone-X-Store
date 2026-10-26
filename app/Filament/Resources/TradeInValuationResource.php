@@ -4,7 +4,6 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\TradeInValuationResource\Pages;
 use App\Models\TradeInValuation;
-use BackedEnum;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
@@ -17,7 +16,10 @@ class TradeInValuationResource extends Resource
 {
     protected static ?string $model = TradeInValuation::class;
 
-    public static function getNavigationIcon(): ?string { return 'heroicon-o-arrows-right-left'; }
+    public static function getNavigationIcon(): ?string
+    {
+        return 'heroicon-o-arrows-right-left';
+    }
 
     public static function getNavigationGroup(): ?string
     {

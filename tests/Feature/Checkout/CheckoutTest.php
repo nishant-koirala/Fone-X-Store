@@ -5,9 +5,7 @@ namespace Tests\Feature\Checkout;
 use App\Mail\OrderPlaced;
 use App\Models\Customer;
 use App\Models\Order;
-use App\Models\OrderItem;
 use App\Models\ProductCondition;
-use App\Models\StockMovement;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
@@ -64,7 +62,7 @@ class CheckoutTest extends TestCase
         $responseMax = $this->post(route('checkout.store'), [
             'name' => str_repeat('A', 256), // Max 255
             'phone' => str_repeat('9', 51), // Max 50
-            'email' => str_repeat('a', 250) . '@test.com', // Exceeds 255
+            'email' => str_repeat('a', 250).'@test.com', // Exceeds 255
             'address' => str_repeat('B', 1001), // Max 1000
         ]);
         $responseMax->assertSessionHasErrors(['name', 'phone', 'email', 'address']);
@@ -152,7 +150,6 @@ class CheckoutTest extends TestCase
         // Mail queued
         Mail::assertQueued(OrderPlaced::class, fn ($mail) => $mail->hasTo('aayush@nepalmail.com'));
     }
-
 
     public function test_race_condition_and_oversell_protection_rolls_back_everything(): void
     {

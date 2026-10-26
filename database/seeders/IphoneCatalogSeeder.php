@@ -29,7 +29,7 @@ class IphoneCatalogSeeder extends Seeder
             ['name' => 'iPhone XR', 'base_price' => 320],
             ['name' => 'iPhone XS', 'base_price' => 350],
             ['name' => 'iPhone XS Max', 'base_price' => 400],
-            
+
             ['name' => 'iPhone 11', 'base_price' => 450],
             ['name' => 'iPhone 11 Pro', 'base_price' => 520],
             ['name' => 'iPhone 11 Pro Max', 'base_price' => 580],
@@ -53,7 +53,7 @@ class IphoneCatalogSeeder extends Seeder
             ['name' => 'iPhone 15 Plus', 'base_price' => 950],
             ['name' => 'iPhone 15 Pro', 'base_price' => 1050],
             ['name' => 'iPhone 15 Pro Max', 'base_price' => 1150],
-            
+
             ['name' => 'iPhone 16', 'base_price' => 900],
             ['name' => 'iPhone 16 Plus', 'base_price' => 1000],
             ['name' => 'iPhone 16 Pro', 'base_price' => 1100],
@@ -73,7 +73,7 @@ class IphoneCatalogSeeder extends Seeder
                     'brand' => 'Apple',
                     'category_id' => $appleCategory->id,
                     'base_price' => $model['base_price'],
-                    'description' => 'The ' . $model['name'] . ' offers an incredible experience. This is a placeholder description that you can edit later in the admin panel.',
+                    'description' => 'The '.$model['name'].' offers an incredible experience. This is a placeholder description that you can edit later in the admin panel.',
                     'is_visible' => true,
                     'is_new' => false,
                 ]
@@ -88,7 +88,7 @@ class IphoneCatalogSeeder extends Seeder
 
             foreach ($conditions as $cond) {
                 $price = round($model['base_price'] * $cond['modifier'], 2);
-                
+
                 $product->conditions()->firstOrCreate(
                     ['grade' => $cond['grade']],
                     [

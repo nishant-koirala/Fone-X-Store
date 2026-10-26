@@ -8,4 +8,3 @@ abstract class TestCase extends BaseTestCase
 {
     use Support\InteractsWithShop;
 }
-

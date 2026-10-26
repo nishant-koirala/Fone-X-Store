@@ -71,7 +71,6 @@ class ProductShowTest extends TestCase
         $this->assertEquals(3, $viewProduct->conditions->firstWhere('grade', 'A')->quantity_in_stock);
     }
 
-
     public function test_shows_out_of_stock_state_when_all_conditions_zero(): void
     {
         $product = Product::factory()->create(['name' => 'Sold Out Phone', 'is_visible' => true]);

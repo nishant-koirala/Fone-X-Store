@@ -2,7 +2,6 @@
 
 namespace Tests\Feature\Catalog;
 
-use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductCondition;
 use Illuminate\Foundation\Testing\RefreshDatabase;

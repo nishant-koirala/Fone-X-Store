@@ -4,7 +4,6 @@ namespace App\Mail;
 
 use App\Models\TradeInValuation;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Mail\Mailables\Content;
@@ -28,7 +27,7 @@ class AdminTradeInAlert extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'ACTION REQUIRED: New Trade-In Request (#' . $this->valuation->id . ')',
+            subject: 'ACTION REQUIRED: New Trade-In Request (#'.$this->valuation->id.')',
         );
     }
 
@@ -41,7 +40,6 @@ class AdminTradeInAlert extends Mailable
             markdown: 'emails.admin-trade-in-alert',
         );
     }
-
 
     /**
      * Get the attachments for the message.

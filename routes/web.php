@@ -15,15 +15,18 @@ Route::post('/products/{product}/reviews', [ProductController::class, 'storeRevi
 
 // Wishlist Routes
 use App\Http\Controllers\WishlistController;
+
 Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist.index');
 Route::post('/wishlist/{product}', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
 
 // Sitemap
 use App\Http\Controllers\SitemapController;
+
 Route::get('/sitemap.xml', [SitemapController::class, 'index']);
 
 // Blog Routes
 use App\Http\Controllers\BlogController;
+
 Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
 Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
 
@@ -49,6 +52,7 @@ Route::post('/trade-in', [TradeInController::class, 'store'])->name('trade-in.st
 Route::get('/trade-in/confirmation/{valuation}', [TradeInController::class, 'confirmation'])->name('trade-in.confirmation');
 
 use App\Http\Controllers\DashboardController;
+
 Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {

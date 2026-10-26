@@ -4,8 +4,6 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ProductResource\Pages;
 use App\Models\Product;
-use BackedEnum;
-use Illuminate\Support\Facades\Storage;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
@@ -14,13 +12,18 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 
 class ProductResource extends Resource
 {
     protected static ?string $model = Product::class;
 
-    public static function getNavigationIcon(): ?string { return 'heroicon-o-device-phone-mobile'; }
+    public static function getNavigationIcon(): ?string
+    {
+        return 'heroicon-o-device-phone-mobile';
+    }
 
     public static function getNavigationGroup(): ?string
     {
@@ -82,10 +85,12 @@ class ProductResource extends Resource
                             ->content(function ($record) {
                                 if ($record && $record->image) {
                                     $url = Storage::disk('public')->url($record->image);
-                                    return new \Illuminate\Support\HtmlString(
-                                        '<img src="' . $url . '" style="max-height:150px;border-radius:8px;" />'
+
+                                    return new HtmlString(
+                                        '<img src="'.$url.'" style="max-height:150px;border-radius:8px;" />'
                                     );
                                 }
+
                                 return 'No image uploaded yet.';
                             })
                             ->columnSpanFull(),

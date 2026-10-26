@@ -35,7 +35,7 @@ class CatalogSeederTest extends TestCase
         $products = Product::with('conditions')->get();
         foreach ($products as $product) {
             $this->assertGreaterThan(0, $product->conditions->count(), "Product [{$product->name}] must have conditions");
-            
+
             foreach ($product->conditions as $cond) {
                 $this->assertGreaterThan(0, (float) $cond->price, "Condition price for [{$product->name} - {$cond->grade}] must be positive");
                 $this->assertGreaterThanOrEqual(0, $cond->quantity_in_stock, "Stock for [{$product->name} - {$cond->grade}] cannot be negative");

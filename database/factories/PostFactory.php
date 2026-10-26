@@ -19,7 +19,7 @@ class PostFactory extends Factory
 
         return [
             'title' => $title,
-            'slug' => Str::slug($title) . '-' . fake()->unique()->numberBetween(10, 9999),
+            'slug' => Str::slug($title).'-'.fake()->unique()->numberBetween(10, 9999),
             'content' => fake()->paragraphs(3, true),
             'is_published' => true,
             'published_at' => now(),

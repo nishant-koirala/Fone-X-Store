@@ -10,7 +10,7 @@ class WishlistController extends Controller
     public function index(Request $request)
     {
         $wishlistIds = $request->session()->get('wishlist', []);
-        
+
         $wishlistProducts = Product::with(['conditions', 'category'])
             ->whereIn('id', $wishlistIds)
             ->where('is_visible', true)
@@ -22,7 +22,7 @@ class WishlistController extends Controller
     public function toggle(Request $request, Product $product)
     {
         $wishlist = $request->session()->get('wishlist', []);
-        
+
         if (in_array($product->id, $wishlist)) {
             // Remove
             $wishlist = array_diff($wishlist, [$product->id]);
@@ -32,7 +32,7 @@ class WishlistController extends Controller
             $wishlist[] = $product->id;
             $message = 'Added to wishlist.';
         }
-        
+
         // Save back to session (array_values re-indexes the array)
         $request->session()->put('wishlist', array_values($wishlist));
 

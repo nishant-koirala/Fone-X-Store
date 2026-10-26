@@ -12,13 +12,11 @@ trait InteractsWithShop
     /**
      * Create a product with realistic conditions and stock.
      *
-     * @param array $productAttributes
-     * @param array|null $conditions Custom array of condition definitions: [['grade' => 'new', 'price' => 120000, 'stock' => 5], ...]
-     * @return Product
+     * @param  array|null  $conditions  Custom array of condition definitions: [['grade' => 'new', 'price' => 120000, 'stock' => 5], ...]
      */
     public function createProductWithConditions(array $productAttributes = [], ?array $conditions = null): Product
     {
-        if (!isset($productAttributes['category_id'])) {
+        if (! isset($productAttributes['category_id'])) {
             $productAttributes['category_id'] = Category::factory()->create()->id;
         }
 
@@ -47,9 +45,6 @@ trait InteractsWithShop
 
     /**
      * Create a single product condition with an attached product.
-     *
-     * @param array $attributes
-     * @return ProductCondition
      */
     public function createCondition(array $attributes = []): ProductCondition
     {
@@ -58,9 +53,6 @@ trait InteractsWithShop
 
     /**
      * Authenticate as an admin user.
-     *
-     * @param User|null $user
-     * @return User
      */
     public function loginAsAdmin(?User $user = null): User
     {
@@ -76,9 +68,6 @@ trait InteractsWithShop
 
     /**
      * Authenticate as a normal customer user.
-     *
-     * @param User|null $user
-     * @return User
      */
     public function loginAsCustomer(?User $user = null): User
     {
@@ -95,8 +84,7 @@ trait InteractsWithShop
     /**
      * Set up the session cart with line items.
      *
-     * @param array $items [ [condition_id => ['quantity' => 1]] or [condition => $cond, 'quantity' => 2] ]
-     * @return static
+     * @param  array  $items  [ [condition_id => ['quantity' => 1]] or [condition => $cond, 'quantity' => 2] ]
      */
     public function setCartSession(array $items): static
     {

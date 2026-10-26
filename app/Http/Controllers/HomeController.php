@@ -31,7 +31,7 @@ class HomeController extends Controller
         $heroConditions = ProductCondition::with(['product', 'product.category'])
             ->whereHas('product', function ($q) {
                 $q->where('is_visible', true)
-                  ->where('is_featured', true);
+                    ->where('is_featured', true);
             })
             ->where('quantity_in_stock', '>', 0)
             ->latest()

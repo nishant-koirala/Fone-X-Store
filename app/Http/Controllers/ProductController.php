@@ -7,7 +7,6 @@ use App\Models\Product;
 use App\Models\ProductCondition;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
 
 class ProductController extends Controller
 {
@@ -20,9 +19,9 @@ class ProductController extends Controller
             ->with([
                 'product' => function ($q) {
                     $q->withCount(['reviews' => fn ($r) => $r->where('is_approved', true)])
-                      ->withAvg(['reviews' => fn ($r) => $r->where('is_approved', true)], 'rating');
+                        ->withAvg(['reviews' => fn ($r) => $r->where('is_approved', true)], 'rating');
                 },
-                'product.category'
+                'product.category',
             ])
             ->whereHas('product', function ($q) {
                 $q->where('is_visible', true);
@@ -59,7 +58,7 @@ class ProductController extends Controller
             $search = $request->input('search');
             $query->whereHas('product', function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('brand', 'like', "%{$search}%");
+                    ->orWhere('brand', 'like', "%{$search}%");
             });
         }
 
@@ -107,7 +106,7 @@ class ProductController extends Controller
         $product->load([
             'conditions',
             'category',
-            'reviews' => fn ($q) => $q->where('is_approved', true)->latest()
+            'reviews' => fn ($q) => $q->where('is_approved', true)->latest(),
         ]);
         $product->loadAvg(['reviews' => fn ($q) => $q->where('is_approved', true)], 'rating');
         $product->loadCount(['reviews' => fn ($q) => $q->where('is_approved', true)]);

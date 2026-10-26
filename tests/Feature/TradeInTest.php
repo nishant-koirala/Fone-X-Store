@@ -2,8 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Models\Customer;
-use App\Models\TradeInValuation;
+use App\Mail\AdminTradeInAlert;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
@@ -27,20 +26,18 @@ class TradeInTest extends TestCase
         ]);
 
         $response->assertRedirect();
-        
+
         $this->assertDatabaseHas('customers', [
             'name' => 'Jane Doe',
-            'phone' => '9812345678'
+            'phone' => '9812345678',
         ]);
 
         $this->assertDatabaseHas('trade_in_valuations', [
             'device_brand' => 'Apple',
             'device_model' => 'iPhone 13',
-            'status' => 'pending'
+            'status' => 'pending',
         ]);
 
-        Mail::assertSent(\App\Mail\AdminTradeInAlert::class);
+        Mail::assertSent(AdminTradeInAlert::class);
     }
-
-
 }

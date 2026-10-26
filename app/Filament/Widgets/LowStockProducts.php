@@ -11,7 +11,7 @@ class LowStockProducts extends BaseWidget
 {
     protected static ?int $sort = 2;
 
-    protected int | string | array $columnSpan = 'full';
+    protected int|string|array $columnSpan = 'full';
 
     protected static ?string $heading = 'Low Stock Alert (< 5 items in stock)';
 

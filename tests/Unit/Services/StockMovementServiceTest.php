@@ -73,7 +73,7 @@ class StockMovementServiceTest extends TestCase
         try {
             DB::transaction(function () use ($condition) {
                 $condition->recordStockMovement('restock', 10);
-                throw new Exception("Simulated mid-operation transaction failure");
+                throw new Exception('Simulated mid-operation transaction failure');
             });
         } catch (Exception $e) {
             // Expected simulation

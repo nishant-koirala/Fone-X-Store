@@ -62,7 +62,7 @@ class ProductTest extends TestCase
 
     public function test_product_fillable_protection(): void
     {
-        $product = new Product();
+        $product = new Product;
         $this->assertContains('name', $product->getFillable());
         $this->assertContains('slug', $product->getFillable());
         $this->assertContains('base_price', $product->getFillable());

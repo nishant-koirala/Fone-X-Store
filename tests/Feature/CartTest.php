@@ -15,7 +15,7 @@ class CartTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         $category = Category::create(['name' => 'Phones', 'slug' => 'phones']);
         $this->product = Product::create([
             'category_id' => $category->id,
@@ -25,7 +25,7 @@ class CartTest extends TestCase
             'base_price' => 1000,
             'is_visible' => true,
         ]);
-        
+
         $this->condition = ProductCondition::create([
             'product_id' => $this->product->id,
             'grade' => 'new',
@@ -48,10 +48,10 @@ class CartTest extends TestCase
             'product_condition_id' => $this->condition->id,
             'quantity' => 1,
         ]);
-        
+
         $response->assertRedirect();
         $response->assertSessionHas('success');
-        
+
         $cart = session('cart');
         $this->assertNotNull($cart);
         $this->assertArrayHasKey($this->condition->id, $cart);
@@ -64,7 +64,7 @@ class CartTest extends TestCase
             'product_condition_id' => $this->condition->id,
             'quantity' => 10,
         ]);
-        
+
         $response->assertRedirect();
         $response->assertSessionHas('error');
     }

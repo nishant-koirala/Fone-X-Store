@@ -20,9 +20,9 @@ class CustomerFactory extends Factory
         return [
             'name' => fake()->name(),
             // Realistic Nepali mobile phone prefix (98XXXXXXXX or 97XXXXXXXX)
-            'phone' => '98' . fake()->unique()->numerify('########'),
+            'phone' => '98'.fake()->unique()->numerify('########'),
             'email' => fake()->safeEmail(),
-            'address' => fake()->streetAddress() . ', ' . $selectedCity . ', Nepal',
+            'address' => fake()->streetAddress().', '.$selectedCity.', Nepal',
         ];
     }
 }

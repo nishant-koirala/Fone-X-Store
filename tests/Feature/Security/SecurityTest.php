@@ -2,13 +2,15 @@
 
 namespace Tests\Feature\Security;
 
+use App\Models\Category;
 use App\Models\Customer;
 use App\Models\Order;
 use App\Models\Product;
-use App\Models\ProductCondition;
 use App\Models\User;
-use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
+use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\Request;
+use Illuminate\Session\TokenMismatchException;
 use Tests\TestCase;
 
 class SecurityTest extends TestCase
@@ -17,25 +19,27 @@ class SecurityTest extends TestCase
 
     public function test_csrf_middleware_rejects_unverified_requests_with_token_mismatch(): void
     {
-        $middleware = new class(app(), app('encrypter')) extends \Illuminate\Foundation\Http\Middleware\PreventRequestForgery {
+        $middleware = new class(app(), app('encrypter')) extends PreventRequestForgery
+        {
             protected function runningUnitTests(): bool
             {
                 return false;
             }
         };
 
-        $request = \Illuminate\Http\Request::create('/checkout', 'POST', ['name' => 'Attack Bot']);
+        $request = Request::create('/checkout', 'POST', ['name' => 'Attack Bot']);
         $session = app('session')->driver();
         $session->start();
         $request->setLaravelSession($session);
 
-        $this->expectException(\Illuminate\Session\TokenMismatchException::class);
+        $this->expectException(TokenMismatchException::class);
         $middleware->handle($request, fn () => response('OK'));
     }
 
     public function test_csrf_middleware_allows_requests_with_valid_token(): void
     {
-        $middleware = new class(app(), app('encrypter')) extends \Illuminate\Foundation\Http\Middleware\PreventRequestForgery {
+        $middleware = new class(app(), app('encrypter')) extends PreventRequestForgery
+        {
             protected function runningUnitTests(): bool
             {
                 return false;
@@ -46,15 +50,12 @@ class SecurityTest extends TestCase
         $session->start();
         $token = $session->token();
 
-        $request = \Illuminate\Http\Request::create('/checkout', 'POST', ['_token' => $token]);
+        $request = Request::create('/checkout', 'POST', ['_token' => $token]);
         $request->setLaravelSession($session);
 
         $response = $middleware->handle($request, fn () => response('OK'));
         $this->assertEquals(200, $response->getStatusCode());
     }
-
-
-
 
     public function test_mass_assignment_protection_on_core_models(): void
     {
@@ -65,7 +66,7 @@ class SecurityTest extends TestCase
             'slug' => 'safe-phone',
             'brand' => 'SafeBrand',
             'base_price' => 50000,
-            'category_id' => \App\Models\Category::factory()->create()->id,
+            'category_id' => Category::factory()->create()->id,
             'is_visible' => true,
         ]);
         $this->assertNotEquals(99999, $product->id);

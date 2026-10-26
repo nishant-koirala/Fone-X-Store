@@ -3,7 +3,6 @@
 namespace Tests\Feature\TradeIn;
 
 use App\Mail\AdminTradeInAlert;
-use App\Mail\TradeInSubmitted;
 use App\Models\Customer;
 use App\Models\TradeInValuation;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -23,9 +22,6 @@ class TradeInTest extends TestCase
         $response->assertSee('Trade & Upgrade', false);
         $response->assertSee('INSTANT VALUATION');
     }
-
-
-
 
     public function test_form_validation_for_required_fields(): void
     {

@@ -52,6 +52,10 @@ class ProductCondition extends Model
      */
     public function recordStockMovement(string $type, int $quantity, ?string $note = null, ?int $createdBy = null): StockMovement
     {
+        if ($this->quantity_in_stock + $quantity < 0) {
+            throw new \InvalidArgumentException("Cannot reduce stock below zero for condition #{$this->id}. Available stock: {$this->quantity_in_stock}, requested adjustment: {$quantity}.");
+        }
+
         return DB::transaction(function () use ($type, $quantity, $note, $createdBy) {
             $movement = $this->stockMovements()->create([
                 'type' => $type,
@@ -65,4 +69,5 @@ class ProductCondition extends Model
             return $movement;
         });
     }
+
 }

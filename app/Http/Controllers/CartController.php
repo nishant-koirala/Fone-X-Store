@@ -44,8 +44,12 @@ class CartController extends Controller
             }
         }
 
-        return view('cart.index', compact('cartItems', 'subtotal'));
+        $total = $subtotal;
+
+        return view('cart.index', compact('cartItems', 'subtotal', 'total'));
     }
+
+
 
     /**
      * Add a product condition item to the session cart.

@@ -39,3 +39,14 @@ This document tracks real application bugs discovered during the implementation 
 - **Actual Behavior:** The Blade template directly invoked `number_format(request('min_price', 0))` and `number_format(request('max_price'))`. In PHP 8.0+, passing non-numeric strings to `number_format()` throws a fatal `TypeError: number_format(): Argument #1 ($num) must be of type int|float, string given`.
 - **Fix:** In `resources/views/products/index.blade.php`, check `is_numeric(request('min_price'))` and `is_numeric(request('max_price'))` (or `(float) request(...)`) before formatting.
 
+---
+
+## Bug 5: Undefined Variable `$total` in `resources/views/cart/index.blade.php`
+
+- **Failing Test:** `Tests\Feature\Cart\CartTest::test_can_add_item_to_cart_and_persists_in_session`
+- **Location:** `resources/views/cart/index.blade.php:101, 115` & `app/Http/Controllers/CartController.php:47`
+- **Expected Behavior:** Viewing `/cart` with items in the cart displays the order summary subtotal and total without throwing an error.
+- **Actual Behavior:** `CartController@index` returns `view('cart.index', compact('cartItems', 'subtotal'))`, passing `$subtotal` to the view. However, `cart/index.blade.php` lines 101 and 115 reference `$total`, throwing `ErrorException: Undefined variable $total`.
+- **Fix:** In `CartController.php`, compute and pass `total: $subtotal` (or alias `$total = $subtotal`), and in `cart/index.blade.php` use `$subtotal` / `$total` consistently.
+
+

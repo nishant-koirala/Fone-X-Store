@@ -96,7 +96,7 @@
                                     <div class="flex-grow">
                                         <div class="font-mono text-xs font-bold">{{ $item['condition']->product->name }}</div>
                                         <div class="font-mono text-xs text-brand-white/50 uppercase">
-                                            Cond: {{ $item['condition']->grade }} • Qty: {{ $item['quantity'] }}
+                                            Cond: {{ $item['condition']->grade instanceof \App\Enums\GradeEnum ? $item['condition']->grade->value : $item['condition']->grade }} • Qty: {{ $item['quantity'] }}
                                         </div>
                                     </div>
                                     <div class="font-mono font-bold flex-shrink-0">

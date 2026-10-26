@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Models;
 
+use App\Enums\OrderStatusEnum;
 use App\Models\Customer;
 use App\Models\Order;
 use App\Models\OrderItem;
@@ -58,6 +59,7 @@ class OrderTest extends TestCase
         ]);
 
         $this->assertSame('120000.50', (string) $order->total);
-        $this->assertSame('pending', $order->status);
+        $this->assertSame(OrderStatusEnum::PENDING, $order->status);
+        $this->assertSame('pending', $order->status->value);
     }
 }

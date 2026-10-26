@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Services;
 
+use App\Enums\StockMovementTypeEnum;
 use App\Models\ProductCondition;
 use App\Models\StockMovement;
 use App\Models\User;
@@ -27,7 +28,7 @@ class StockMovementServiceTest extends TestCase
         );
 
         $this->assertInstanceOf(StockMovement::class, $movement);
-        $this->assertEquals('restock', $movement->type);
+        $this->assertEquals(StockMovementTypeEnum::RESTOCK, $movement->type);
         $this->assertEquals(10, $movement->quantity);
         $this->assertEquals('Shipment received from distributor', $movement->note);
         $this->assertEquals($user->id, $movement->created_by);
@@ -50,7 +51,7 @@ class StockMovementServiceTest extends TestCase
             note: 'Order #1001 sale'
         );
 
-        $this->assertEquals('sale', $movement->type);
+        $this->assertEquals(StockMovementTypeEnum::SALE, $movement->type);
         $this->assertEquals(-2, $movement->quantity);
         $this->assertEquals(8, $condition->fresh()->quantity_in_stock);
     }

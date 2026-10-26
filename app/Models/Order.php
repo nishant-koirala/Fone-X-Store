@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\OrderStatusEnum;
+use App\Enums\StockMovementTypeEnum;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -24,6 +26,7 @@ class Order extends Model
     ];
 
     protected $casts = [
+        'status' => OrderStatusEnum::class,
         'total' => 'decimal:2',
         'restocked_at' => 'datetime',
     ];
@@ -31,13 +34,14 @@ class Order extends Model
     protected static function booted(): void
     {
         static::updated(function (Order $order) {
-            if ($order->wasChanged('status') && $order->status === 'cancelled' && $order->restocked_at === null) {
+            $isCancelled = $order->status === OrderStatusEnum::CANCELLED;
+            if ($order->wasChanged('status') && $isCancelled && $order->restocked_at === null) {
                 DB::transaction(function () use ($order) {
                     $order->loadMissing('items.productCondition');
                     foreach ($order->items as $item) {
                         if ($item->productCondition) {
                             $item->productCondition->recordStockMovement(
-                                type: 'restock',
+                                type: StockMovementTypeEnum::RESTOCK,
                                 quantity: $item->quantity,
                                 note: "Automatic restock from cancelled Order #{$order->id}",
                                 createdBy: auth()->id()

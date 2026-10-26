@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\TradeInStatusEnum;
 use App\Filament\Resources\TradeInValuationResource\Pages;
 use App\Models\TradeInValuation;
 use Filament\Actions\DeleteAction;
@@ -54,13 +55,9 @@ class TradeInValuationResource extends Resource
                     ->nullable(),
 
                 Forms\Components\Select::make('status')
-                    ->options([
-                        'pending' => 'Pending Review',
-                        'reviewed' => 'Valuation Reviewed',
-                        'completed' => 'Trade-In Completed',
-                    ])
+                    ->options(TradeInStatusEnum::class)
                     ->required()
-                    ->default('pending'),
+                    ->default(TradeInStatusEnum::PENDING),
 
                 Forms\Components\Textarea::make('condition_description')
                     ->required()
@@ -88,21 +85,12 @@ class TradeInValuationResource extends Resource
                     ->sortable()
                     ->placeholder('Unassessed'),
                 Tables\Columns\TextColumn::make('status')
-                    ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'reviewed' => 'info',
-                        'completed' => 'success',
-                        default => 'warning',
-                    }),
+                    ->badge(),
                 Tables\Columns\TextColumn::make('created_at')->dateTime()->sortable(),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('status')
-                    ->options([
-                        'pending' => 'Pending Review',
-                        'reviewed' => 'Valuation Reviewed',
-                        'completed' => 'Trade-In Completed',
-                    ]),
+                    ->options(TradeInStatusEnum::class),
             ])
             ->actions([
                 EditAction::make(),

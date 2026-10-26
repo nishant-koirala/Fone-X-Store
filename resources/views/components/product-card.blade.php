@@ -3,7 +3,8 @@
 @php
     $product = $condition->product;
     $category = $product->category;
-    $gradeLower = strtolower($condition->grade);
+    $gradeVal = $condition->grade instanceof \App\Enums\GradeEnum ? $condition->grade->value : (string) $condition->grade;
+    $gradeLower = strtolower($gradeVal);
     $isNew = $gradeLower === 'new';
     $savings = 0;
     if ($condition->original_price && $condition->original_price > $condition->price) {
@@ -16,7 +17,7 @@
         'b' => ['label' => 'Grade B • Excellent', 'bg' => 'bg-amber-50 text-amber-800 border-amber-300'],
         'c' => ['label' => 'Grade C • Fair Value', 'bg' => 'bg-stone-100 text-stone-800 border-stone-300'],
     ];
-    $gradeMeta = $gradeBadges[$gradeLower] ?? ['label' => 'Grade ' . strtoupper($condition->grade), 'bg' => 'bg-gray-100 text-brand-charcoal border-gray-300'];
+    $gradeMeta = $gradeBadges[$gradeLower] ?? ['label' => 'Grade ' . strtoupper($gradeVal), 'bg' => 'bg-gray-100 text-brand-charcoal border-gray-300'];
 @endphp
 
 <a href="{{ route('products.show', $product->slug) }}" 

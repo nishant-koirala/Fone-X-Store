@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Checkout;
 
+use App\Enums\OrderStatusEnum;
 use App\Mail\OrderPlaced;
 use App\Models\Customer;
 use App\Models\Order;
@@ -111,7 +112,7 @@ class CheckoutTest extends TestCase
         // Order created with pending status and correct total (180,000)
         $order = Order::where('customer_id', $customer->id)->first();
         $this->assertNotNull($order);
-        $this->assertEquals('pending', $order->status);
+        $this->assertEquals(OrderStatusEnum::PENDING, $order->status);
         $this->assertEquals(180000, (float) $order->total);
 
         // Order items created with accurate price snapshots

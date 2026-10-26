@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\GradeEnum;
 use App\Filament\Resources\ProductResource\Pages;
 use App\Models\Product;
 use Filament\Actions\DeleteAction;
@@ -130,12 +131,7 @@ class ProductResource extends Resource
                             ->relationship('conditions')
                             ->schema([
                                 Forms\Components\Select::make('grade')
-                                    ->options([
-                                        'new' => 'New (Brand New)',
-                                        'A' => 'Grade A (Excellent Used)',
-                                        'B' => 'Grade B (Good Used)',
-                                        'C' => 'Grade C (Fair Used)',
-                                    ])
+                                    ->options(GradeEnum::class)
                                     ->required(),
 
                                 Forms\Components\TextInput::make('original_price')

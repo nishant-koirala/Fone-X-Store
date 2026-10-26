@@ -71,7 +71,8 @@
     $inWishlist = in_array($product->id, session('wishlist', []));
     $conditionLookup = [];
     foreach($product->conditions as $cond) {
-        $conditionLookup[$cond->grade] = $cond;
+        $gradeKey = $cond->grade instanceof \App\Enums\GradeEnum ? $cond->grade->value : $cond->grade;
+        $conditionLookup[$gradeKey] = $cond;
     }
 @endphp
 

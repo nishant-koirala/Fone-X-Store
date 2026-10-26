@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\ProductCondition;
+use App\Services\Cart\CartService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -10,44 +11,13 @@ use Illuminate\Http\Request;
 class CartController extends Controller
 {
     /**
-     * Display the shopping cart page with line items and subtotal.
+     * Display the shopping cart page with line items, subtotal, and total.
      */
-    public function index(): View
+    public function index(CartService $cartService): View
     {
-        $cartSession = session('cart', []);
-        $cartItems = [];
-        $subtotal = 0;
-
-        if (! empty($cartSession)) {
-            $conditionIds = array_keys($cartSession);
-            $conditions = ProductCondition::with(['product', 'product.category'])
-                ->whereIn('id', $conditionIds)
-                ->get()
-                ->keyBy('id');
-
-            foreach ($cartSession as $condId => $item) {
-                if (isset($conditions[$condId])) {
-                    $condition = $conditions[$condId];
-                    if (! $condition->product || ! $condition->product->is_visible) {
-                        continue;
-                    }
-                    $qty = min($item['quantity'], $condition->quantity_in_stock);
-
-                    if ($qty > 0) {
-                        $lineTotal = $condition->price * $qty;
-                        $subtotal += $lineTotal;
-
-                        $cartItems[] = [
-                            'condition' => $condition,
-                            'quantity' => $qty,
-                            'line_total' => $lineTotal,
-                        ];
-                    }
-                }
-            }
-        }
-
-        $total = $subtotal;
+        $cartItems = $cartService->getItems();
+        $subtotal = $cartService->subtotal();
+        $total = $cartService->total();
 
         return view('cart.index', compact('cartItems', 'subtotal', 'total'));
     }
@@ -69,20 +39,20 @@ class CartController extends Controller
         }
 
         $requestedQty = (int) $request->input('quantity', 1);
-
         $productName = $condition->product->name;
+        $gradeStr = $condition->grade->value;
 
         if ($condition->quantity_in_stock < $requestedQty) {
-            return back()->with('error', "Insufficient stock for {$productName} (Grade ".strtoupper($condition->grade)."). Only {$condition->quantity_in_stock} items remaining.");
+            return back()->with('error', "Insufficient stock for {$productName} (Grade ".strtoupper($gradeStr)."). Only {$condition->quantity_in_stock} items remaining.");
         }
 
         $cart = session()->get('cart', []);
         $condId = $condition->id;
-        $currentQty = isset($cart[$condId]) ? $cart[$condId]['quantity'] : 0;
+        $currentQty = isset($cart[$condId]) ? (int) $cart[$condId]['quantity'] : 0;
         $newQty = $currentQty + $requestedQty;
 
         if ($newQty > $condition->quantity_in_stock) {
-            return back()->with('error', "Cannot add more. Stock limit for {$productName} (Grade ".strtoupper($condition->grade).") is {$condition->quantity_in_stock}.");
+            return back()->with('error', "Cannot add more. Stock limit for {$productName} (Grade ".strtoupper($gradeStr).") is {$condition->quantity_in_stock}.");
         }
 
         $cart[$condId] = [
@@ -92,7 +62,7 @@ class CartController extends Controller
 
         session()->put('cart', $cart);
 
-        return redirect()->route('cart.index')->with('success', "{$productName} (Grade ".strtoupper($condition->grade).') added to your cart.');
+        return redirect()->route('cart.index')->with('success', "{$productName} (Grade ".strtoupper($gradeStr).') added to your cart.');
     }
 
     /**
@@ -109,11 +79,13 @@ class CartController extends Controller
         if (! $condition->product || ! $condition->product->is_visible) {
             return back()->with('error', 'This product is currently unavailable.');
         }
+
         $requestedQty = (int) $request->input('quantity');
         $productName = $condition->product->name;
+        $gradeStr = $condition->grade->value;
 
         if ($requestedQty > $condition->quantity_in_stock) {
-            return back()->with('error', "Only {$condition->quantity_in_stock} items available for {$productName} (Grade ".strtoupper($condition->grade).').');
+            return back()->with('error', "Only {$condition->quantity_in_stock} items available for {$productName} (Grade ".strtoupper($gradeStr).').');
         }
 
         $cart = session()->get('cart', []);

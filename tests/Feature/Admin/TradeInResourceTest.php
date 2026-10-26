@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Admin;
 
+use App\Enums\TradeInStatusEnum;
 use App\Filament\Resources\TradeInValuationResource\Pages\EditTradeInValuation;
 use App\Filament\Resources\TradeInValuationResource\Pages\ListTradeInValuations;
 use App\Models\TradeInValuation;
@@ -42,7 +43,7 @@ class TradeInResourceTest extends TestCase
 
         $fresh = $valuation->fresh();
         $this->assertEquals(65000, (float) $fresh->estimated_value);
-        $this->assertEquals('reviewed', $fresh->status);
+        $this->assertEquals(TradeInStatusEnum::REVIEWED, $fresh->status);
     }
 
     public function test_can_mark_trade_in_as_completed(): void
@@ -56,6 +57,6 @@ class TradeInResourceTest extends TestCase
             ->call('save')
             ->assertHasNoFormErrors();
 
-        $this->assertEquals('completed', $valuation->fresh()->status);
+        $this->assertEquals(TradeInStatusEnum::COMPLETED, $valuation->fresh()->status);
     }
 }

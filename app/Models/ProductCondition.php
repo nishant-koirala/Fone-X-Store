@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\GradeEnum;
+use App\Enums\StockMovementTypeEnum;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -23,6 +25,7 @@ class ProductCondition extends Model
     ];
 
     protected $casts = [
+        'grade' => GradeEnum::class,
         'price' => 'decimal:2',
         'original_price' => 'decimal:2',
         'quantity_in_stock' => 'integer',
@@ -77,21 +80,23 @@ class ProductCondition extends Model
     /**
      * Record a stock movement and adjust quantity_in_stock inside a DB transaction.
      *
-     * @param  string  $type  ('restock', 'sale', 'exchange_in', 'adjustment')
+     * @param  string|StockMovementTypeEnum  $type  ('restock', 'sale', 'exchange_in', 'adjustment')
      * @param  int  $quantity  (positive to increase stock, negative to decrease stock)
      */
-    public function recordStockMovement(string $type, int $quantity, ?string $note = null, ?int $createdBy = null): StockMovement
+    public function recordStockMovement(string|StockMovementTypeEnum $type, int $quantity, ?string $note = null, ?int $createdBy = null): StockMovement
     {
+        $typeValue = $type instanceof StockMovementTypeEnum ? $type->value : $type;
+
         if ($quantity === 0) {
             throw new \InvalidArgumentException('Stock movement quantity cannot be zero.');
         }
 
-        if ($type === 'sale' && $quantity >= 0) {
+        if ($typeValue === 'sale' && $quantity >= 0) {
             throw new \InvalidArgumentException("Sale stock movement must have a negative quantity. Given: {$quantity}.");
         }
 
-        if (in_array($type, ['restock', 'exchange_in']) && $quantity <= 0) {
-            throw new \InvalidArgumentException("{$type} stock movement must have a positive quantity. Given: {$quantity}.");
+        if (in_array($typeValue, ['restock', 'exchange_in']) && $quantity <= 0) {
+            throw new \InvalidArgumentException("{$typeValue} stock movement must have a positive quantity. Given: {$quantity}.");
         }
 
         if ($this->quantity_in_stock + $quantity < 0) {

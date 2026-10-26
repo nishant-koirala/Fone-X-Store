@@ -73,8 +73,8 @@
                                         </div>
                                         <div class="text-right">
                                             <span class="font-mono text-xs font-bold uppercase tracking-widest text-brand-grey block mb-1">Status</span>
-                                            <span class="inline-block border-2 border-brand-charcoal px-3 py-1 font-mono text-xs font-bold uppercase tracking-widest bg-brand-white {{ $order->status === 'pending' ? 'text-brand-red' : 'text-brand-charcoal' }}">
-                                                {{ $order->status }}
+                                            <span class="inline-block border-2 border-brand-charcoal px-3 py-1 font-mono text-xs font-bold uppercase tracking-widest bg-brand-white {{ ($order->status instanceof \App\Enums\OrderStatusEnum ? $order->status === \App\Enums\OrderStatusEnum::PENDING : $order->status === 'pending') ? 'text-brand-red' : 'text-brand-charcoal' }}">
+                                                {{ $order->status instanceof \App\Enums\OrderStatusEnum ? $order->status->getLabel() : $order->status }}
                                             </span>
                                         </div>
                                     </div>
@@ -82,7 +82,7 @@
                                     <div class="space-y-2">
                                         @foreach($order->items as $item)
                                             <div class="flex justify-between items-center text-sm font-mono font-bold">
-                                                <span>{{ $item->quantity }}x {{ $item->productCondition->product->name ?? 'Unknown Product' }} (Grade {{ $item->productCondition->grade ?? 'N/A' }})</span>
+                                                <span>{{ $item->quantity }}x {{ $item->productCondition->product->name ?? 'Unknown Product' }} (Grade {{ $item->productCondition?->grade instanceof \App\Enums\GradeEnum ? $item->productCondition->grade->value : ($item->productCondition->grade ?? 'N/A') }})</span>
                                                 <span>Rs {{ number_format($item->price_at_purchase * $item->quantity) }}</span>
                                             </div>
                                         @endforeach
@@ -111,8 +111,8 @@
                                 <div class="border-2 border-brand-charcoal bg-brand-white p-6 shadow-[4px_4px_0px_0px_rgba(42,42,44,1)]">
                                     <div class="flex justify-between items-start mb-4">
                                         <h4 class="font-display text-xl uppercase tracking-tight text-brand-charcoal">{{ $tradeIn->device_brand }} {{ $tradeIn->device_model }}</h4>
-                                        <span class="inline-block border border-brand-charcoal px-2 py-0.5 font-mono text-xs font-bold uppercase tracking-widest {{ $tradeIn->status === 'approved' ? 'bg-green-100 text-green-800' : 'bg-brand-offwhite text-brand-grey' }}">
-                                            {{ $tradeIn->status }}
+                                        <span class="inline-block border border-brand-charcoal px-2 py-0.5 font-mono text-xs font-bold uppercase tracking-widest {{ ($tradeIn->status instanceof \App\Enums\TradeInStatusEnum ? $tradeIn->status === \App\Enums\TradeInStatusEnum::COMPLETED : $tradeIn->status === 'completed') ? 'bg-green-100 text-green-800' : 'bg-brand-offwhite text-brand-grey' }}">
+                                            {{ $tradeIn->status instanceof \App\Enums\TradeInStatusEnum ? $tradeIn->status->getLabel() : $tradeIn->status }}
                                         </span>
                                     </div>
                                     <p class="font-sans text-sm text-brand-grey mb-6">{{ $tradeIn->condition_description }}</p>

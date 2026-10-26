@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\TradeInStatusEnum;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -21,6 +22,7 @@ class TradeInValuation extends Model
     ];
 
     protected $casts = [
+        'status' => TradeInStatusEnum::class,
         'estimated_value' => 'decimal:2',
     ];
 

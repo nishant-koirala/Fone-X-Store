@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\TradeIn;
 
+use App\Enums\TradeInStatusEnum;
 use App\Mail\AdminTradeInAlert;
 use App\Models\Customer;
 use App\Models\TradeInValuation;
@@ -73,7 +74,7 @@ class TradeInTest extends TestCase
         $this->assertNotNull($valuation);
         $this->assertEquals('Samsung', $valuation->device_brand);
         $this->assertEquals('Galaxy S22 Ultra', $valuation->device_model);
-        $this->assertEquals('pending', $valuation->status);
+        $this->assertEquals(TradeInStatusEnum::PENDING, $valuation->status);
         $this->assertStringContainsString('Overall Condition: Good', $valuation->condition_description);
         $this->assertStringContainsString('Minor scratch', $valuation->condition_description);
         $this->assertNull($valuation->estimated_value);

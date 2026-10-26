@@ -35,14 +35,7 @@ class LowStockProducts extends BaseWidget
                     ->label('Category'),
                 Tables\Columns\TextColumn::make('grade')
                     ->label('Condition Grade')
-                    ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'new' => 'success',
-                        'A' => 'info',
-                        'B' => 'warning',
-                        'C' => 'danger',
-                        default => 'gray',
-                    }),
+                    ->badge(),
                 Tables\Columns\TextColumn::make('price')
                     ->label('Price')
                     ->money('NPR')

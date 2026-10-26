@@ -40,7 +40,7 @@
 
                         <div class="flex items-center justify-between mb-4 mt-2">
                             <span class="border border-brand-red text-brand-red font-mono text-xs font-bold uppercase px-2 py-0.5">
-                                {{ strtoupper($firstCond->grade) }}
+                                {{ strtoupper($firstCond->grade instanceof \App\Enums\GradeEnum ? $firstCond->grade->value : (string) $firstCond->grade) }}
                             </span>
                             <span class="font-mono text-xs text-brand-grey uppercase">
                                 {{ $product->brand }}

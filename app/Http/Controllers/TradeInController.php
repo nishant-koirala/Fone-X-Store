@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\TradeInStatusEnum;
+use App\Http\Requests\StoreTradeInRequest;
 use App\Mail\AdminTradeInAlert;
 use App\Mail\TradeInSubmitted;
 use App\Models\Customer;
@@ -25,21 +27,14 @@ class TradeInController extends Controller
     /**
      * Store a new trade-in valuation request in pending status.
      */
-    public function store(Request $request): RedirectResponse
+    public function store(StoreTradeInRequest $request): RedirectResponse
     {
         // Honeypot spam check - redirect as if successful without processing or emailing
         if ($request->filled('secondary_address')) {
             return redirect()->route('home')->with('success', 'Trade-in request submitted successfully!');
         }
 
-        $request->validate([
-            'device_brand' => 'required|string|max:100',
-            'device_model' => 'required|string|max:255',
-            'condition' => 'required|string|in:flawless,good,broken',
-            'customer_name' => 'required|string|max:255',
-            'customer_phone' => 'required|string|max:50',
-            'additional_notes' => 'nullable|string|max:1000',
-        ]);
+        $validated = $request->validated();
 
         // Compile structured condition details string
         $description = sprintf(
@@ -68,11 +63,11 @@ class TradeInController extends Controller
         $valuation = TradeInValuation::create([
             'customer_id' => $customer->id,
             'user_id' => $verifiedUserId,
-            'device_brand' => trim($request->input('device_brand')),
-            'device_model' => trim($request->input('device_model')),
+            'device_brand' => trim($validated['device_brand']),
+            'device_model' => trim($validated['device_model']),
             'condition_description' => $description,
             'estimated_value' => null,
-            'status' => 'pending',
+            'status' => TradeInStatusEnum::PENDING,
         ]);
 
         session(['last_valuation_id' => $valuation->id]);

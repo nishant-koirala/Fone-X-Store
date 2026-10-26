@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Models;
 
+use App\Enums\TradeInStatusEnum;
 use App\Models\Customer;
 use App\Models\TradeInValuation;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -29,13 +30,16 @@ class TradeInValuationTest extends TestCase
     public function test_valuation_statuses(): void
     {
         $pending = TradeInValuation::factory()->pending()->create();
-        $this->assertSame('pending', $pending->status);
+        $this->assertSame(TradeInStatusEnum::PENDING, $pending->status);
+        $this->assertSame('pending', $pending->status->value);
 
         $reviewed = TradeInValuation::factory()->reviewed(50000)->create();
-        $this->assertSame('reviewed', $reviewed->status);
+        $this->assertSame(TradeInStatusEnum::REVIEWED, $reviewed->status);
+        $this->assertSame('reviewed', $reviewed->status->value);
         $this->assertSame('50000.00', (string) $reviewed->estimated_value);
 
         $completed = TradeInValuation::factory()->completed(50000)->create();
-        $this->assertSame('completed', $completed->status);
+        $this->assertSame(TradeInStatusEnum::COMPLETED, $completed->status);
+        $this->assertSame('completed', $completed->status->value);
     }
 }

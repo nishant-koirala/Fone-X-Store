@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreProductReviewRequest;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductCondition;
@@ -122,17 +123,13 @@ class ProductController extends Controller
     /**
      * Store a new product review.
      */
-    public function storeReview(Request $request, Product $product)
+    public function storeReview(StoreProductReviewRequest $request, Product $product)
     {
         if ($request->filled('author_notes')) {
             return back()->with('success', 'Thank you! Your review has been submitted and is pending approval.');
         }
 
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'rating' => 'required|integer|min:1|max:5',
-            'comment' => 'required|string|max:1000',
-        ]);
+        $validated = $request->validated();
 
         $product->reviews()->create([
             'name' => $validated['name'],

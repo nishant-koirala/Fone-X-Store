@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Smoke;
 
+use App\Enums\TradeInStatusEnum;
 use App\Filament\Resources\TradeInValuationResource\Pages\EditTradeInValuation;
 use App\Filament\Resources\TradeInValuationResource\Pages\ListTradeInValuations;
 use App\Mail\AdminTradeInAlert;
@@ -90,7 +91,7 @@ class EndToEndTradeInFlowTest extends TestCase
 
         // 7. Step: Verify final database status
         $fresh = $valuation->fresh();
-        $this->assertEquals('reviewed', $fresh->status);
+        $this->assertEquals(TradeInStatusEnum::REVIEWED, $fresh->status);
         $this->assertEquals(68000, (float) $fresh->estimated_value);
     }
 }

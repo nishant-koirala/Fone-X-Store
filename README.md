@@ -68,9 +68,11 @@ php artisan key:generate
 # 4. Migrate and seed catalog
 php artisan migrate --seed
 
-# 5. Build assets & serve
+# 5. Build assets & serve (or run dev environment)
 npm run build
 php artisan serve
+# Alternatively, run concurrent dev server, queue listener, and Vite:
+composer run dev
 ```
 
 ---
@@ -105,3 +107,7 @@ APP_DEBUG=false
 - **IDOR Protection:** Customer order confirmations and trade-in receipts verify the requesting session token to prevent unauthorized access.
 - **Filament User Gate:** Admin access requires an explicit administrator account (`is_admin = true`) via `FilamentUser::canAccessPanel()`. In production, promote administrators via `php artisan user:make-admin {email}`.
 - **Negative Inventory Guard:** Stock decrement operations automatically validate that remaining stock cannot fall below zero, throwing `InvalidArgumentException` before database writes.
+- **Cart Calculation Service (`CartService`):** Single source of truth computing line item totals, subtotal, shipping cost (free for phone orders, flat for accessories-only), and grand total.
+- **Transactional Checkout Action (`PlaceOrder`):** Dedicated transactional action locking stock rows with `lockForUpdate()`, generating immutable shipping snapshots, and recording inventory audit logs via `StockMovement`.
+- **PHP 8 Backed Enums:** Type-safe backed enums (`GradeEnum`, `OrderStatusEnum`, `TradeInStatusEnum`, `StockMovementTypeEnum`) implementing Filament's `HasLabel`, `HasColor`, and `HasIcon` contracts.
+- **Dedicated Form Requests:** HTTP input validation isolated into `CheckoutRequest`, `StoreTradeInRequest`, and `StoreProductReviewRequest`.

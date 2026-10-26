@@ -52,7 +52,7 @@
                 <p class="text-brand-charcoal leading-snug">{{ $order->customer->address }}</p>
                 <div class="mt-2">
                     <span class="font-mono text-xs font-bold uppercase bg-amber-100 text-amber-800 px-2 py-0.5 border border-amber-300">
-                        STATUS: {{ strtoupper($order->status) }} (CASH ON DELIVERY)
+                        STATUS: {{ strtoupper($order->status instanceof \App\Enums\OrderStatusEnum ? $order->status->value : (string) $order->status) }} (CASH ON DELIVERY)
                     </span>
                 </div>
             </div>
@@ -75,7 +75,7 @@
                         <div>
                             <div class="flex items-center space-x-2">
                                 <span class="font-mono text-xs font-bold uppercase bg-brand-red text-white px-1.5 py-0.5">
-                                    GRADE {{ strtoupper($cond->grade) }}
+                                    GRADE {{ strtoupper($cond->grade instanceof \App\Enums\GradeEnum ? $cond->grade->value : (string) $cond->grade) }}
                                 </span>
                                 <span class="font-sans font-bold text-brand-charcoal text-base">
                                     {{ $prod->name }}

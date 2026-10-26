@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\StockMovementTypeEnum;
 use App\Filament\Resources\StockMovementResource\Pages;
 use App\Models\ProductCondition;
 use App\Models\StockMovement;
@@ -41,9 +42,10 @@ class StockMovementResource extends Resource
                             ->get()
                             ->mapWithKeys(function (ProductCondition $cond) {
                                 $prodName = $cond->product ? "{$cond->product->brand} {$cond->product->name}" : "Condition #{$cond->id}";
+                                $gradeLabel = $cond->grade->value;
 
                                 return [
-                                    $cond->id => "{$prodName} (Grade: {$cond->grade}) - Current Stock: {$cond->quantity_in_stock}",
+                                    $cond->id => "{$prodName} (Grade: {$gradeLabel}) - Current Stock: {$cond->quantity_in_stock}",
                                 ];
                             });
                     })
@@ -51,12 +53,7 @@ class StockMovementResource extends Resource
                     ->required(),
 
                 Forms\Components\Select::make('type')
-                    ->options([
-                        'restock' => 'Restock (+ Stock)',
-                        'sale' => 'Sale (- Stock)',
-                        'exchange_in' => 'Exchange In (+ Stock)',
-                        'adjustment' => 'Adjustment (+/- Stock)',
-                    ])
+                    ->options(StockMovementTypeEnum::class)
                     ->required(),
 
                 Forms\Components\TextInput::make('quantity')
@@ -82,14 +79,7 @@ class StockMovementResource extends Resource
                     ->label('Grade')
                     ->badge(),
                 Tables\Columns\TextColumn::make('type')
-                    ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'restock' => 'success',
-                        'exchange_in' => 'info',
-                        'sale' => 'danger',
-                        'adjustment' => 'warning',
-                        default => 'gray',
-                    }),
+                    ->badge(),
                 Tables\Columns\TextColumn::make('quantity')
                     ->formatStateUsing(fn (int $state): string => $state > 0 ? "+{$state}" : (string) $state)
                     ->color(fn (int $state): string => $state > 0 ? 'success' : 'danger')
@@ -102,12 +92,7 @@ class StockMovementResource extends Resource
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('type')
-                    ->options([
-                        'restock' => 'Restock',
-                        'sale' => 'Sale',
-                        'exchange_in' => 'Exchange In',
-                        'adjustment' => 'Adjustment',
-                    ]),
+                    ->options(StockMovementTypeEnum::class),
             ]);
     }
 

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Admin;
 
+use App\Enums\OrderStatusEnum;
 use App\Filament\Resources\OrderResource\Pages\EditOrder;
 use App\Filament\Resources\OrderResource\Pages\ListOrders;
 use App\Models\Order;
@@ -39,6 +40,6 @@ class OrderResourceTest extends TestCase
             ->call('save')
             ->assertHasNoFormErrors();
 
-        $this->assertEquals('fulfilled', $order->fresh()->status);
+        $this->assertEquals(OrderStatusEnum::FULFILLED, $order->fresh()->status);
     }
 }

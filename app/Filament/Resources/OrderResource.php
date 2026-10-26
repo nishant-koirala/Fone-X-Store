@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\OrderStatusEnum;
 use App\Filament\Resources\OrderResource\Pages;
 use App\Models\Order;
 use App\Models\ProductCondition;
@@ -43,14 +44,9 @@ class OrderResource extends Resource
                             ->required(),
 
                         Forms\Components\Select::make('status')
-                            ->options([
-                                'pending' => 'Pending',
-                                'paid' => 'Paid',
-                                'fulfilled' => 'Fulfilled',
-                                'cancelled' => 'Cancelled',
-                            ])
+                            ->options(OrderStatusEnum::class)
                             ->required()
-                            ->default('pending'),
+                            ->default(OrderStatusEnum::PENDING),
 
                         Forms\Components\TextInput::make('total')
                             ->numeric()
@@ -76,9 +72,10 @@ class OrderResource extends Resource
                                         ->get()
                                         ->mapWithKeys(function (ProductCondition $cond) {
                                             $prodName = $cond->product ? "{$cond->product->brand} {$cond->product->name}" : "Condition #{$cond->id}";
+                                            $gradeLabel = $cond->grade->value;
 
                                             return [
-                                                $cond->id => "{$prodName} (Grade: {$cond->grade}) - Rs {$cond->price}",
+                                                $cond->id => "{$prodName} (Grade: {$gradeLabel}) - Rs {$cond->price}",
                                             ];
                                         })
                                         ->toArray()
@@ -89,8 +86,9 @@ class OrderResource extends Resource
                                             return null;
                                         }
                                         $prodName = $cond->product ? "{$cond->product->brand} {$cond->product->name}" : "Condition #{$cond->id}";
+                                        $gradeLabel = $cond->grade->value;
 
-                                        return "{$prodName} (Grade: {$cond->grade}) - Rs {$cond->price}";
+                                        return "{$prodName} (Grade: {$gradeLabel}) - Rs {$cond->price}";
                                     })
                                     ->searchable()
                                     ->required()
@@ -125,13 +123,7 @@ class OrderResource extends Resource
                 Tables\Columns\TextColumn::make('customer.name')->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('customer.phone')->label('Phone'),
                 Tables\Columns\TextColumn::make('status')
-                    ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'paid' => 'info',
-                        'fulfilled' => 'success',
-                        'cancelled' => 'danger',
-                        default => 'warning',
-                    }),
+                    ->badge(),
                 Tables\Columns\TextColumn::make('total')->money('NPR')->sortable(),
                 Tables\Columns\TextColumn::make('items_count')
                     ->counts('items')
@@ -140,12 +132,7 @@ class OrderResource extends Resource
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('status')
-                    ->options([
-                        'pending' => 'Pending',
-                        'paid' => 'Paid',
-                        'fulfilled' => 'Fulfilled',
-                        'cancelled' => 'Cancelled',
-                    ]),
+                    ->options(OrderStatusEnum::class),
             ])
             ->actions([
                 EditAction::make(),

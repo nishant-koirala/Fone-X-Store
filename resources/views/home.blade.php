@@ -110,7 +110,7 @@
                                         <div class="absolute bottom-11 left-1/2 -translate-x-1/2 z-20 w-[90%] max-w-xs text-center pointer-events-auto">
                                             <div class="bg-brand-white/95 backdrop-blur-sm border-2 border-brand-charcoal px-4 py-2 shadow-[4px_4px_0px_0px_rgba(200,32,45,1)] group-hover/slide:shadow-[4px_4px_0px_0px_rgba(42,42,44,1)] group-hover/slide:border-brand-red transition-all duration-200">
                                                 <div class="font-mono text-[9px] font-bold uppercase tracking-wider text-brand-grey truncate">
-                                                    {{ $hero->product->brand }} • {{ $hero->grade === 'new' ? 'NEW IN STOCK' : 'GRADE ' . $hero->grade . ' • CERTIFIED' }}
+                                                    {{ $hero->product->brand }} • {{ ($hero->grade instanceof \App\Enums\GradeEnum ? $hero->grade === \App\Enums\GradeEnum::NEW : $hero->grade === 'new') ? 'NEW IN STOCK' : 'GRADE ' . ($hero->grade instanceof \App\Enums\GradeEnum ? $hero->grade->value : $hero->grade) . ' • CERTIFIED' }}
                                                 </div>
                                                 <div class="font-display text-xs sm:text-sm uppercase tracking-tight text-brand-charcoal group-hover/slide:text-brand-red transition-colors font-bold truncate">
                                                     {{ $hero->product->name }}

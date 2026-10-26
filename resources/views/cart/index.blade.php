@@ -62,7 +62,7 @@
                                             <a href="{{ route('products.show', $item['condition']->product->slug) }}" class="hover:text-brand-red transition-colors">{{ $item['condition']->product->name }}</a>
                                         </h3>
                                         <div class="inline-block border border-brand-charcoal px-2 py-0.5 font-mono text-xs font-bold uppercase tracking-widest text-brand-charcoal bg-brand-white">
-                                            CONDITION: {{ strtoupper($item['condition']->grade === 'new' ? 'Brand New' : 'Grade ' . $item['condition']->grade) }}
+                                            CONDITION: {{ strtoupper($item['condition']->grade instanceof \App\Enums\GradeEnum ? ($item['condition']->grade === \App\Enums\GradeEnum::NEW ? 'Brand New' : 'Grade ' . $item['condition']->grade->value) : ($item['condition']->grade === 'new' ? 'Brand New' : 'Grade ' . $item['condition']->grade)) }}
                                         </div>
                                     </div>
                                     

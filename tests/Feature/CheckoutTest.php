@@ -71,7 +71,7 @@ class CheckoutTest extends TestCase
         // Assert stock deducted
         $this->assertEquals(3, $this->condition->fresh()->quantity_in_stock);
         
-        // Assert mail sent
-        Mail::assertSent(\App\Mail\OrderPlaced::class);
+        // Assert mail queued
+        Mail::assertQueued(\App\Mail\OrderPlaced::class);
     }
 }

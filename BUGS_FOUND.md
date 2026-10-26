@@ -69,6 +69,17 @@ This document tracks real application bugs discovered during the implementation 
 - **Actual Behavior:** `AdminTradeInAlert::content()` declared `view: 'emails.admin-trade-in-alert'`. Because `<x-mail::...>` requires the Markdown mail renderer, rendering as a plain HTML view throws `InvalidArgumentException: No hint path defined for [mail]`.
 - **Fix:** In `app/Mail/AdminTradeInAlert.php`, change `view: 'emails.admin-trade-in-alert'` to `markdown: 'emails.admin-trade-in-alert'`.
 
+---
+
+## Bug 8: Missing Spatie MediaLibrary `media` Table Migration
+
+- **Failing Test:** `Tests\Feature\Smoke\PublicRoutesSmokeTest::test_all_public_get_routes_respond_with_successful_status`
+- **Location:** `database/migrations/`, `resources/views/blog/index.blade.php:23`, `app/Models/Post.php`
+- **Expected Behavior:** Visiting the public blog index route (`/blog`) executes smoothly and renders existing published blog posts without throwing database table exceptions.
+- **Actual Behavior:** The `Post` model implements Spatie's `HasMedia` / `InteractsWithMedia` and `resources/views/blog/index.blade.php` queries `$post->getFirstMediaUrl('thumbnail')`. However, the Spatie MediaLibrary `create_media_table` migration was never published to `database/migrations`. In any clean environment, in-memory SQLite test suite, or fresh migration run, the request crashed with `PDOException: SQLSTATE[HY000]: General error: 1 no such table: media` (HTTP 500).
+- **Fix:** Published the official Spatie MediaLibrary migration to `database/migrations/2026_10_26_114437_create_media_table.php` so all testing and production environments properly instantiate the `media` schema.
+
+
 
 
 

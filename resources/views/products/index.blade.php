@@ -411,10 +411,11 @@
 
                         @if(request('min_price') || request('max_price'))
                             <span class="inline-flex items-center space-x-1.5 bg-brand-white border border-brand-charcoal/30 rounded-full text-brand-charcoal font-mono text-xs font-bold px-3 py-1 shadow-xs">
-                                <span>Rs {{ number_format(request('min_price', 0)) }} – {{ request('max_price') ? number_format(request('max_price')) : 'Max' }}</span>
+                                <span>Rs {{ is_numeric(request('min_price')) ? number_format((float) request('min_price')) : '0' }} – {{ is_numeric(request('max_price')) ? number_format((float) request('max_price')) : (request('max_price') ?: 'Max') }}</span>
                                 <button type="button" @click="selectedMinPrice = ''; selectedMaxPrice = ''; applyFilters();" class="text-brand-grey hover:text-brand-red font-bold ml-1">✕</button>
                             </span>
                         @endif
+
 
                         <button type="button" @click="resetFilters()" class="font-mono text-xs uppercase font-bold text-brand-red hover:underline ml-2">
                             Clear All

@@ -28,3 +28,14 @@ This document tracks real application bugs discovered during the implementation 
 
 - **Observation:** `app/Filament/Widgets/LowStockProducts.php` and `StoreStatsOverview.php` format money as `USD` with `$` prefixes (e.g. `->money('USD')`, `Stat::make('Total Revenue', '$' . ...)`), contradicting the project's strict NPR-only currency requirement.
 - **Fix:** Update Filament money formatting in widgets to use `NPR` or `Rs ` prefix.
+
+---
+
+## Bug 4: Unchecked `number_format()` on Query Input Crashes `/products` on Non-Numeric Prices
+
+- **Failing Test:** `Tests\Feature\Catalog\ProductIndexTest::test_invalid_filter_values_handled_gracefully`
+- **Location:** `resources/views/products/index.blade.php:414`
+- **Expected Behavior:** If a user passes an invalid or non-numeric query parameter (e.g. `?min_price=invalid_number` or `?max_price=abc`), the page should handle it gracefully without crashing with an uncaught 500 `TypeError`.
+- **Actual Behavior:** The Blade template directly invoked `number_format(request('min_price', 0))` and `number_format(request('max_price'))`. In PHP 8.0+, passing non-numeric strings to `number_format()` throws a fatal `TypeError: number_format(): Argument #1 ($num) must be of type int|float, string given`.
+- **Fix:** In `resources/views/products/index.blade.php`, check `is_numeric(request('min_price'))` and `is_numeric(request('max_price'))` (or `(float) request(...)`) before formatting.
+

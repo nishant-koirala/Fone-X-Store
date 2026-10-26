@@ -54,6 +54,9 @@
         "test": [
             "@php vendor/phpunit/phpunit/phpunit --colors=always"
         ],
+        "test:coverage": [
+            "@php vendor/phpunit/phpunit/phpunit --coverage-text --min-coverage=70"
+        ],
         "lint": [
             "vendor/bin/pint --test"
         ],

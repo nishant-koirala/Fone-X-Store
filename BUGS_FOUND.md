@@ -59,5 +59,16 @@ This document tracks real application bugs discovered during the implementation 
 - **Actual Behavior:** `User` did not implement `Filament\Models\Contracts\FilamentUser`. Filament defaults to denying panel access with HTTP 403 outside of `local` environment for models that do not implement `canAccessPanel()`.
 - **Fix:** Implement `FilamentUser` on `User` and define `canAccessPanel(Panel $panel): bool` permitting authorized staff/admin emails (`@fonexstore.test`, `@fonex.com`, `test@example.com`) while denying non-admin storefront customers.
 
+---
+
+## Bug 7: `AdminTradeInAlert` Uses `view:` Instead of `markdown:`, Causing View Crash
+
+- **Failing Test:** `Tests\Feature\Security\SecurityTest::test_csrf_protection_is_enforced_on_trade_in_post`
+- **Location:** `app/Mail/AdminTradeInAlert.php:41`
+- **Expected Behavior:** `AdminTradeInAlert` renders its markdown components (`<x-mail::message>`, `<x-mail::button>`) without throwing an exception.
+- **Actual Behavior:** `AdminTradeInAlert::content()` declared `view: 'emails.admin-trade-in-alert'`. Because `<x-mail::...>` requires the Markdown mail renderer, rendering as a plain HTML view throws `InvalidArgumentException: No hint path defined for [mail]`.
+- **Fix:** In `app/Mail/AdminTradeInAlert.php`, change `view: 'emails.admin-trade-in-alert'` to `markdown: 'emails.admin-trade-in-alert'`.
+
+
 
 

@@ -38,9 +38,10 @@ class AdminTradeInAlert extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.admin-trade-in-alert',
+            markdown: 'emails.admin-trade-in-alert',
         );
     }
+
 
     /**
      * Get the attachments for the message.

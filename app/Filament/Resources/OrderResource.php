@@ -54,8 +54,10 @@ class OrderResource extends Resource
 
                         Forms\Components\TextInput::make('total')
                             ->numeric()
-                            ->prefix('$')
-                            ->required(),
+                            ->prefix('Rs ')
+                            ->disabled()
+                            ->dehydrated(false)
+                            ->helperText('Order total is read-only / computed from items.'),
                     ])->columns(3),
 
                 Section::make('Order Items')
@@ -106,7 +108,7 @@ class OrderResource extends Resource
 
                                 Forms\Components\TextInput::make('price_at_purchase')
                                     ->numeric()
-                                    ->prefix('$')
+                                    ->prefix('Rs ')
                                     ->required(),
                             ])
                             ->columns(3)
@@ -130,7 +132,7 @@ class OrderResource extends Resource
                         'cancelled' => 'danger',
                         default => 'warning',
                     }),
-                Tables\Columns\TextColumn::make('total')->money('USD')->sortable(),
+                Tables\Columns\TextColumn::make('total')->money('NPR')->sortable(),
                 Tables\Columns\TextColumn::make('items_count')
                     ->counts('items')
                     ->label('Items'),

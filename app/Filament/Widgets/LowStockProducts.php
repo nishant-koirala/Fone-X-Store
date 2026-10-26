@@ -45,7 +45,7 @@ class LowStockProducts extends BaseWidget
                     }),
                 Tables\Columns\TextColumn::make('price')
                     ->label('Price')
-                    ->money('USD')
+                    ->money('NPR')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('quantity_in_stock')
                     ->label('Quantity in Stock')

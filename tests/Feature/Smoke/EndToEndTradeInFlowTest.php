@@ -58,7 +58,7 @@ class EndToEndTradeInFlowTest extends TestCase
         ]);
 
         // 4. Step: Notification alerts
-        Mail::assertSent(AdminTradeInAlert::class, function (AdminTradeInAlert $mail) use ($valuation) {
+        Mail::assertQueued(AdminTradeInAlert::class, function (AdminTradeInAlert $mail) use ($valuation) {
             return $mail->valuation->id === $valuation->id;
         });
 
@@ -69,7 +69,7 @@ class EndToEndTradeInFlowTest extends TestCase
         $confirmationResponse->assertSee('iPhone 13 Pro');
 
         // 6. Step: Admin Staff reviews and prices the valuation in Filament
-        $admin = User::factory()->create([
+        $admin = User::factory()->admin()->create([
             'email' => 'admin@fonexstore.test',
         ]);
         $this->actingAs($admin);

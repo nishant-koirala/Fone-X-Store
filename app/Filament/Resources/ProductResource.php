@@ -145,7 +145,9 @@ class ProductResource extends Resource
                                 Forms\Components\TextInput::make('quantity_in_stock')
                                     ->numeric()
                                     ->default(0)
-                                    ->required(),
+                                    ->disabled()
+                                    ->dehydrated(false)
+                                    ->helperText('Stock changes must be recorded via Stock Movements.'),
                             ])
                             ->columns(4)
                             ->defaultItems(1),
@@ -162,7 +164,7 @@ class ProductResource extends Resource
                 Tables\Columns\TextColumn::make('name')->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('brand')->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('category.name')->sortable(),
-                Tables\Columns\TextColumn::make('base_price')->money('USD')->sortable(),
+                Tables\Columns\TextColumn::make('base_price')->money('NPR')->sortable(),
                 Tables\Columns\IconColumn::make('is_new')->boolean(),
                 Tables\Columns\ToggleColumn::make('is_visible')->label('Visible on Store'),
                 Tables\Columns\ToggleColumn::make('is_featured')->label('Featured Phone'),

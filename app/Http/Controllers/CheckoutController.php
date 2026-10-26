@@ -95,6 +95,10 @@ class CheckoutController extends Controller
                     }
 
                     $condition = $conditions[$condId];
+                    if (! $condition->product || ! $condition->product->is_visible) {
+                        throw new InsufficientStockException("The product '{$condition->product?->name}' is no longer available for purchase.");
+                    }
+
                     $requestedQty = (int) $item['quantity'];
 
                     $prodName = $condition->product->name;

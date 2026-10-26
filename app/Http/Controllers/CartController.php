@@ -28,6 +28,9 @@ class CartController extends Controller
             foreach ($cartSession as $condId => $item) {
                 if (isset($conditions[$condId])) {
                     $condition = $conditions[$condId];
+                    if (! $condition->product || ! $condition->product->is_visible) {
+                        continue;
+                    }
                     $qty = min($item['quantity'], $condition->quantity_in_stock);
 
                     if ($qty > 0) {
@@ -60,6 +63,11 @@ class CartController extends Controller
         ]);
 
         $condition = ProductCondition::with('product')->findOrFail($request->input('product_condition_id'));
+
+        if (! $condition->product || ! $condition->product->is_visible) {
+            return back()->with('error', 'This product is currently unavailable.');
+        }
+
         $requestedQty = (int) $request->input('quantity', 1);
 
         $productName = $condition->product->name;
@@ -97,6 +105,10 @@ class CartController extends Controller
         ]);
 
         $condition = ProductCondition::with('product')->findOrFail($conditionId);
+
+        if (! $condition->product || ! $condition->product->is_visible) {
+            return back()->with('error', 'This product is currently unavailable.');
+        }
         $requestedQty = (int) $request->input('quantity');
         $productName = $condition->product->name;
 

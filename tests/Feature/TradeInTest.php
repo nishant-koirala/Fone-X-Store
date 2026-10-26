@@ -38,6 +38,6 @@ class TradeInTest extends TestCase
             'status' => 'pending',
         ]);
 
-        Mail::assertSent(AdminTradeInAlert::class);
+        Mail::assertQueued(AdminTradeInAlert::class);
     }
 }

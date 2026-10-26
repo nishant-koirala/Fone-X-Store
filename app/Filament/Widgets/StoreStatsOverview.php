@@ -12,7 +12,7 @@ class StoreStatsOverview extends StatsOverviewWidget
     protected function getStats(): array
     {
         return [
-            Stat::make('Total Revenue', '$'.number_format(Order::where('status', 'fulfilled')->sum('total'), 2))
+            Stat::make('Total Revenue', 'Rs '.number_format(Order::where('status', 'fulfilled')->sum('total'), 2))
                 ->description('From fulfilled orders')
                 ->descriptionIcon('heroicon-m-banknotes')
                 ->color('success'),

@@ -64,7 +64,7 @@ class ProductResourceTest extends TestCase
         $this->assertDatabaseHas('product_conditions', [
             'grade' => 'new',
             'price' => 220000,
-            'quantity_in_stock' => 5,
+            'quantity_in_stock' => 0,
         ]);
     }
 
@@ -102,6 +102,6 @@ class ProductResourceTest extends TestCase
         Livewire::test(EditProduct::class, ['record' => $product->getRouteKey()])
             ->callAction('delete');
 
-        $this->assertModelMissing($product);
+        $this->assertSoftDeleted($product);
     }
 }

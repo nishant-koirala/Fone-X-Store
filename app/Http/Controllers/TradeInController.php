@@ -9,6 +9,7 @@ use App\Models\TradeInValuation;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
 class TradeInController extends Controller
@@ -76,13 +77,19 @@ class TradeInController extends Controller
 
         session(['last_valuation_id' => $valuation->id]);
 
-        if ($customer->email) {
-            Mail::to($customer->email)->send(new TradeInSubmitted($valuation));
-        }
+        try {
+            if ($customer->email) {
+                Mail::to($customer->email)->send(new TradeInSubmitted($valuation));
+            }
 
-        // Send alert to Admin
-        $adminEmail = config('mail.admin_address', 'admin@fonex.com');
-        Mail::to($adminEmail)->send(new AdminTradeInAlert($valuation));
+            // Send alert to Admin
+            $adminEmail = config('mail.admin_address', 'admin@fonex.com');
+            Mail::to($adminEmail)->send(new AdminTradeInAlert($valuation));
+        } catch (\Throwable $mailException) {
+            Log::error("Failed sending trade-in notification emails for valuation #{$valuation->id}: {$mailException->getMessage()}", [
+                'exception' => $mailException,
+            ]);
+        }
 
         return redirect()->route('trade-in.confirmation', $valuation)
             ->with('success', 'Trade-in request submitted successfully!');

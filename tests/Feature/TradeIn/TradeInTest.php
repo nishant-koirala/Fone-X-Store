@@ -82,7 +82,7 @@ class TradeInTest extends TestCase
         $response->assertRedirect(route('trade-in.confirmation', $valuation));
 
         // Mail alerts sent
-        Mail::assertSent(AdminTradeInAlert::class);
+        Mail::assertQueued(AdminTradeInAlert::class);
 
         // Session key set
         $this->assertEquals($valuation->id, session('last_valuation_id'));

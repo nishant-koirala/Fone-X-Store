@@ -1,58 +1,83 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# FoneX Store
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+[![CI](https://github.com/nishant-koirala/Fone-X-Store/actions/workflows/ci.yml/badge.svg)](https://github.com/nishant-koirala/Fone-X-Store/actions/workflows/ci.yml)
+[![PHP Version](https://img.shields.io/badge/PHP-8.3%20%7C%208.4-777BB4?logo=php&logoColor=white)](https://php.net)
+[![Laravel](https://img.shields.io/badge/Laravel-13.x-FF2D20?logo=laravel&logoColor=white)](https://laravel.com)
+[![Filament](https://img.shields.io/badge/Filament-v5.7-FFAA00?logo=filament&logoColor=white)](https://filamentphp.com)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-## About Laravel
+**FoneX Store** is an e-commerce platform and trade-in management portal tailored for a smartphone retailer in Nepal. The application supports buying brand-new devices, certified pre-owned phones across condition grades (New, A, B, C), and requesting instant trade-in valuations.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Key Features
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- **Strict NPR Currency:** Tailored specifically for the Nepali market, standardizing all storefront and admin pricing on Nepalese Rupees (`NPR` / `Rs `).
+- **Session-Based Cart & COD Checkout:** Frictionless customer checkout with Cash on Delivery (COD) and customer lookup/deduplication by Nepali phone numbers.
+- **Graded Device Conditions & Stock Audit:** Transactional stock movements (`recordStockMovement`) ensure inventory integrity, prevent overselling, and reject negative stock states with an immutable audit log.
+- **Trade-In Valuation Portal:** Interactive customer trade-in submission with condition assessments, automated email dispatch, and Filament admin valuation review & pricing.
+- **Filament Admin Panel:** Back-office dashboard for managing products, categories, stock adjustments, orders, customer records, and low-inventory alerts.
+- **Catalog Capped Under 150 Products:** Optimized server-side pagination, sorting, search, and category filters built for fast navigation.
 
-## Learning Laravel
+---
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Quality Assurance & Automated Testing
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+The codebase features a system-wide automated test suite (142 tests, 1,029 assertions) executing on SQLite in-memory without side effects on production data.
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+### Running Quality Gates Locally
 
-## Agentic Development
+| Command | Description | Tool |
+| :--- | :--- | :--- |
+| `composer run test` | Run complete PHPUnit automated test suite | PHPUnit 12 |
+| `composer run test:coverage` | Run test suite with 70% minimum code coverage threshold | PHPUnit + PCOV |
+| `composer run lint` | Verify code style and formatting standards | Laravel Pint (`--test`) |
+| `composer run lint:fix` | Automatically format and fix code style issues | Laravel Pint |
+| `composer run analyse` | Run static type analysis at **Level 5** | Larastan / PHPStan |
+| `composer run ci` | Run full local pre-push pipeline (`lint` &rarr; `analyse` &rarr; `test`) | Composite Script |
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+---
+
+## Continuous Integration (CI) Pipeline
+
+GitHub Actions workflows are defined in [`.github/workflows/`](.github/workflows/):
+
+- **[`ci.yml`](.github/workflows/ci.yml):** Runs on every push and pull request to `main`:
+  - **Job 1 (Lint):** Validates code styling via Laravel Pint.
+  - **Job 2 (Static Analysis):** Executes Larastan at Level 5 across `app/`, `config/`, `database/`, and `routes/`.
+  - **Job 3 (Test Matrix):** Builds frontend assets with Vite and executes the full PHPUnit test suite against PHP 8.3 and PHP 8.4 on Ubuntu runners with PCOV code coverage reporting.
+- **[`nightly.yml`](.github/workflows/nightly.yml):** Nightly automated security audit (`composer audit`) and regression test suite run against latest upstream packages.
+
+---
+
+## Local Development Setup
 
 ```bash
-composer require laravel/boost --dev
+# 1. Clone repository
+git clone https://github.com/nishant-koirala/Fone-X-Store.git
+cd Fone-X-Store
 
-php artisan boost:install
+# 2. Install dependencies
+composer install
+npm install
+
+# 3. Environment setup
+cp .env.example .env
+php artisan key:generate
+
+# 4. Migrate and seed catalog
+php artisan migrate --seed
+
+# 5. Build assets & serve
+npm run build
+php artisan serve
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+---
 
-## Contributing
+## Security & Architecture Notes
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+- **CSRF Protection:** Strictly enforced on all order checkout, cart modification, and trade-in submission endpoints.
+- **IDOR Protection:** Customer order confirmations and trade-in receipts verify the requesting session token to prevent unauthorized access.
+- **Filament User Gate:** Admin access outside `local` environment requires an authorized `@fonexstore.test` or `@fonex.com` staff email via `FilamentUser::canAccessPanel()`.
+- **Negative Inventory Guard:** Stock decrement operations automatically validate that remaining stock cannot fall below zero, throwing `InvalidArgumentException` before database writes.

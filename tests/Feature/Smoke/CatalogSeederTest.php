@@ -51,12 +51,16 @@ class CatalogSeederTest extends TestCase
         // Test product catalog index
         $indexResponse = $this->get(route('products.index'));
         $indexResponse->assertOk();
-        $indexResponse->assertSee('iPhone 7');
+        $indexResponse->assertSee('iPhone');
 
         // Test search filter
         $searchResponse = $this->get(route('products.index', ['search' => 'iPhone 15']));
         $searchResponse->assertOk();
         $searchResponse->assertSee('iPhone 15');
+
+        $searchSeven = $this->get(route('products.index', ['search' => 'iPhone 7']));
+        $searchSeven->assertOk();
+        $searchSeven->assertSee('iPhone 7');
 
         // Test category filter
         $filterResponse = $this->get(route('products.index', ['category' => 'apple']));

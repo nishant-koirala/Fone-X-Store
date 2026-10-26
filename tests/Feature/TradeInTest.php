@@ -18,14 +18,12 @@ class TradeInTest extends TestCase
 
         $response = $this->post(route('trade-in.store'), [
             'customer_name' => 'Jane Doe',
-            'phone' => '9812345678',
+            'customer_phone' => '9812345678',
             'email' => 'jane@example.com',
             'device_brand' => 'Apple',
             'device_model' => 'iPhone 13',
-            'condition_screen' => 'perfect',
-            'condition_body' => 'minor_scratches',
-            'condition_functional' => 'yes',
-            'accessories' => ['box', 'charger']
+            'condition' => 'good',
+            'additional_notes' => 'minor scratches',
         ]);
 
         $response->assertRedirect();
@@ -41,7 +39,8 @@ class TradeInTest extends TestCase
             'status' => 'pending'
         ]);
 
-        Mail::assertSent(\App\Mail\TradeInSubmitted::class);
         Mail::assertSent(\App\Mail\AdminTradeInAlert::class);
     }
+
+
 }

@@ -49,4 +49,15 @@ This document tracks real application bugs discovered during the implementation 
 - **Actual Behavior:** `CartController@index` returns `view('cart.index', compact('cartItems', 'subtotal'))`, passing `$subtotal` to the view. However, `cart/index.blade.php` lines 101 and 115 reference `$total`, throwing `ErrorException: Undefined variable $total`.
 - **Fix:** In `CartController.php`, compute and pass `total: $subtotal` (or alias `$total = $subtotal`), and in `cart/index.blade.php` use `$subtotal` / `$total` consistently.
 
+---
+
+## Bug 6: `User` Model Does Not Implement `FilamentUser`, Blocking Admin Panel Access Outside Local Environment
+
+- **Failing Test:** `Tests\Feature\Admin\AdminAuthTest::test_authenticated_user_can_access_admin_dashboard`
+- **Location:** `app/Models/User.php`
+- **Expected Behavior:** In testing and production environments (`APP_ENV != 'local'`), authorized admin users must be allowed access to the Filament admin panel (`/admin`), while non-admin users (such as registered storefront customers) and guests must be blocked.
+- **Actual Behavior:** `User` did not implement `Filament\Models\Contracts\FilamentUser`. Filament defaults to denying panel access with HTTP 403 outside of `local` environment for models that do not implement `canAccessPanel()`.
+- **Fix:** Implement `FilamentUser` on `User` and define `canAccessPanel(Panel $panel): bool` permitting authorized staff/admin emails (`@fonexstore.test`, `@fonex.com`, `test@example.com`) while denying non-admin storefront customers.
+
+
 

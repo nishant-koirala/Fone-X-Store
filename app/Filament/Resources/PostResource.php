@@ -4,11 +4,14 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\PostResource\Pages;
 use App\Models\Post;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
 use Filament\Forms;
-use Filament\Schemas\Schema;
+use Filament\Resources\Resource;
 use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
-use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
@@ -17,9 +20,15 @@ class PostResource extends Resource
 {
     protected static ?string $model = Post::class;
 
-    public static function getNavigationIcon(): ?string { return 'heroicon-o-document-text'; }
+    public static function getNavigationIcon(): ?string
+    {
+        return 'heroicon-o-document-text';
+    }
 
-    public static function getNavigationGroup(): ?string { return 'Content'; }
+    public static function getNavigationGroup(): ?string
+    {
+        return 'Content';
+    }
 
     public static function form(Schema $schema): Schema
     {
@@ -32,7 +41,7 @@ class PostResource extends Resource
                                 Forms\Components\TextInput::make('title')
                                     ->required()
                                     ->live(onBlur: true)
-                                    ->afterStateUpdated(fn (string $operation, $state, Forms\Set $set) => $operation === 'create' ? $set('slug', Str::slug($state)) : null),
+                                    ->afterStateUpdated(fn (string $operation, $state, callable $set) => $operation === 'create' ? $set('slug', Str::slug($state)) : null),
 
                                 Forms\Components\TextInput::make('slug')
                                     ->disabled()
@@ -57,7 +66,7 @@ class PostResource extends Resource
                                 Forms\Components\DateTimePicker::make('published_at')
                                     ->label('Publish Date'),
                             ]),
-                            
+
                         Section::make('Image')
                             ->schema([
                                 Forms\Components\SpatieMediaLibraryFileUpload::make('thumbnail')
@@ -88,14 +97,14 @@ class PostResource extends Resource
                     ->sortable(),
             ])
             ->filters([
-                Tables\Filters\TernaryFilter::make('is_published')
+                Tables\Filters\TernaryFilter::make('is_published'),
             ])
             ->actions([
-                \Filament\Actions\EditAction::make(),
+                EditAction::make(),
             ])
             ->bulkActions([
-                \Filament\Actions\BulkActionGroup::make([
-                    \Filament\Actions\DeleteBulkAction::make(),
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }

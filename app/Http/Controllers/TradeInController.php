@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\AdminTradeInAlert;
+use App\Mail\TradeInSubmitted;
 use App\Models\Customer;
 use App\Models\TradeInValuation;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class TradeInController extends Controller
 {
@@ -34,9 +37,9 @@ class TradeInController extends Controller
 
         // Compile structured condition details string
         $description = sprintf(
-            "Overall Condition: %s%s",
+            'Overall Condition: %s%s',
             ucfirst($request->input('condition')),
-            $request->filled('additional_notes') ? " | Notes: " . trim($request->input('additional_notes')) : ""
+            $request->filled('additional_notes') ? ' | Notes: '.trim($request->input('additional_notes')) : ''
         );
 
         // Find or create customer record by phone number
@@ -65,12 +68,12 @@ class TradeInController extends Controller
         session(['last_valuation_id' => $valuation->id]);
 
         if ($customer->email) {
-            \Illuminate\Support\Facades\Mail::to($customer->email)->send(new \App\Mail\TradeInSubmitted($valuation));
+            Mail::to($customer->email)->send(new TradeInSubmitted($valuation));
         }
 
         // Send alert to Admin
-        $adminEmail = env('ADMIN_EMAIL', 'admin@fonex.com');
-        \Illuminate\Support\Facades\Mail::to($adminEmail)->send(new \App\Mail\AdminTradeInAlert($valuation));
+        $adminEmail = config('mail.admin_address', 'admin@fonex.com');
+        Mail::to($adminEmail)->send(new AdminTradeInAlert($valuation));
 
         return redirect()->route('trade-in.confirmation', $valuation)
             ->with('success', 'Trade-in request submitted successfully!');

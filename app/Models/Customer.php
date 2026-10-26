@@ -17,11 +17,17 @@ class Customer extends Model
         'address',
     ];
 
+    /**
+     * @return HasMany<Order, $this>
+     */
     public function orders(): HasMany
     {
         return $this->hasMany(Order::class);
     }
 
+    /**
+     * @return HasMany<TradeInValuation, $this>
+     */
     public function tradeInValuations(): HasMany
     {
         return $this->hasMany(TradeInValuation::class);

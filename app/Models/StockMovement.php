@@ -22,11 +22,17 @@ class StockMovement extends Model
         'quantity' => 'integer',
     ];
 
+    /**
+     * @return BelongsTo<ProductCondition, $this>
+     */
     public function productCondition(): BelongsTo
     {
         return $this->belongsTo(ProductCondition::class);
     }
 
+    /**
+     * @return BelongsTo<User, $this>
+     */
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');

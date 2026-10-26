@@ -27,6 +27,6 @@ class Post extends Model implements HasMedia
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('thumbnail')
-             ->singleFile();
+            ->singleFile();
     }
 }

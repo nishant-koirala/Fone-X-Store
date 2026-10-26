@@ -2,14 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\OrderPlaced;
 use App\Models\Customer;
 use App\Models\Order;
 use App\Models\ProductCondition;
+use Exception;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Exception;
+use Illuminate\Support\Facades\Mail;
 
 class CheckoutController extends Controller
 {
@@ -87,15 +89,16 @@ class CheckoutController extends Controller
 
                 // 1. Re-verify stock for every line item
                 foreach ($cartSession as $condId => $item) {
-                    if (!isset($conditions[$condId])) {
-                        throw new Exception("One of the selected items is no longer available.");
+                    if (! isset($conditions[$condId])) {
+                        throw new Exception('One of the selected items is no longer available.');
                     }
 
                     $condition = $conditions[$condId];
                     $requestedQty = (int) $item['quantity'];
 
+                    $prodName = $condition->product->name;
                     if ($condition->quantity_in_stock < $requestedQty) {
-                        throw new Exception("Stock for {$condition->product->name} (Grade " . strtoupper($condition->grade) . ") is insufficient. Only {$condition->quantity_in_stock} items remaining in stock.");
+                        throw new Exception("Stock for {$prodName} (Grade ".strtoupper($condition->grade).") is insufficient. Only {$condition->quantity_in_stock} items remaining in stock.");
                     }
 
                     $lineTotal = $condition->price * $requestedQty;
@@ -159,8 +162,8 @@ class CheckoutController extends Controller
             session()->forget('cart');
             session(['last_order_id' => $order->id]);
 
-            if ($order->customer->email) {
-                \Illuminate\Support\Facades\Mail::to($order->customer->email)->send(new \App\Mail\OrderPlaced($order));
+            if ($order->customer?->email) {
+                Mail::to($order->customer->email)->send(new OrderPlaced($order));
             }
 
             return redirect()->route('orders.confirmation', $order)->with('success', 'Order placed successfully!');

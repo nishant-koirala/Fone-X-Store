@@ -18,7 +18,7 @@ class CartController extends Controller
         $cartItems = [];
         $subtotal = 0;
 
-        if (!empty($cartSession)) {
+        if (! empty($cartSession)) {
             $conditionIds = array_keys($cartSession);
             $conditions = ProductCondition::with(['product', 'product.category'])
                 ->whereIn('id', $conditionIds)
@@ -29,7 +29,7 @@ class CartController extends Controller
                 if (isset($conditions[$condId])) {
                     $condition = $conditions[$condId];
                     $qty = min($item['quantity'], $condition->quantity_in_stock);
-                    
+
                     if ($qty > 0) {
                         $lineTotal = $condition->price * $qty;
                         $subtotal += $lineTotal;
@@ -49,8 +49,6 @@ class CartController extends Controller
         return view('cart.index', compact('cartItems', 'subtotal', 'total'));
     }
 
-
-
     /**
      * Add a product condition item to the session cart.
      */
@@ -64,8 +62,10 @@ class CartController extends Controller
         $condition = ProductCondition::with('product')->findOrFail($request->input('product_condition_id'));
         $requestedQty = (int) $request->input('quantity', 1);
 
+        $productName = $condition->product->name;
+
         if ($condition->quantity_in_stock < $requestedQty) {
-            return back()->with('error', "Insufficient stock for {$condition->product->name} (Grade " . strtoupper($condition->grade) . "). Only {$condition->quantity_in_stock} items remaining.");
+            return back()->with('error', "Insufficient stock for {$productName} (Grade ".strtoupper($condition->grade)."). Only {$condition->quantity_in_stock} items remaining.");
         }
 
         $cart = session()->get('cart', []);
@@ -74,7 +74,7 @@ class CartController extends Controller
         $newQty = $currentQty + $requestedQty;
 
         if ($newQty > $condition->quantity_in_stock) {
-            return back()->with('error', "Cannot add more. Stock limit for {$condition->product->name} (Grade " . strtoupper($condition->grade) . ") is {$condition->quantity_in_stock}.");
+            return back()->with('error', "Cannot add more. Stock limit for {$productName} (Grade ".strtoupper($condition->grade).") is {$condition->quantity_in_stock}.");
         }
 
         $cart[$condId] = [
@@ -84,7 +84,7 @@ class CartController extends Controller
 
         session()->put('cart', $cart);
 
-        return redirect()->route('cart.index')->with('success', "{$condition->product->name} (Grade " . strtoupper($condition->grade) . ") added to your cart.");
+        return redirect()->route('cart.index')->with('success', "{$productName} (Grade ".strtoupper($condition->grade).') added to your cart.');
     }
 
     /**
@@ -98,9 +98,10 @@ class CartController extends Controller
 
         $condition = ProductCondition::with('product')->findOrFail($conditionId);
         $requestedQty = (int) $request->input('quantity');
+        $productName = $condition->product->name;
 
         if ($requestedQty > $condition->quantity_in_stock) {
-            return back()->with('error', "Only {$condition->quantity_in_stock} items available for {$condition->product->name} (Grade " . strtoupper($condition->grade) . ").");
+            return back()->with('error', "Only {$condition->quantity_in_stock} items available for {$productName} (Grade ".strtoupper($condition->grade).').');
         }
 
         $cart = session()->get('cart', []);

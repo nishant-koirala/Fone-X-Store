@@ -26,16 +26,25 @@ class ProductCondition extends Model
         'quantity_in_stock' => 'integer',
     ];
 
+    /**
+     * @return BelongsTo<Product, $this>
+     */
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
     }
 
+    /**
+     * @return HasMany<StockMovement, $this>
+     */
     public function stockMovements(): HasMany
     {
         return $this->hasMany(StockMovement::class);
     }
 
+    /**
+     * @return HasMany<OrderItem, $this>
+     */
     public function orderItems(): HasMany
     {
         return $this->hasMany(OrderItem::class);
@@ -44,11 +53,8 @@ class ProductCondition extends Model
     /**
      * Record a stock movement and adjust quantity_in_stock inside a DB transaction.
      *
-     * @param string $type ('restock', 'sale', 'exchange_in', 'adjustment')
-     * @param int $quantity (positive to increase stock, negative to decrease stock)
-     * @param string|null $note
-     * @param int|null $createdBy
-     * @return StockMovement
+     * @param  string  $type  ('restock', 'sale', 'exchange_in', 'adjustment')
+     * @param  int  $quantity  (positive to increase stock, negative to decrease stock)
      */
     public function recordStockMovement(string $type, int $quantity, ?string $note = null, ?int $createdBy = null): StockMovement
     {
@@ -56,7 +62,8 @@ class ProductCondition extends Model
             throw new \InvalidArgumentException("Cannot reduce stock below zero for condition #{$this->id}. Available stock: {$this->quantity_in_stock}, requested adjustment: {$quantity}.");
         }
 
-        return DB::transaction(function () use ($type, $quantity, $note, $createdBy) {
+        return DB::transaction(function () use ($type, $quantity, $note, $createdBy): StockMovement {
+            /** @var StockMovement $movement */
             $movement = $this->stockMovements()->create([
                 'type' => $type,
                 'quantity' => $quantity,
@@ -69,5 +76,4 @@ class ProductCondition extends Model
             return $movement;
         });
     }
-
 }

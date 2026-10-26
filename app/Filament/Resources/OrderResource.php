@@ -19,7 +19,7 @@ class OrderResource extends Resource
 {
     protected static ?string $model = Order::class;
 
-    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-shopping-bag';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-shopping-bag';
 
     public static function getNavigationGroup(): ?string
     {
@@ -68,18 +68,27 @@ class OrderResource extends Resource
                                     ->getSearchResultsUsing(fn (string $search): array => ProductCondition::with('product')
                                         ->whereHas('product', function ($query) use ($search) {
                                             $query->where('name', 'like', "%{$search}%")
-                                                  ->orWhere('brand', 'like', "%{$search}%");
+                                                ->orWhere('brand', 'like', "%{$search}%");
                                         })
                                         ->limit(50)
                                         ->get()
-                                        ->mapWithKeys(fn ($cond) => [
-                                            $cond->id => "{$cond->product->brand} {$cond->product->name} (Grade: {$cond->grade}) - \${$cond->price}",
-                                        ])
+                                        ->mapWithKeys(function (ProductCondition $cond) {
+                                            $prodName = $cond->product ? "{$cond->product->brand} {$cond->product->name}" : "Condition #{$cond->id}";
+
+                                            return [
+                                                $cond->id => "{$prodName} (Grade: {$cond->grade}) - Rs {$cond->price}",
+                                            ];
+                                        })
                                         ->toArray()
                                     )
                                     ->getOptionLabelUsing(function ($value): ?string {
                                         $cond = ProductCondition::with('product')->find($value);
-                                        return $cond ? "{$cond->product->brand} {$cond->product->name} (Grade: {$cond->grade}) - \${$cond->price}" : null;
+                                        if (! $cond) {
+                                            return null;
+                                        }
+                                        $prodName = $cond->product ? "{$cond->product->brand} {$cond->product->name}" : "Condition #{$cond->id}";
+
+                                        return "{$prodName} (Grade: {$cond->grade}) - Rs {$cond->price}";
                                     })
                                     ->searchable()
                                     ->required()

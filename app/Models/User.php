@@ -30,7 +30,6 @@ class User extends Authenticatable implements FilamentUser
             || $this->email === 'test@example.com';
     }
 
-
     /**
      * Get the attributes that should be cast.
      *

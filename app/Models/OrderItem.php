@@ -22,11 +22,17 @@ class OrderItem extends Model
         'price_at_purchase' => 'decimal:2',
     ];
 
+    /**
+     * @return BelongsTo<Order, $this>
+     */
     public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class);
     }
 
+    /**
+     * @return BelongsTo<ProductCondition, $this>
+     */
     public function productCondition(): BelongsTo
     {
         return $this->belongsTo(ProductCondition::class);

@@ -21,6 +21,7 @@ class ProductConditionFactory extends Factory
             'A' => 0.85,
             'B' => 0.70,
             'C' => 0.55,
+            default => 1.00,
         };
 
         // Realistic NPR price

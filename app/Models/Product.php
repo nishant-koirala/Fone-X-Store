@@ -33,16 +33,25 @@ class Product extends Model
         'gallery' => 'array',
     ];
 
+    /**
+     * @return BelongsTo<Category, $this>
+     */
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
     }
 
+    /**
+     * @return HasMany<ProductCondition, $this>
+     */
     public function conditions(): HasMany
     {
         return $this->hasMany(ProductCondition::class);
     }
 
+    /**
+     * @return HasMany<Review, $this>
+     */
     public function reviews(): HasMany
     {
         return $this->hasMany(Review::class);

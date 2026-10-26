@@ -5,7 +5,6 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\StockMovementResource\Pages;
 use App\Models\ProductCondition;
 use App\Models\StockMovement;
-use BackedEnum;
 use Filament\Forms;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -16,7 +15,10 @@ class StockMovementResource extends Resource
 {
     protected static ?string $model = StockMovement::class;
 
-    public static function getNavigationIcon(): ?string { return 'heroicon-o-truck'; }
+    public static function getNavigationIcon(): ?string
+    {
+        return 'heroicon-o-truck';
+    }
 
     public static function getNavigationGroup(): ?string
     {
@@ -37,9 +39,13 @@ class StockMovementResource extends Resource
                     ->options(function () {
                         return ProductCondition::with('product')
                             ->get()
-                            ->mapWithKeys(fn ($cond) => [
-                                $cond->id => "{$cond->product->brand} {$cond->product->name} (Grade: {$cond->grade}) - Current Stock: {$cond->quantity_in_stock}",
-                            ]);
+                            ->mapWithKeys(function (ProductCondition $cond) {
+                                $prodName = $cond->product ? "{$cond->product->brand} {$cond->product->name}" : "Condition #{$cond->id}";
+
+                                return [
+                                    $cond->id => "{$prodName} (Grade: {$cond->grade}) - Current Stock: {$cond->quantity_in_stock}",
+                                ];
+                            });
                     })
                     ->searchable()
                     ->required(),

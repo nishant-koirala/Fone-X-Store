@@ -31,6 +31,7 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             IphoneCatalogSeeder::class,
+            SamsungCatalogSeeder::class,
         ]);
     }
 }

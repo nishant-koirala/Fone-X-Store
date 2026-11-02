@@ -60,12 +60,29 @@ class OrderResource extends Resource
                     ])->columns(3),
 
                 Section::make('Order Items')
+                    ->description(fn (string $operation): string => $operation === 'edit'
+                        ? 'Line items are locked to preserve inventory and audit trails. To modify items, cancel this order (which auto-restocks) and create a new order.'
+                        : 'Select products and quantities for this order. Stock will be automatically deducted upon creation.')
                     ->schema([
                         Forms\Components\Repeater::make('items')
                             ->relationship('items')
                             ->schema([
                                 Forms\Components\Select::make('product_condition_id')
                                     ->label('Product & Grade')
+                                    ->options(function () {
+                                        return ProductCondition::with('product')
+                                            ->limit(50)
+                                            ->get()
+                                            ->mapWithKeys(function (ProductCondition $cond) {
+                                                $prodName = $cond->product ? "{$cond->product->brand} {$cond->product->name}" : "Condition #{$cond->id}";
+                                                $gradeLabel = $cond->grade->value;
+
+                                                return [
+                                                    $cond->id => "{$prodName} (Grade: {$gradeLabel}) - Rs {$cond->price} [Stock: {$cond->quantity_in_stock}]",
+                                                ];
+                                            })
+                                            ->toArray();
+                                    })
                                     ->getSearchResultsUsing(fn (string $search): array => ProductCondition::with('product')
                                         ->whereHas('product', function ($query) use ($search) {
                                             $query->where('name', 'like', "%{$search}%")
@@ -78,7 +95,7 @@ class OrderResource extends Resource
                                             $gradeLabel = $cond->grade->value;
 
                                             return [
-                                                $cond->id => "{$prodName} (Grade: {$gradeLabel}) - Rs {$cond->price}",
+                                                $cond->id => "{$prodName} (Grade: {$gradeLabel}) - Rs {$cond->price} [Stock: {$cond->quantity_in_stock}]",
                                             ];
                                         })
                                         ->toArray()
@@ -91,7 +108,7 @@ class OrderResource extends Resource
                                         $prodName = $cond->product ? "{$cond->product->brand} {$cond->product->name}" : "Condition #{$cond->id}";
                                         $gradeLabel = $cond->grade->value;
 
-                                        return "{$prodName} (Grade: {$gradeLabel}) - Rs {$cond->price}";
+                                        return "{$prodName} (Grade: {$gradeLabel}) - Rs {$cond->price} [Stock: {$cond->quantity_in_stock}]";
                                     })
                                     ->searchable()
                                     ->required()
@@ -105,6 +122,28 @@ class OrderResource extends Resource
                                 Forms\Components\TextInput::make('quantity')
                                     ->numeric()
                                     ->default(1)
+                                    ->minValue(1)
+                                    ->maxValue(function (callable $get, string $operation) {
+                                        if ($operation !== 'create') {
+                                            return null;
+                                        }
+                                        $condId = $get('product_condition_id');
+                                        if (! $condId) {
+                                            return null;
+                                        }
+                                        $cond = ProductCondition::find($condId);
+
+                                        return $cond ? max(1, $cond->quantity_in_stock) : null;
+                                    })
+                                    ->helperText(function (callable $get) {
+                                        $condId = $get('product_condition_id');
+                                        if (! $condId) {
+                                            return null;
+                                        }
+                                        $cond = ProductCondition::find($condId);
+
+                                        return $cond ? "Available in stock: {$cond->quantity_in_stock}" : null;
+                                    })
                                     ->required(),
 
                                 Forms\Components\TextInput::make('price_at_purchase')
@@ -113,7 +152,10 @@ class OrderResource extends Resource
                                     ->required(),
                             ])
                             ->columns(3)
-                            ->defaultItems(1),
+                            ->defaultItems(1)
+                            ->disabled(fn (string $operation): bool => $operation !== 'create')
+                            ->deletable(fn (string $operation): bool => $operation === 'create')
+                            ->addable(fn (string $operation): bool => $operation === 'create'),
                     ]),
             ]);
     }

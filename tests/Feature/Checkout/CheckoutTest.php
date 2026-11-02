@@ -272,4 +272,80 @@ class CheckoutTest extends TestCase
         $this->assertEquals('suman@fonex.test', $fresh->email);
         $this->assertEquals('Suman Gurung', $fresh->name);
     }
+
+    public function test_checkout_validates_nepali_mobile_phone_format(): void
+    {
+        $condition = ProductCondition::factory()->create(['quantity_in_stock' => 5]);
+        $this->setCartSession([$condition->id => ['quantity' => 1]]);
+
+        // Non-Nepali / invalid numbers
+        foreach (['12345', '9612345678', '9512345678', 'invalid-phone', '01-4412345'] as $invalidPhone) {
+            $response = $this->post(route('checkout.store'), [
+                'name' => 'Tester',
+                'phone' => $invalidPhone,
+                'address' => 'Kathmandu',
+            ]);
+
+            $response->assertSessionHasErrors(['phone']);
+        }
+    }
+
+    public function test_checkout_normalizes_nepali_phone_and_deduplicates_customer(): void
+    {
+        Mail::fake();
+
+        $existingCustomer = Customer::factory()->create([
+            'phone' => '9841223344',
+            'name' => 'Bishal Shrestha',
+        ]);
+
+        $cond = ProductCondition::factory()->create(['price' => 50000, 'quantity_in_stock' => 5]);
+        $this->setCartSession([$cond->id => ['quantity' => 1]]);
+
+        // Checkout providing +977-984-122-3344
+        $response = $this->post(route('checkout.store'), [
+            'name' => 'Bishal Shrestha',
+            'phone' => '+977-984-122-3344',
+            'address' => 'Patan Dhoka, Lalitpur',
+        ]);
+
+        $response->assertRedirect();
+
+        // Customer count must not increment; matches normalized 9841223344
+        $this->assertEquals(1, Customer::where('phone', '9841223344')->count());
+
+        $order = Order::latest()->first();
+        $this->assertEquals($existingCustomer->id, $order->customer_id);
+        $this->assertEquals('9841223344', $order->shipping_phone);
+    }
+
+    public function test_checkout_captures_delivery_zone_selection(): void
+    {
+        Mail::fake();
+
+        $cond = ProductCondition::factory()->create(['price' => 30000, 'quantity_in_stock' => 5]);
+        $this->setCartSession([$cond->id => ['quantity' => 1]]);
+
+        $responseOutside = $this->post(route('checkout.store'), [
+            'name' => 'Hari Bahadur',
+            'phone' => '9801998877',
+            'delivery_zone' => 'outside_valley',
+            'address' => 'Main Road, Biratnagar, Morang',
+        ]);
+
+        $responseOutside->assertRedirect();
+        $order = Order::latest()->first();
+        $this->assertEquals('outside_valley', $order->delivery_zone);
+
+        // Invalid delivery zone is rejected
+        $this->setCartSession([$cond->id => ['quantity' => 1]]);
+        $responseInvalid = $this->post(route('checkout.store'), [
+            'name' => 'Hari Bahadur',
+            'phone' => '9801998877',
+            'delivery_zone' => 'invalid_zone',
+            'address' => 'Kathmandu',
+        ]);
+
+        $responseInvalid->assertSessionHasErrors(['delivery_zone']);
+    }
 }

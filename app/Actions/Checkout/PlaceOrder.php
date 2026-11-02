@@ -8,6 +8,7 @@ use App\Exceptions\InsufficientStockException;
 use App\Models\Customer;
 use App\Models\Order;
 use App\Models\ProductCondition;
+use App\Rules\NepaliPhone;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 
@@ -73,11 +74,12 @@ class PlaceOrder
                 ];
             }
 
-            // 2. Create or match Customer by primary phone number without overwriting existing data
-            $phone = trim($data['phone']);
+            // 2. Normalize Nepali phone & match Customer by primary phone number without overwriting existing data
+            $phone = NepaliPhone::normalize($data['phone']) ?? trim($data['phone']);
             $shippingName = trim($data['name']);
             $shippingEmail = ! empty($data['email']) ? trim((string) $data['email']) : null;
             $shippingAddress = trim($data['address']);
+            $deliveryZone = $data['delivery_zone'] ?? 'inside_valley';
 
             $customer = Customer::firstOrCreate(
                 ['phone' => $phone],
@@ -103,12 +105,13 @@ class PlaceOrder
                 $customer->update($customerUpdates);
             }
 
-            // 3. Create Order record with shipping snapshot
+            // 3. Create Order record with shipping snapshot and delivery zone
             /** @var Order $order */
             $order = Order::create([
                 'customer_id' => $customer->id,
                 'user_id' => $userId,
                 'status' => OrderStatusEnum::PENDING,
+                'delivery_zone' => $deliveryZone,
                 'total' => $orderTotal,
                 'shipping_name' => $shippingName,
                 'shipping_phone' => $phone,

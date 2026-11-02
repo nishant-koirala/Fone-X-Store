@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\NepaliPhone;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -27,7 +28,7 @@ class StoreTradeInRequest extends FormRequest
             'device_model' => ['required', 'string', 'max:255'],
             'condition' => ['required', 'string', 'in:flawless,good,broken'],
             'customer_name' => ['required', 'string', 'max:255'],
-            'customer_phone' => ['required', 'string', 'max:50'],
+            'customer_phone' => ['required', 'string', new NepaliPhone],
             'additional_notes' => ['nullable', 'string', 'max:1000'],
         ];
     }

@@ -19,6 +19,7 @@ class Order extends Model
         'customer_id',
         'user_id',
         'status',
+        'delivery_zone',
         'total',
         'shipping_name',
         'shipping_phone',

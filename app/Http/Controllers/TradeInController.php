@@ -8,6 +8,7 @@ use App\Mail\AdminTradeInAlert;
 use App\Mail\TradeInSubmitted;
 use App\Models\Customer;
 use App\Models\TradeInValuation;
+use App\Rules\NepaliPhone;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -55,8 +56,10 @@ class TradeInController extends Controller
             $customerData['email'] = auth()->user()->email;
         }
 
+        $phone = NepaliPhone::normalize($request->input('customer_phone')) ?? trim($request->input('customer_phone'));
+
         $customer = Customer::firstOrCreate(
-            ['phone' => trim($request->input('customer_phone'))],
+            ['phone' => $phone],
             $customerData
         );
 

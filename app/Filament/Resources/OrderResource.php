@@ -51,13 +51,21 @@ class OrderResource extends Resource
                             ->required()
                             ->default(OrderStatusEnum::PENDING),
 
+                        Forms\Components\Select::make('delivery_zone')
+                            ->options([
+                                'inside_valley' => 'Inside Kathmandu Valley (Pathao)',
+                                'outside_valley' => 'Outside Valley (Courier)',
+                            ])
+                            ->default('inside_valley')
+                            ->required(),
+
                         Forms\Components\TextInput::make('total')
                             ->numeric()
                             ->prefix('Rs ')
                             ->disabled()
                             ->dehydrated(false)
                             ->helperText('Order total is read-only / computed from items.'),
-                    ])->columns(3),
+                    ])->columns(4),
 
                 Section::make('Order Items')
                     ->description(fn (string $operation): string => $operation === 'edit'
@@ -169,6 +177,17 @@ class OrderResource extends Resource
                 Tables\Columns\TextColumn::make('customer.phone')->label('Phone'),
                 Tables\Columns\TextColumn::make('status')
                     ->badge(),
+                Tables\Columns\TextColumn::make('delivery_zone')
+                    ->label('Zone')
+                    ->badge()
+                    ->formatStateUsing(fn (?string $state): string => match ($state) {
+                        'outside_valley' => 'Outside Valley (Courier)',
+                        default => 'Inside Valley (Pathao)',
+                    })
+                    ->color(fn (?string $state): string => match ($state) {
+                        'outside_valley' => 'warning',
+                        default => 'info',
+                    }),
                 Tables\Columns\TextColumn::make('total')->money('NPR')->sortable(),
                 Tables\Columns\TextColumn::make('items_count')
                     ->counts('items')
@@ -178,6 +197,11 @@ class OrderResource extends Resource
             ->filters([
                 Tables\Filters\SelectFilter::make('status')
                     ->options(OrderStatusEnum::class),
+                Tables\Filters\SelectFilter::make('delivery_zone')
+                    ->options([
+                        'inside_valley' => 'Inside Kathmandu Valley (Pathao)',
+                        'outside_valley' => 'Outside Valley (Courier)',
+                    ]),
                 TrashedFilter::make(),
             ])
             ->actions([

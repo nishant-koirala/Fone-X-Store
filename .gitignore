@@ -1,5 +1,7 @@
 *.log
 .DS_Store
+/php.ini
+/reset_admin_pass.php
 .env
 .env.backup
 .env.production

@@ -49,7 +49,7 @@
                     <span>OFFICIAL STORE</span>
                 </span>
                 <span class="hidden sm:inline-block text-white/80">
-                    ⚡ FREE NEPALWIDE DELIVERY • 100-POINT DIAGNOSTIC TEST • 7-DAY CHECK GUARANTEE
+                    ⚡ FREE NEPALWIDE DELIVERY • THOROUGHLY INSPECTED • {{ config('shop.guarantees.check_guarantee_days') }}-DAY CHECK GUARANTEE
                 </span>
             </div>
             <div class="flex items-center space-x-4 text-white/70">
@@ -270,7 +270,7 @@
                         <span class="ml-2 font-mono text-xs uppercase tracking-widest text-white/70 border border-white/20 px-1.5 py-0.5">STORE NEPAL</span>
                     </div>
                     <p class="font-sans text-sm text-white/70 max-w-md leading-relaxed">
-                        Kathmandu's premier store for factory-sealed smartphones, certified pre-owned devices, and instant device trade-ins. Every phone is backed by our 100-point diagnostic inspection and 7-day checking guarantee.
+                        Kathmandu's premier store for factory-sealed smartphones, certified pre-owned devices, and instant device trade-ins. Every pre-owned phone is thoroughly inspected and backed by our {{ config('shop.guarantees.check_guarantee_days') }}-day checking guarantee.
                     </p>
                     <div class="font-mono text-xs text-white/50 space-y-1">
                         <p>📍 Store Address: <a href="https://maps.app.goo.gl/ofXysJJNMjXPPYiEA" target="_blank" rel="noopener noreferrer" class="hover:text-brand-red underline underline-offset-2 transition-colors">Fone X Store, Kathmandu, Nepal &nearr;</a></p>
@@ -295,15 +295,15 @@
                     <ul class="space-y-2.5 font-sans text-sm text-white/70">
                         <li class="flex items-center space-x-2">
                             <span class="text-brand-red font-bold">✓</span>
-                            <span>7-Day Check Time Guarantee</span>
+                            <span>{{ config('shop.guarantees.check_guarantee_days') }}-Day Check Time Guarantee</span>
                         </li>
                         <li class="flex items-center space-x-2">
                             <span class="text-brand-red font-bold">✓</span>
-                            <span>100-Point Diagnostic Testing</span>
+                            <span>Thorough Device Inspection</span>
                         </li>
                         <li class="flex items-center space-x-2">
                             <span class="text-brand-red font-bold">✓</span>
-                            <span>Clean IMEI & Verified Device History</span>
+                            <span>IMEI Verified in Store</span>
                         </li>
                         <li class="flex items-center space-x-2">
                             <span class="text-brand-red font-bold">✓</span>

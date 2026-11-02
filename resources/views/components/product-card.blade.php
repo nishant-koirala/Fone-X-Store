@@ -88,7 +88,7 @@
                     </div>
                     <span>•</span>
                 @endif
-                <span class="text-brand-charcoal/70">✓ 100-Point Inspected</span>
+                <span class="text-brand-charcoal/70">✓ Thoroughly Inspected</span>
             </div>
         </div>
     </div>

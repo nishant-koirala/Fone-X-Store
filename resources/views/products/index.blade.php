@@ -43,7 +43,7 @@
                         Certified Devices
                     </h1>
                     <p class="font-sans text-sm sm:text-base text-white/70 max-w-xl font-light mt-2 leading-relaxed">
-                        Factory-sealed brand new models and 100-point diagnostic certified pre-owned smartphones backed by a 7-day checking guarantee.
+                        Factory-sealed brand new models and thoroughly inspected pre-owned smartphones backed by a {{ config('shop.guarantees.check_guarantee_days') }}-day checking guarantee.
                     </p>
                 </div>
 

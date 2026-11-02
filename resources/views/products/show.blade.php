@@ -45,25 +45,25 @@
         'new' => [
             'name' => 'Brand New Sealed',
             'tag' => 'Factory Sealed',
-            'desc' => '100% Official warranty • Zero battery cycles • Sealed box with original accessories',
+            'desc' => 'Sealed in original box • Full accessories included • Official distributor stock',
             'badgeColor' => 'bg-emerald-600',
         ],
         'A' => [
             'name' => 'Grade A (Pristine)',
             'tag' => 'Like-New',
-            'desc' => 'Flawless display & body • Battery health 90%+ • 100-point diagnostic certified',
+            'desc' => 'Flawless display & body • Strong battery health • Thoroughly inspected',
             'badgeColor' => 'bg-blue-600',
         ],
         'B' => [
             'name' => 'Grade B (Excellent)',
             'tag' => 'Most Popular',
-            'desc' => 'Light micro-marks invisible from arm length • Battery health 85%+ • 100% functional',
+            'desc' => 'Light micro-marks invisible from arm length • Good battery health • Fully functional',
             'badgeColor' => 'bg-brand-charcoal',
         ],
         'C' => [
             'name' => 'Grade C (Fair Value)',
             'tag' => 'Best Value',
-            'desc' => 'Noticeable cosmetic wear • Fully tested & verified internal components • Best budget',
+            'desc' => 'Noticeable cosmetic wear • Tested & verified internal components • Best budget pick',
             'badgeColor' => 'bg-stone-600',
         ],
     ];
@@ -104,10 +104,10 @@
                 <div class="hidden sm:flex items-center space-x-3 text-[11px] font-bold uppercase tracking-wider text-brand-charcoal">
                     <span class="inline-flex items-center space-x-1.5 text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-sm">
                         <span class="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                        <span>100-Point Inspected</span>
+                        <span>Thoroughly Inspected</span>
                     </span>
                     <span class="text-brand-grey">•</span>
-                    <span class="text-brand-charcoal/80">7-Day Checking Guarantee</span>
+                    <span class="text-brand-charcoal/80">{{ config('shop.guarantees.check_guarantee_days') }}-Day Checking Guarantee</span>
                 </div>
             </div>
         </div>
@@ -191,19 +191,19 @@
                 <!-- Inspection & Guarantee Trust Highlights (Bento Grid) -->
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
                     <div class="border-2 border-brand-charcoal/20 bg-brand-offwhite/50 rounded-lg p-3 text-center">
-                        <div class="font-mono text-brand-red text-base mb-0.5">✓ 100-PT</div>
+                        <div class="font-mono text-brand-red text-base mb-0.5">✓ TESTED</div>
                         <div class="font-sans text-[11px] font-bold text-brand-charcoal uppercase tracking-wider">Hardware Tested</div>
                         <div class="font-sans text-[10px] text-brand-grey">Sensors, Audio, Cameras</div>
                     </div>
                     <div class="border-2 border-brand-charcoal/20 bg-brand-offwhite/50 rounded-lg p-3 text-center">
-                        <div class="font-mono text-brand-red text-base mb-0.5">🛡️ 7-DAY</div>
+                        <div class="font-mono text-brand-red text-base mb-0.5">🛡️ {{ config('shop.guarantees.check_guarantee_days') }}-DAY</div>
                         <div class="font-sans text-[11px] font-bold text-brand-charcoal uppercase tracking-wider">Check Guarantee</div>
                         <div class="font-sans text-[10px] text-brand-grey">Hassle-free replacement</div>
                     </div>
                     <div class="border-2 border-brand-charcoal/20 bg-brand-offwhite/50 rounded-lg p-3 text-center">
-                        <div class="font-mono text-brand-red text-base mb-0.5">🔋 85%+</div>
-                        <div class="font-sans text-[11px] font-bold text-brand-charcoal uppercase tracking-wider">Battery Health</div>
-                        <div class="font-sans text-[10px] text-brand-grey">Verified peak capacity</div>
+                        <div class="font-mono text-brand-red text-base mb-0.5">🔋 CHECKED</div>
+                        <div class="font-sans text-[11px] font-bold text-brand-charcoal uppercase tracking-wider">Battery Verified</div>
+                        <div class="font-sans text-[10px] text-brand-grey">Health checked in-store</div>
                     </div>
                     <div class="border-2 border-brand-charcoal/20 bg-brand-offwhite/50 rounded-lg p-3 text-center">
                         <div class="font-mono text-brand-red text-base mb-0.5">🚚 FAST</div>
@@ -286,7 +286,7 @@
                     </div>
 
                     <div class="mt-3 pt-3 border-t border-brand-charcoal/10 flex items-center justify-between text-xs font-mono text-brand-charcoal/70">
-                        <span>Includes official VAT bill & test report</span>
+                        <span>VAT bill provided upon request</span>
                         <span class="text-emerald-700 font-bold">● Pay on Delivery (COD)</span>
                     </div>
                 </div>
@@ -327,7 +327,7 @@
                                         </div>
 
                                         <p class="font-sans text-xs text-brand-grey mt-1 font-light leading-snug"
-                                           x-text="c.grade.toUpperCase() === 'NEW' ? 'Official distributor sealed box • Complete accessories • 1-Year warranty' : (c.grade.toUpperCase() === 'A' ? 'Near-flawless display & body • 90%+ battery capacity • 100-pt certified' : (c.grade.toUpperCase() === 'B' ? 'Light micro-marks not visible from 20cm • 85%+ battery • 100% functional' : 'Noticeable exterior cosmetic wear • Core internals 100% verified'))">
+                                           x-text="c.grade.toUpperCase() === 'NEW' ? 'Sealed in original box • Full accessories • Official distributor stock' : (c.grade.toUpperCase() === 'A' ? 'Near-flawless display & body • Strong battery health • Thoroughly inspected' : (c.grade.toUpperCase() === 'B' ? 'Light micro-marks not visible from 20cm • Good battery health • Fully functional' : 'Noticeable exterior cosmetic wear • Core internals verified & working'))">  
                                         </p>
                                     </div>
 
@@ -440,7 +440,7 @@
                             @click="activeTab = 'inspection'" 
                             :class="activeTab === 'inspection' ? 'border-b-4 border-brand-red text-brand-charcoal font-black bg-brand-white' : 'text-brand-grey hover:text-brand-charcoal font-bold'"
                             class="py-3 px-4 sm:px-6 font-mono text-xs sm:text-sm uppercase tracking-wider transition-colors whitespace-nowrap flex items-center space-x-1.5">
-                        <span>2. 100-Point Inspection</span>
+                        <span>2. Device Inspection</span>
                         <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
                     </button>
                     <button type="button" 
@@ -485,7 +485,7 @@
                                 </div>
                                 <div class="bg-brand-offwhite p-3 rounded border border-brand-charcoal/10">
                                     <span class="text-brand-grey block text-[10px] uppercase">IMEI Status</span>
-                                    <span class="font-bold text-emerald-700">✓ Clean / NTA Registered</span>
+                                    <span class="font-bold text-emerald-700">✓ Verified in-store</span>
                                 </div>
                             </div>
                         </div>
@@ -496,7 +496,7 @@
                         <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-brand-charcoal/15 mb-6 gap-3">
                             <div>
                                 <h2 class="font-display text-2xl uppercase tracking-tight text-brand-charcoal">
-                                    FoneX 100-Point Diagnostic Testing
+                                    FoneX Device Inspection Process
                                 </h2>
                                 <p class="font-sans text-xs text-brand-grey mt-1">Every pre-owned phone undergoes rigorous hardware & software validation prior to inventory listing.</p>
                             </div>
@@ -525,10 +525,10 @@
                                     <span>Battery & Power Architecture</span>
                                 </h3>
                                 <ul class="space-y-1.5 text-brand-charcoal/80">
-                                    <li>• Minimum 85%+ verified health retention</li>
+                                    <li>• Battery health checked & documented in-store</li>
                                     <li>• Fast charging circuit thermal check</li>
                                     <li>• Wireless Qi/MagSafe induction validation</li>
-                                    <li>• Standby battery leakage diagnostic</li>
+                                    <li>• Standby battery drain diagnostic</li>
                                 </ul>
                             </div>
 
@@ -554,7 +554,7 @@
                                     <li>• Face ID / Touch ID sensor calibration</li>
                                     <li>• Nepal 5G / 4G LTE signal reception on all bands</li>
                                     <li>• Dual SIM / eSIM provisioning capability</li>
-                                    <li>• NTA registration & clean IMEI guarantee</li>
+                                    <li>• IMEI checked in-store prior to sale</li>
                                 </ul>
                             </div>
                         </div>
@@ -574,7 +574,7 @@
                                     <span class="font-mono text-xs font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded">100% Brand New</span>
                                 </div>
                                 <p class="font-sans text-xs text-emerald-900 leading-relaxed">
-                                    Direct import factory-sealed device in original packaging. 0 battery cycles, official manufacturer warranty, and all original accessories included.
+                                    Direct import factory-sealed device in original packaging. Sealed box with full original accessories. Ask in-store about manufacturer warranty terms.
                                 </p>
                             </div>
 
@@ -584,7 +584,7 @@
                                     <span class="font-mono text-xs font-bold text-blue-800 bg-blue-100 px-2 py-0.5 rounded">Like New</span>
                                 </div>
                                 <p class="font-sans text-xs text-blue-900 leading-relaxed">
-                                    Looks and performs almost indistinguishable from new. Screen is flawless with zero scratches. Body has virtually no marks. 100-point inspected with minimum 90% battery health.
+                                    Looks and performs almost indistinguishable from new. Screen is flawless with zero scratches. Body has virtually no marks. Thoroughly inspected with strong battery health.
                                 </p>
                             </div>
 
@@ -594,7 +594,7 @@
                                     <span class="font-mono text-xs font-bold text-brand-charcoal bg-white border border-brand-charcoal px-2 py-0.5 rounded">Most Popular</span>
                                 </div>
                                 <p class="font-sans text-xs text-brand-charcoal/80 leading-relaxed">
-                                    Minor micro-scratches on casing or bezel that are invisible from normal viewing distance (20cm). Screen is clear when turned on. 100% functionally perfect with 85%+ battery health.
+                                    Minor micro-scratches on casing or bezel that are invisible from normal viewing distance. Screen is clear when turned on. Fully functional with good battery health.
                                 </p>
                             </div>
 

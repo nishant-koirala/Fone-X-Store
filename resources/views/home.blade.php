@@ -25,7 +25,7 @@
                     </h1>
                     
                     <p class="font-sans text-sm sm:text-base text-brand-charcoal/80 max-w-lg font-light leading-relaxed mb-5 sm:mb-6">
-                        Buy brand-new sealed smartphones with official warranty or shop 100-point inspected Grade A/B/C pre-owned devices.
+                        Buy brand-new sealed smartphones or shop thoroughly inspected Grade A/B/C pre-owned devices — all backed by our {{ config('shop.guarantees.check_guarantee_days') }}-day checking guarantee.
                     </p>
                     
                     <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
@@ -163,7 +163,7 @@
                 <div class="flex flex-col sm:flex-row justify-between items-center text-center font-mono text-[11px] sm:text-xs font-bold text-brand-white uppercase tracking-wider sm:tracking-widest gap-2 sm:gap-4">
                     <div class="flex items-center space-x-2">
                         <span class="text-brand-red text-base leading-none">✓</span>
-                        <span>100-Point Diagnostic Test</span>
+                        <span>Thorough Device Inspection</span>
                     </div>
                     <div class="hidden sm:block text-brand-white/20">|</div>
                     <div class="flex items-center space-x-2">
@@ -284,7 +284,7 @@
                 </div>
                 <div class="max-w-md">
                     <p class="font-sans text-brand-charcoal/80 text-base leading-relaxed">
-                        Test devices in-person, inspect 100-point diagnostic reports, claim your 7-day checking guarantee, or trade in your old phone on the spot.
+                        Test devices in-person, review our inspection process, claim your {{ config('shop.guarantees.check_guarantee_days') }}-day checking guarantee, or trade in your old phone on the spot.
                     </p>
                 </div>
             </div>
@@ -327,7 +327,7 @@
                             <ul class="space-y-2.5 font-mono text-xs text-brand-charcoal/90">
                                 <li class="flex items-center space-x-2">
                                     <span class="text-brand-red font-bold text-sm">✓</span>
-                                    <span>Hands-on 100-point physical device verification</span>
+                                    <span>Hands-on physical device testing</span>
                                 </li>
                                 <li class="flex items-center space-x-2">
                                     <span class="text-brand-red font-bold text-sm">✓</span>

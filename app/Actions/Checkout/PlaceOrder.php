@@ -88,6 +88,21 @@ class PlaceOrder
                 ]
             );
 
+            // Update customer profile if address was empty or placeholder, or if email/name was missing
+            $customerUpdates = [];
+            if (empty($customer->address) || $customer->address === 'Trade-In Request Submission') {
+                $customerUpdates['address'] = $shippingAddress;
+            }
+            if (empty($customer->email) && $shippingEmail) {
+                $customerUpdates['email'] = $shippingEmail;
+            }
+            if (empty($customer->name) && $shippingName) {
+                $customerUpdates['name'] = $shippingName;
+            }
+            if (! empty($customerUpdates)) {
+                $customer->update($customerUpdates);
+            }
+
             // 3. Create Order record with shipping snapshot
             /** @var Order $order */
             $order = Order::create([

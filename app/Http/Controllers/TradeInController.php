@@ -43,18 +43,34 @@ class TradeInController extends Controller
             $request->filled('additional_notes') ? ' | Notes: '.trim($request->input('additional_notes')) : ''
         );
 
-        // Find or create customer record by phone number
+        // Find or create customer record by phone number without overwriting existing details
+        $customerData = [
+            'name' => trim($request->input('customer_name')),
+            'address' => null,
+        ];
+
+        if ($request->filled('email')) {
+            $customerData['email'] = trim($request->input('email'));
+        } elseif (auth()->check() && auth()->user()?->email) {
+            $customerData['email'] = auth()->user()->email;
+        }
+
         $customer = Customer::firstOrCreate(
             ['phone' => trim($request->input('customer_phone'))],
-            [
-                'name' => trim($request->input('customer_name')),
-                'address' => 'Trade-In Request Submission',
-            ]
+            $customerData
         );
 
-        $customer->update([
-            'name' => trim($request->input('customer_name')),
-        ]);
+        // Fill missing fields on existing customer without overwriting existing name
+        $customerUpdates = [];
+        if (empty($customer->name)) {
+            $customerUpdates['name'] = trim($request->input('customer_name'));
+        }
+        if (empty($customer->email) && ! empty($customerData['email'])) {
+            $customerUpdates['email'] = $customerData['email'];
+        }
+        if (! empty($customerUpdates)) {
+            $customer->update($customerUpdates);
+        }
 
         // Link user_id only if authenticated user is verified
         $verifiedUserId = (auth()->check() && auth()->user()?->hasVerifiedEmail()) ? auth()->id() : null;

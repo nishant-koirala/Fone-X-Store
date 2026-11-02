@@ -242,4 +242,34 @@ class CheckoutTest extends TestCase
         $responseAuthorized->assertViewIs('orders.confirmation');
         $responseAuthorized->assertSee((string) $order->id);
     }
+
+    public function test_checkout_updates_placeholder_trade_in_address_and_missing_email_on_existing_customer(): void
+    {
+        Mail::fake();
+
+        // Customer created earlier via Trade-In with placeholder address and no email
+        $existingCustomer = Customer::factory()->create([
+            'name' => 'Suman Gurung',
+            'phone' => '9841888777',
+            'email' => null,
+            'address' => 'Trade-In Request Submission',
+        ]);
+
+        $cond = ProductCondition::factory()->create(['price' => 45000, 'quantity_in_stock' => 5]);
+        $this->setCartSession([$cond->id => ['quantity' => 1]]);
+
+        $response = $this->post(route('checkout.store'), [
+            'name' => 'Suman Gurung',
+            'phone' => '9841888777',
+            'email' => 'suman@fonex.test',
+            'address' => 'Maharajgunj, Kathmandu',
+        ]);
+
+        $response->assertRedirect();
+
+        $fresh = $existingCustomer->fresh();
+        $this->assertEquals('Maharajgunj, Kathmandu', $fresh->address);
+        $this->assertEquals('suman@fonex.test', $fresh->email);
+        $this->assertEquals('Suman Gurung', $fresh->name);
+    }
 }

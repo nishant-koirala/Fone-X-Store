@@ -62,4 +62,27 @@ class OrderTest extends TestCase
         $this->assertSame(OrderStatusEnum::PENDING, $order->status);
         $this->assertSame('pending', $order->status->value);
     }
+    public function test_order_soft_deletes_and_is_recoverable(): void
+    {
+        $order = Order::factory()->create();
+        $orderId = $order->id;
+
+        // Soft delete — should stamp deleted_at, not hard-delete
+        $order->delete();
+
+        $this->assertSoftDeleted('orders', ['id' => $orderId]);
+
+        // Default query scope excludes soft-deleted rows
+        $this->assertNull(Order::find($orderId));
+
+        // withTrashed() includes them — so it can be recovered
+        $found = Order::withTrashed()->find($orderId);
+        $this->assertNotNull($found);
+        $this->assertNotNull($found->deleted_at);
+
+        // Restore brings it back to the default scope
+        $found->restore();
+        $this->assertNotNull(Order::find($orderId));
+        $this->assertNull(Order::find($orderId)->deleted_at);
+    }
 }

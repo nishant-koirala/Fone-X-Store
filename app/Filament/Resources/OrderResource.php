@@ -9,11 +9,14 @@ use App\Models\ProductCondition;
 use BackedEnum;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ForceDeleteAction;
+use Filament\Actions\RestoreAction;
 use Filament\Forms;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables;
+use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 
 class OrderResource extends Resource
@@ -133,10 +136,13 @@ class OrderResource extends Resource
             ->filters([
                 Tables\Filters\SelectFilter::make('status')
                     ->options(OrderStatusEnum::class),
+                TrashedFilter::make(),
             ])
             ->actions([
                 EditAction::make(),
+                RestoreAction::make(),
                 DeleteAction::make(),
+                ForceDeleteAction::make(),
             ]);
     }
 

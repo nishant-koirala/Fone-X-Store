@@ -4,6 +4,7 @@ namespace App\Filament\Resources\TradeInValuationResource\Pages;
 
 use App\Enums\TradeInStatusEnum;
 use App\Filament\Resources\TradeInValuationResource;
+use App\Models\TradeInValuation;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
@@ -20,6 +21,7 @@ class EditTradeInValuation extends EditRecord
 
     protected function afterSave(): void
     {
+        /** @var TradeInValuation $record */
         $record = $this->record;
 
         if ($record->stock_ingested_at === null

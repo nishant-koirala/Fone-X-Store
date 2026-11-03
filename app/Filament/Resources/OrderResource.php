@@ -51,7 +51,9 @@ class OrderResource extends Resource
                         Forms\Components\Select::make('status')
                             ->options(OrderStatusEnum::class)
                             ->required()
-                            ->default(OrderStatusEnum::PENDING),
+                            ->default(OrderStatusEnum::PENDING)
+                            ->disabled(fn (?Order $record) => $record?->status === OrderStatusEnum::CANCELLED)
+                            ->helperText(fn (?Order $record) => $record?->status === OrderStatusEnum::CANCELLED ? 'Cancelled orders cannot be modified or reactivated.' : null),
 
                         Forms\Components\Select::make('delivery_zone')
                             ->options([

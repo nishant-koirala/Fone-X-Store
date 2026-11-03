@@ -8,6 +8,7 @@ use App\Enums\TradeInStatusEnum;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Facades\DB;
 
 class TradeInValuation extends Model
@@ -57,9 +58,9 @@ class TradeInValuation extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne<DeviceUnit, $this>
+     * @return HasOne<DeviceUnit, $this>
      */
-    public function deviceUnit(): \Illuminate\Database\Eloquent\Relations\HasOne
+    public function deviceUnit(): HasOne
     {
         return $this->hasOne(DeviceUnit::class);
     }

@@ -7,9 +7,12 @@ use App\Filament\Resources\DeviceUnitResource\Pages;
 use App\Models\DeviceUnit;
 use App\Models\ProductCondition;
 use App\Rules\Imei;
+use App\Services\Inventory\UnitInventoryService;
+use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables;
@@ -202,8 +205,46 @@ class DeviceUnitResource extends Resource
                         : $query),
             ])
             ->actions([
+                Action::make('markReturned')
+                    ->label('Mark Returned')
+                    ->icon('heroicon-o-arrow-uturn-left')
+                    ->color('warning')
+                    ->visible(fn (DeviceUnit $record): bool => $record->status === DeviceUnitStatusEnum::SOLD)
+                    ->form([
+                        Forms\Components\Textarea::make('return_reason')
+                            ->label('Return Reason')
+                            ->placeholder('e.g. Returned under checking guarantee: battery drain issue')
+                            ->required(),
+                    ])
+                    ->action(function (DeviceUnit $record, array $data): void {
+                        app(UnitInventoryService::class)->markReturned($record, $data['return_reason'] ?? null, auth()->id());
+                        Notification::make()
+                            ->title('Unit Marked as Returned')
+                            ->body('Unit has been marked returned. It is not available for sale.')
+                            ->warning()
+                            ->send();
+                    }),
+
+                Action::make('returnToStock')
+                    ->label('Return to Stock')
+                    ->icon('heroicon-o-arrow-path')
+                    ->color('success')
+                    ->visible(fn (DeviceUnit $record): bool => $record->status === DeviceUnitStatusEnum::RETURNED)
+                    ->requiresConfirmation()
+                    ->modalHeading('Return Unit to Sellable Stock')
+                    ->modalDescription('This will mark the unit as Available and record +1 stock movement in inventory.')
+                    ->action(function (DeviceUnit $record): void {
+                        app(UnitInventoryService::class)->returnToStock($record, auth()->id());
+                        Notification::make()
+                            ->title('Unit Restored to Stock')
+                            ->body('Unit is now Available and stock has been incremented by 1.')
+                            ->success()
+                            ->send();
+                    }),
+
                 EditAction::make(),
-                DeleteAction::make(),
+                DeleteAction::make()
+                    ->using(fn (DeviceUnit $record) => app(UnitInventoryService::class)->deleteUnit($record, auth()->id())),
             ]);
     }
 

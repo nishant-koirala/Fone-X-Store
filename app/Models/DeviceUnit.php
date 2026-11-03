@@ -33,6 +33,15 @@ class DeviceUnit extends Model
         'sold_at' => 'datetime',
     ];
 
+    protected static function booted(): void
+    {
+        static::deleting(function (DeviceUnit $unit) {
+            if ($unit->status === DeviceUnitStatusEnum::SOLD) {
+                throw new \LogicException('Cannot delete a sold device unit. Sold units must be retained for sales and warranty audit trails.');
+            }
+        });
+    }
+
     /**
      * @return BelongsTo<ProductCondition, $this>
      */

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\OrderStatusEnum;
 use App\Enums\StockMovementTypeEnum;
+use App\Services\Inventory\UnitInventoryService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -64,6 +65,8 @@ class Order extends Model
                         }
                     }
 
+                    app(UnitInventoryService::class)->restockOrderUnits($order, auth()->id());
+
                     $order->forceFill(['restocked_at' => now()])->saveQuietly();
                 });
             }
@@ -88,6 +91,8 @@ class Order extends Model
                             );
                         }
                     }
+
+                    app(UnitInventoryService::class)->restockOrderUnits($order, auth()->id());
 
                     $order->forceFill(['restocked_at' => now()])->saveQuietly();
                 });
@@ -125,7 +130,7 @@ class Order extends Model
      */
     public function calculateProfit(): ?float
     {
-        $this->loadMissing('items');
+        $this->loadMissing(['items.deviceUnits']);
 
         if ($this->items->isEmpty()) {
             return 0.0;
@@ -136,7 +141,12 @@ class Order extends Model
 
         foreach ($this->items as $item) {
             if ($item->cost_price_at_purchase !== null) {
-                $totalProfit += ($item->price_at_purchase - $item->cost_price_at_purchase) * $item->quantity;
+                $revenue = (float) ($item->price_at_purchase * $item->quantity);
+                $totalCost = $item->deviceUnits->isNotEmpty()
+                    ? (float) $item->cost_price_at_purchase
+                    : (float) ($item->cost_price_at_purchase * $item->quantity);
+
+                $totalProfit += ($revenue - $totalCost);
                 $hasAnyCost = true;
             }
         }

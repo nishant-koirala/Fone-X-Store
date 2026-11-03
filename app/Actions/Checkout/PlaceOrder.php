@@ -7,8 +7,10 @@ use App\Enums\StockMovementTypeEnum;
 use App\Exceptions\InsufficientStockException;
 use App\Models\Customer;
 use App\Models\Order;
+use App\Models\OrderItem;
 use App\Models\ProductCondition;
 use App\Rules\NepaliPhone;
+use App\Services\Inventory\UnitInventoryService;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 
@@ -119,18 +121,45 @@ class PlaceOrder
                 'shipping_address' => $shippingAddress,
             ]);
 
-            // 4. Create OrderItems & deduct stock via transactional stock movement helper
+            // 4. Create OrderItems, assign units for tracked conditions, and deduct stock
+            $unitService = app(UnitInventoryService::class);
+
             foreach ($orderItemsData as $itemData) {
                 /** @var ProductCondition $condition */
                 $condition = $itemData['condition'];
                 $qty = (int) $itemData['quantity'];
 
-                $order->items()->create([
+                /** @var OrderItem $orderItem */
+                $orderItem = $order->items()->create([
                     'product_condition_id' => $condition->id,
                     'quantity' => $qty,
                     'price_at_purchase' => $itemData['price_at_purchase'],
                     'cost_price_at_purchase' => $condition->cost_price,
                 ]);
+
+                // Auto-assign available serialized units if this condition tracks units
+                $assignedUnits = $unitService->assignUnitsToOrderItem($orderItem, null, $userId);
+
+                // Compute cost price from units if tracked
+                if ($condition->tracks_units && $assignedUnits->isNotEmpty()) {
+                    $totalCost = 0.0;
+                    $hasNullCost = false;
+                    foreach ($assignedUnits as $unit) {
+                        $unitCost = $unit->cost_price !== null
+                            ? (float) $unit->cost_price
+                            : ($condition->cost_price !== null ? (float) $condition->cost_price : null);
+
+                        if ($unitCost === null) {
+                            $hasNullCost = true;
+                            break;
+                        }
+                        $totalCost += $unitCost;
+                    }
+
+                    $orderItem->update([
+                        'cost_price_at_purchase' => $hasNullCost ? null : $totalCost,
+                    ]);
+                }
 
                 // Call stock movement helper to deduct stock (type: sale)
                 $condition->recordStockMovement(

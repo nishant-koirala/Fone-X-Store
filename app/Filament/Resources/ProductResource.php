@@ -159,8 +159,13 @@ class ProductResource extends Resource
                                     ->disabled()
                                     ->dehydrated(false)
                                     ->helperText('Stock changes must be recorded via Stock Movements.'),
+
+                                Forms\Components\Toggle::make('tracks_units')
+                                    ->label('Track Individual Units')
+                                    ->default(false)
+                                    ->helperText('Requires available units to equal stock count before enabling.'),
                             ])
-                            ->columns(5)
+                            ->columns(6)
                             ->defaultItems(1),
                     ]),
             ]);

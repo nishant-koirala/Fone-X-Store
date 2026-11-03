@@ -4,9 +4,11 @@ namespace App\Filament\Resources\OrderResource\Pages;
 
 use App\Enums\OrderStatusEnum;
 use App\Enums\StockMovementTypeEnum;
+use App\Exceptions\InsufficientStockException;
 use App\Filament\Resources\OrderResource;
 use App\Models\Order;
 use App\Models\ProductCondition;
+use App\Services\Inventory\UnitInventoryService;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\CreateRecord;
 use Filament\Support\Exceptions\Halt;
@@ -61,9 +63,12 @@ class CreateOrder extends CreateRecord
             ->get()
             ->keyBy('id');
 
+        $unitService = app(UnitInventoryService::class);
+        /** @var array<int, array<string, mixed>> $formItems */
+        $formItems = array_values($this->data['items'] ?? []);
         $total = 0;
 
-        foreach ($order->items as $item) {
+        foreach ($order->items as $index => $item) {
             $condId = $item->product_condition_id;
             $qty = (int) $item->quantity;
 
@@ -94,6 +99,25 @@ class CreateOrder extends CreateRecord
                 throw (new Halt)->rollBackDatabaseTransaction();
             }
 
+            // Assign specific units if chosen by staff, otherwise auto-assign
+            $specificUnitIds = null;
+            if (isset($formItems[$index]['assigned_unit_ids']) && ! empty($formItems[$index]['assigned_unit_ids'])) {
+                $specificUnitIds = (array) $formItems[$index]['assigned_unit_ids'];
+            }
+
+            $assignedUnits = collect();
+            try {
+                $assignedUnits = $unitService->assignUnitsToOrderItem($item, $specificUnitIds, auth()->id());
+            } catch (InsufficientStockException $e) {
+                Notification::make()
+                    ->title('Insufficient Units')
+                    ->body($e->getMessage())
+                    ->danger()
+                    ->send();
+
+                throw (new Halt)->rollBackDatabaseTransaction();
+            }
+
             if ($order->status !== OrderStatusEnum::CANCELLED) {
                 $condition->recordStockMovement(
                     type: StockMovementTypeEnum::SALE,
@@ -103,9 +127,30 @@ class CreateOrder extends CreateRecord
                 );
             }
 
-            $item->forceFill([
-                'cost_price_at_purchase' => $condition->cost_price,
-            ])->saveQuietly();
+            // Snapshot cost: if tracked, sum of unit costs (or fallback to condition cost)
+            if ($condition->tracks_units && $assignedUnits->isNotEmpty()) {
+                $totalCost = 0.0;
+                $hasNullCost = false;
+                foreach ($assignedUnits as $unit) {
+                    $unitCost = $unit->cost_price !== null
+                        ? (float) $unit->cost_price
+                        : ($condition->cost_price !== null ? (float) $condition->cost_price : null);
+
+                    if ($unitCost === null) {
+                        $hasNullCost = true;
+                        break;
+                    }
+                    $totalCost += $unitCost;
+                }
+
+                $item->forceFill([
+                    'cost_price_at_purchase' => $hasNullCost ? null : $totalCost,
+                ])->saveQuietly();
+            } else {
+                $item->forceFill([
+                    'cost_price_at_purchase' => $condition->cost_price,
+                ])->saveQuietly();
+            }
 
             $total += $qty * $item->price_at_purchase;
         }

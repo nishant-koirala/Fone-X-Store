@@ -35,6 +35,12 @@ class OrderItem extends Model
             return null;
         }
 
+        $revenue = (float) ($this->price_at_purchase * $this->quantity);
+
+        if ($this->deviceUnits()->exists()) {
+            return $revenue - (float) $this->cost_price_at_purchase;
+        }
+
         return (float) (($this->price_at_purchase - $this->cost_price_at_purchase) * $this->quantity);
     }
 

@@ -2,8 +2,10 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\DeviceUnitStatusEnum;
 use App\Enums\OrderStatusEnum;
 use App\Filament\Resources\OrderResource\Pages;
+use App\Models\DeviceUnit;
 use App\Models\Order;
 use App\Models\ProductCondition;
 use BackedEnum;
@@ -183,8 +185,56 @@ class OrderResource extends Resource
                                     ->dehydrated(false)
                                     ->helperText('Cost price snapshotted at time of sale')
                                     ->visible(fn (string $operation): bool => $operation !== 'create'),
+
+                                Forms\Components\Select::make('assigned_unit_ids')
+                                    ->label('Specific Units (Optional)')
+                                    ->helperText('Leave empty to auto-assign oldest available units')
+                                    ->multiple()
+                                    ->options(function (callable $get): array {
+                                        $condId = $get('product_condition_id');
+                                        if (! $condId) {
+                                            return [];
+                                        }
+                                        $cond = ProductCondition::find($condId);
+                                        if (! $cond || ! $cond->tracks_units) {
+                                            return [];
+                                        }
+
+                                        return DeviceUnit::where('product_condition_id', $cond->id)
+                                            ->where('status', DeviceUnitStatusEnum::AVAILABLE)
+                                            ->get()
+                                            ->mapWithKeys(function (DeviceUnit $u): array {
+                                                $battery = $u->battery_health ? " ({$u->battery_health}%)" : '';
+
+                                                return [$u->id => "Unit #{$u->id} - IMEI: ".($u->imei ?? 'N/A').$battery];
+                                            })
+                                            ->toArray();
+                                    })
+                                    ->visible(function (callable $get, string $operation): bool {
+                                        if ($operation !== 'create') {
+                                            return false;
+                                        }
+                                        $condId = $get('product_condition_id');
+                                        if (! $condId) {
+                                            return false;
+                                        }
+                                        $cond = ProductCondition::find($condId);
+
+                                        return $cond ? (bool) $cond->tracks_units : false;
+                                    })
+                                    ->rules([
+                                        fn (callable $get) => function (string $attribute, $value, \Closure $fail) use ($get) {
+                                            if (empty($value)) {
+                                                return;
+                                            }
+                                            $qty = (int) $get('quantity');
+                                            if (count((array) $value) !== $qty) {
+                                                $fail("You must select exactly {$qty} unit(s) to match the line quantity, or leave empty to auto-assign.");
+                                            }
+                                        },
+                                    ]),
                             ])
-                            ->columns(4)
+                            ->columns(5)
                             ->defaultItems(1)
                             ->disabled(fn (string $operation): bool => $operation !== 'create')
                             ->deletable(fn (string $operation): bool => $operation === 'create')

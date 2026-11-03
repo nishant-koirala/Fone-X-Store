@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class ProductCondition extends Model
 {
@@ -22,6 +23,7 @@ class ProductCondition extends Model
         'grade',
         'price',
         'cost_price',
+        'tracks_units',
         'original_price',
         'quantity_in_stock',
     ];
@@ -30,9 +32,24 @@ class ProductCondition extends Model
         'grade' => GradeEnum::class,
         'price' => 'decimal:2',
         'cost_price' => 'decimal:2',
+        'tracks_units' => 'boolean',
         'original_price' => 'decimal:2',
         'quantity_in_stock' => 'integer',
     ];
+
+    protected static function booted(): void
+    {
+        static::saving(function (ProductCondition $condition) {
+            if ($condition->exists && $condition->isDirty('tracks_units') && $condition->tracks_units && ! $condition->getOriginal('tracks_units')) {
+                $availableCount = $condition->availableDeviceUnits()->count();
+                if ($availableCount !== $condition->quantity_in_stock) {
+                    throw ValidationException::withMessages([
+                        'tracks_units' => "Cannot enable unit tracking: this condition has {$condition->quantity_in_stock} unit(s) in stock but {$availableCount} available device unit(s) registered. Please register device units until the numbers match.",
+                    ]);
+                }
+            }
+        });
+    }
 
     /**
      * @return BelongsTo<Product, $this>

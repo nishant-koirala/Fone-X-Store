@@ -104,4 +104,51 @@ class DeviceUnitResourceTest extends TestCase
         $this->assertEquals(DeviceUnitStatusEnum::DEFECTIVE, $fresh->status);
         $this->assertStringContainsString('Faulty camera', $fresh->notes);
     }
+
+    public function test_can_mark_sold_unit_returned_via_filament_action(): void
+    {
+        $unit = DeviceUnit::factory()->sold()->create();
+
+        Livewire::test(ListDeviceUnits::class)
+            ->callTableAction('markReturned', $unit, [
+                'return_reason' => 'Customer reported microphone defect within 7 days',
+            ])
+            ->assertHasNoTableActionErrors();
+
+        $fresh = $unit->fresh();
+        $this->assertEquals(DeviceUnitStatusEnum::RETURNED, $fresh->status);
+        $this->assertStringContainsString('microphone defect', $fresh->notes);
+    }
+
+    public function test_can_return_unit_to_stock_via_filament_action(): void
+    {
+        $condition = ProductCondition::factory()->create(['quantity_in_stock' => 1]);
+        $unit = DeviceUnit::factory()->create([
+            'product_condition_id' => $condition->id,
+            'status' => DeviceUnitStatusEnum::RETURNED,
+        ]);
+
+        Livewire::test(ListDeviceUnits::class)
+            ->callTableAction('returnToStock', $unit)
+            ->assertHasNoTableActionErrors();
+
+        $this->assertEquals(DeviceUnitStatusEnum::AVAILABLE, $unit->fresh()->status);
+        $this->assertEquals(2, $condition->fresh()->quantity_in_stock);
+    }
+
+    public function test_delete_available_unit_decrements_stock(): void
+    {
+        $condition = ProductCondition::factory()->create(['quantity_in_stock' => 4]);
+        $unit = DeviceUnit::factory()->create([
+            'product_condition_id' => $condition->id,
+            'status' => DeviceUnitStatusEnum::AVAILABLE,
+        ]);
+
+        Livewire::test(ListDeviceUnits::class)
+            ->callTableAction('delete', $unit)
+            ->assertHasNoTableActionErrors();
+
+        $this->assertEquals(3, $condition->fresh()->quantity_in_stock);
+        $this->assertDatabaseMissing('device_units', ['id' => $unit->id]);
+    }
 }

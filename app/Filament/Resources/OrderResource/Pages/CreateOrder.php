@@ -4,13 +4,12 @@ namespace App\Filament\Resources\OrderResource\Pages;
 
 use App\Enums\OrderStatusEnum;
 use App\Enums\StockMovementTypeEnum;
-use App\Exceptions\InsufficientStockException;
 use App\Filament\Resources\OrderResource;
+use App\Models\Order;
 use App\Models\ProductCondition;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\CreateRecord;
 use Filament\Support\Exceptions\Halt;
-use Illuminate\Support\Facades\DB;
 
 class CreateOrder extends CreateRecord
 {
@@ -32,6 +31,7 @@ class CreateOrder extends CreateRecord
      */
     protected function afterCreate(): void
     {
+        /** @var Order $order */
         $order = $this->record;
         $order->loadMissing('items.productCondition');
 
@@ -54,7 +54,7 @@ class CreateOrder extends CreateRecord
 
         foreach ($order->items as $item) {
             $condId = $item->product_condition_id;
-            $qty    = (int) $item->quantity;
+            $qty = (int) $item->quantity;
 
             if (! isset($conditions[$condId])) {
                 Notification::make()
@@ -100,7 +100,7 @@ class CreateOrder extends CreateRecord
         }
 
         $order->forceFill([
-            'total'        => $total,
+            'total' => $total,
             'restocked_at' => $order->status === OrderStatusEnum::CANCELLED ? now() : null,
         ])->saveQuietly();
     }

@@ -4,10 +4,13 @@ namespace App\Filament\Resources;
 
 use App\Enums\TradeInStatusEnum;
 use App\Filament\Resources\TradeInValuationResource\Pages;
+use App\Models\ProductCondition;
 use App\Models\TradeInValuation;
+use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables;
@@ -59,6 +62,23 @@ class TradeInValuationResource extends Resource
                     ->required()
                     ->default(TradeInStatusEnum::PENDING),
 
+                Forms\Components\Select::make('product_condition_id')
+                    ->label('Target Inventory Condition')
+                    ->relationship('productCondition')
+                    ->options(function () {
+                        return ProductCondition::with('product')
+                            ->get()
+                            ->mapWithKeys(function (ProductCondition $cond) {
+                                $prodName = $cond->product ? "{$cond->product->brand} {$cond->product->name}" : "Condition #{$cond->id}";
+
+                                return [$cond->id => "{$prodName} (Grade: {$cond->grade->value}) - Stock: {$cond->quantity_in_stock}"];
+                            })
+                            ->toArray();
+                    })
+                    ->searchable()
+                    ->helperText('Assign accepted device to a sellable product condition grade')
+                    ->nullable(),
+
                 Forms\Components\Textarea::make('condition_description')
                     ->required()
                     ->columnSpanFull(),
@@ -86,6 +106,11 @@ class TradeInValuationResource extends Resource
                     ->placeholder('Unassessed'),
                 Tables\Columns\TextColumn::make('status')
                     ->badge(),
+                Tables\Columns\TextColumn::make('stock_ingested_at')
+                    ->label('Stock Ingestion')
+                    ->badge()
+                    ->formatStateUsing(fn ($state) => $state ? 'In Stock (+1)' : 'Not Ingested')
+                    ->color(fn ($state) => $state ? 'success' : 'gray'),
                 Tables\Columns\TextColumn::make('created_at')->dateTime()->sortable(),
             ])
             ->filters([
@@ -93,6 +118,37 @@ class TradeInValuationResource extends Resource
                     ->options(TradeInStatusEnum::class),
             ])
             ->actions([
+                Action::make('ingestStock')
+                    ->label('Ingest to Stock')
+                    ->icon('heroicon-o-arrow-down-tray')
+                    ->color('success')
+                    ->visible(fn (TradeInValuation $record): bool => $record->stock_ingested_at === null)
+                    ->form([
+                        Forms\Components\Select::make('product_condition_id')
+                            ->label('Select Condition to Ingest Into (+1 Stock)')
+                            ->options(function () {
+                                return ProductCondition::with('product')
+                                    ->get()
+                                    ->mapWithKeys(function (ProductCondition $cond) {
+                                        $prodName = $cond->product ? "{$cond->product->brand} {$cond->product->name}" : "Condition #{$cond->id}";
+
+                                        return [$cond->id => "{$prodName} (Grade: {$cond->grade->value}) - Current: {$cond->quantity_in_stock}"];
+                                    })
+                                    ->toArray();
+                            })
+                            ->required()
+                            ->searchable(),
+                    ])
+                    ->action(function (TradeInValuation $record, array $data): void {
+                        $condition = ProductCondition::findOrFail($data['product_condition_id']);
+                        $record->ingestIntoStock($condition);
+
+                        Notification::make()
+                            ->title('Device Ingested Into Inventory')
+                            ->body("Added 1 unit to {$condition->product?->name} ({$condition->grade->value}) as exchange-in stock.")
+                            ->success()
+                            ->send();
+                    }),
                 EditAction::make(),
                 DeleteAction::make(),
             ]);

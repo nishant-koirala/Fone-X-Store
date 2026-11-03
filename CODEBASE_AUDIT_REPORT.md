@@ -119,51 +119,30 @@ The application is in a stable, well-tested state with zero test regressions. Ho
 
 ---
 
-## 4. Completed Work Audit (Phases 1–4)
+## 4. Completed Work Audit (Phases 1–8: 100% Complete)
 
-| Phase | Commit | Files Changed | Changes & Mentor Rationale |
+| Phase | Commit | Files Changed | Changes & Domain Implementation |
 |---|---|---|---|
-| **Phase 1: Repo Hygiene & Config** | `ab1f57b` | 10 files | • **Deleted** `reset_admin_pass.php` (hardcoded plain text `admin123`).<br>• **Deleted** `php.ini` (local Windows path not portable).<br>• Updated `.gitignore` and `.env.example`.<br>• Centralized delivery fees, guarantee days, and order expiry in `config/shop.php`.<br>• Softened unverifiable storefront marketing claims ("100-point diagnostic certified" → "Thoroughly Inspected"). |
-| **Phase 2: Order Soft Deletes** | `619b587` | 4 files | • Added safe migration `2026_11_02_160949_add_soft_deletes_to_orders_table.php`.<br>• Applied `SoftDeletes` trait to `Order` model.<br>• Added `TrashedFilter`, `RestoreAction`, and `ForceDeleteAction` in `OrderResource`.<br>• Prevents accidental permanent loss of orders and cascading line items. |
-| **Phase 3: Admin Stock Drift Remediation** | `f6f86f0` | 4 files | • Added `afterCreate()` in `CreateOrder` page to compute order total and deduct inventory via `recordStockMovement(SALE, -$qty)` under staff `auth()->id()`.<br>• Enforced real-time `maxValue()` matching warehouse stock in repeater.<br>• Locked line items on `edit` (`disabled(operation !== 'create')`) to maintain immutable financial records.<br>• Added stock badges `[Stock: X]` in product dropdowns. |
-| **Phase 4: Customer Data Consistency** | `ccf3ee2` | 5 files | • Stopped `TradeInController` from setting placeholder address string `'Trade-In Request Submission'` and prevented unconditional overwriting of existing customer names.<br>• Enhanced `PlaceOrder` to automatically cure placeholder/empty addresses when customers checkout with a real shipping address.<br>• Created and executed safe migration `2026_11_02_163555_clean_legacy_trade_in_placeholder_addresses.php` to nullify legacy placeholder addresses. |
+| **Phase 1: Repo Hygiene & Config** | `ab1f57b` | 10 files | • **Deleted** `reset_admin_pass.php` (plain text credentials) and `php.ini`.<br>• Centralized delivery fees, guarantee days, and order expiry in `config/shop.php`.<br>• Softened unverifiable storefront marketing claims. |
+| **Phase 2: Order Soft Deletes & Serialized IMEI Tracking** | `619b587`, `b26044f` | 18 files | • Soft deletes on `orders` table with TrashedFilter and restore guards.<br>• Added `device_units` table, `DeviceUnit` model, and `DeviceUnitStatusEnum`.<br>• Full IMEI, serial number, and verified battery health % tracking for pre-owned phones (MDMS & 7-day guarantee returns).<br>• Dedicated Filament `DeviceUnitResource` with search and stock synchronization. |
+| **Phase 3: Admin Stock Drift Remediation & Atomic Locking** | `f6f86f0`, `9ba0ae9` | 14 files | • Added atomic DB transaction with `lockForUpdate()` in Filament `CreateOrder`.<br>• Auto-restock guard in `Order::deleting` hook for unreturned items.<br>• Restricted table DeleteAction to cancelled orders only.<br>• Removed `admin@fonex.com` fallback and updated banner/footer contact info. |
+| **Phase 4: Customer Data Consistency** | `ccf3ee2` | 5 files | • Eliminated placeholder address strings in trade-ins and prevented customer name overwriting.<br>• Migration cleaned legacy placeholder records.<br>• Auto-heals customer addresses upon checkout. |
+| **Phase 5: Nepali Phone & Delivery Zone Hardening** | `8ccbcf2` | 10 files | • `NepaliPhone` validation rule strictly enforcing 10-digit mobile numbers with 98/97 prefixes and automatic normalization.<br>• Delivery zone selection (Kathmandu Valley Pathao vs. Outside Valley Courier with pay-on-delivery fees). |
+| **Phase 6: Financial Visibility — Purchase Cost & Margin Tracking** | `9542b32` | 11 files | • Added `cost_price` to `product_conditions` and `cost_price_at_purchase` snapshot to `order_items`.<br>• Implemented `calculateProfit()` on `Order` and profit accessor on `OrderItem`.<br>• Added 'Est. Margin' column and line-item cost visibility in Filament `OrderResource`. |
+| **Phase 7: Trade-In Stock Ingestion (exchange_in)** | `1e0b7dd` | 5 files | • Linked trade-in valuations to `product_conditions` with `stock_ingested_at` timestamp.<br>• Idempotent `ingestIntoStock()` method creating `StockMovementTypeEnum::EXCHANGE_IN` (+1 unit).<br>• Sourcing acquisition cost basis from valuation value.<br>• Filament 'Ingest to Stock' modal action with IMEI and battery health inputs. |
+| **Phase 8: COD Lifecycle & Pre-Dispatch Confirmation** | `cd4b3ea` | 7 files | • Added `confirmed_at` timestamp to `orders` with 'Confirm Phone' action in Filament.<br>• Created `shop:expire-unconfirmed-orders` Artisan command with `--dry-run` and `--hours`.<br>• Auto-cancels and restocks abandoned unconfirmed COD orders.<br>• Scheduled hourly in `routes/console.php`. |
 
 ---
 
-## 5. Actionable Remediation Plan (Phases 5–8)
+## 5. Verification & Final Status
 
-### Phase 5: Nepali Phone & Delivery Zone Hardening
-*Goal: Prevent fake phone numbers and recover courier delivery costs.*
-1. **Strict Nepali Mobile Regex Validation**:
-   - Update `CheckoutRequest` and `StoreTradeInRequest` with rule: `regex:/^(?:\+977[- ]?)?(?:98\d{8}|97\d{8})$/`.
-   - Provide clear Nepali validation feedback: `"Please provide a valid 10-digit Nepali mobile number (starting with 98 or 97)."`.
-2. **Delivery Zone Selection at Checkout**:
-   - Add radio or select dropdown on checkout:
-     - `Inside Kathmandu Valley (Kathmandu, Lalitpur, Bhaktapur)` — Free delivery (NPR 0).
-     - `Outside Valley (Courier / Nationwide)` — NPR 200 delivery fee (driven by `config('shop.delivery.outside_valley_fee')`).
-   - Wire delivery fee calculation into `PlaceOrder`, snapshotting `delivery_fee` and reflecting it on the order invoice.
+- **Automated Tests**: **219 tests passing (1,504 assertions)** with 0 failures in ~26 seconds.
+- **Findings Resolution Status**:
+  - **F1 (Unbacked Storefront Claims)**: Resolved (claims softened, Pathao/Courier pay-on-delivery accurate copy, footer WhatsApp aligned).
+  - **F2 (Per-Unit Inventory & IMEI)**: Resolved (full `DeviceUnit` tracking with IMEI, battery %, status, and MDMS/warranty support).
+  - **F3 (Cost & Profit Margin Tracking)**: Resolved (`cost_price` & `cost_price_at_purchase` tracked, margins displayed in Filament).
+  - **F4 (Trade-In Linking to Stock)**: Resolved (trade-ins ingest into sellable inventory via `EXCHANGE_IN` stock movements).
+  - **F5 (Nepali Phone Validation & Normalization)**: Resolved (`NepaliPhone` rule, +977 stripping, 98/97 enforcement).
+  - **F6 (COD Confirmation & Auto-Expiry)**: Resolved (pre-dispatch phone confirmation and `shop:expire-unconfirmed-orders` hourly cron).
+  - **F7 (Repo Hygiene)**: Resolved (no hardcoded passwords/emails, cleaned config and gitignore).
 
-### Phase 6: Financial Visibility — Purchase Cost & Profit Margin
-*Goal: Allow the shop owner to track profitability and gross margins.*
-1. **Schema Addition**:
-   - New migration adding `cost_price nullable decimal(10,2)` to `product_conditions`.
-   - Add `cost_price_at_purchase nullable decimal(10,2)` to `order_items` (snapshotting cost at the moment of sale).
-2. **Filament Integration**:
-   - Add optional `Cost Price (Purchase Price)` field to `ProductResource` (visible to admin).
-   - Display `Profit / Margin` column on `OrderResource` table and order edit view: `Profit = Total - Cost`.
-
-### Phase 7: Trade-In Stock Ingestion
-*Goal: Close the loop when a trade-in phone is physically accepted in the shop.*
-1. **Acceptance Action in Filament**:
-   - In `TradeInValuationResource`, when status is updated to `COMPLETED`:
-     - Allow staff to attach or select which sellable product listing it corresponds to.
-     - Record `StockMovementTypeEnum::EXCHANGE_IN` with quantity `+1`, note `"Trade-In #ID accepted from CustomerName"`, and valuation value as the cost basis.
-
-### Phase 8: COD Lifecycle & Pre-Dispatch Confirmation
-*Goal: Prevent dead inventory holds on unconfirmed Cash-on-Delivery orders.*
-1. **Awaiting Confirmation State**:
-   - Add `AWAITING_CONFIRMATION` or use `PENDING` with a dedicated "Confirmed by Phone" toggle in Filament.
-2. **Automated Order Expiry Artisan Command**:
-   - Create command `php artisan shop:expire-unconfirmed-orders`.
-   - Checks orders with status `pending` older than `config('shop.orders.pending_expiry_hours')` (48 hours).
-   - Automatically marks them `cancelled`, which triggers existing `Order::booted()` restock logic, freeing up inventory for in-store customers.

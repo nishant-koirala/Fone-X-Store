@@ -27,4 +27,20 @@ class CustomerTest extends TestCase
 
         $this->assertTrue($customer->tradeInValuations->contains($valuation));
     }
+
+    public function test_deleting_customer_with_orders_throws_exception_and_preserves_orders(): void
+    {
+        $customer = Customer::factory()->create();
+        $order = Order::factory()->create(['customer_id' => $customer->id]);
+
+        $this->expectException(\DomainException::class);
+        $this->expectExceptionMessage("Cannot delete customer #{$customer->id} because they have existing orders.");
+
+        try {
+            $customer->delete();
+        } finally {
+            $this->assertDatabaseHas('customers', ['id' => $customer->id]);
+            $this->assertDatabaseHas('orders', ['id' => $order->id]);
+        }
+    }
 }

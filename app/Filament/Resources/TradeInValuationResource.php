@@ -138,14 +138,31 @@ class TradeInValuationResource extends Resource
                             })
                             ->required()
                             ->searchable(),
+                        Forms\Components\TextInput::make('imei')
+                            ->label('Device IMEI (15 digits)')
+                            ->maxLength(25)
+                            ->placeholder('e.g. 356938031234567')
+                            ->helperText('IMEI for NTA/MDMS registration and returns tracking')
+                            ->nullable(),
+
+                        Forms\Components\TextInput::make('battery_health')
+                            ->label('Tested Battery Health %')
+                            ->numeric()
+                            ->minValue(1)
+                            ->maxValue(100)
+                            ->suffix('%')
+                            ->nullable(),
                     ])
                     ->action(function (TradeInValuation $record, array $data): void {
                         $condition = ProductCondition::findOrFail($data['product_condition_id']);
-                        $record->ingestIntoStock($condition);
+                        $imei = ! empty($data['imei']) ? trim($data['imei']) : null;
+                        $batteryHealth = ! empty($data['battery_health']) ? (int) $data['battery_health'] : null;
+
+                        $record->ingestIntoStock($condition, auth()->id(), $imei, $batteryHealth);
 
                         Notification::make()
                             ->title('Device Ingested Into Inventory')
-                            ->body("Added 1 unit to {$condition->product?->name} ({$condition->grade->value}) as exchange-in stock.")
+                            ->body("Added 1 unit to {$condition->product?->name} ({$condition->grade->value}) with IMEI tracking.")
                             ->success()
                             ->send();
                     }),

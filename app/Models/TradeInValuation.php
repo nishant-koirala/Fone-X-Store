@@ -56,16 +56,24 @@ class TradeInValuation extends Model
     }
 
     /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne<DeviceUnit, $this>
+     */
+    public function deviceUnit(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(DeviceUnit::class);
+    }
+
+    /**
      * Ingest this accepted trade-in phone into inventory (type: exchange_in).
      * Idempotent: cannot double-ingest stock if called multiple times.
      */
-    public function ingestIntoStock(ProductCondition $condition, ?int $staffUserId = null): ?StockMovement
+    public function ingestIntoStock(ProductCondition $condition, ?int $staffUserId = null, ?string $imei = null, ?int $batteryHealth = null): ?StockMovement
     {
         if ($this->stock_ingested_at !== null) {
             return null;
         }
 
-        return DB::transaction(function () use ($condition, $staffUserId): StockMovement {
+        return DB::transaction(function () use ($condition, $staffUserId, $imei, $batteryHealth): StockMovement {
             $customerName = $this->customer?->name ?? 'Customer';
             $note = "Trade-in #{$this->id} accepted: {$this->device_brand} {$this->device_model} from {$customerName}";
 
@@ -80,6 +88,17 @@ class TradeInValuation extends Model
             if ($this->estimated_value !== null && $condition->cost_price === null) {
                 $condition->update(['cost_price' => $this->estimated_value]);
             }
+
+            // Create individual serialized device unit
+            DeviceUnit::create([
+                'product_condition_id' => $condition->id,
+                'imei' => $imei,
+                'battery_health' => $batteryHealth,
+                'cost_price' => $this->estimated_value,
+                'status' => \App\Enums\DeviceUnitStatusEnum::AVAILABLE,
+                'trade_in_valuation_id' => $this->id,
+                'notes' => "Trade-in from {$customerName} ({$this->device_brand} {$this->device_model})",
+            ]);
 
             $this->forceFill([
                 'product_condition_id' => $condition->id,

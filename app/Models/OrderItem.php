@@ -51,4 +51,20 @@ class OrderItem extends Model
     {
         return $this->belongsTo(ProductCondition::class);
     }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<DeviceUnit, $this>
+     */
+    public function deviceUnits(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(DeviceUnit::class);
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne<DeviceUnit, $this>
+     */
+    public function deviceUnit(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(DeviceUnit::class);
+    }
 }

@@ -58,6 +58,22 @@ class ProductCondition extends Model
     }
 
     /**
+     * @return HasMany<DeviceUnit, $this>
+     */
+    public function deviceUnits(): HasMany
+    {
+        return $this->hasMany(DeviceUnit::class);
+    }
+
+    /**
+     * @return HasMany<DeviceUnit, $this>
+     */
+    public function availableDeviceUnits(): HasMany
+    {
+        return $this->hasMany(DeviceUnit::class)->where('status', \App\Enums\DeviceUnitStatusEnum::AVAILABLE);
+    }
+
+    /**
      * Scope a query to only include conditions that have positive stock.
      *
      * @param  Builder<ProductCondition>  $query

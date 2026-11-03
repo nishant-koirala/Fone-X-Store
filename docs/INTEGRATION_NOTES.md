@@ -114,6 +114,27 @@ A-006 resolved by policy: delivery payable on delivery
 - **Storefront & Admin Consistency**:
   - `resources/views/checkout/index.blade.php`: Clearly notes delivery fees as "Pathao / Courier (Payable on Delivery)" with an order total matching pure item subtotal.
   - `resources/views/orders/confirmation.blade.php`: States that delivery fare is payable directly to the courier upon delivery.
-  - `resources/views/emails/orders/placed.blade.php`: Confirmation email reminds customer that courier fare is paid separately to the courier upon delivery.
-  - `app/Filament/Resources/OrderResource.php`: Table `delivery_zone` column includes tooltip confirming delivery fares are paid by customer to courier upon delivery.
+## Step 5 - Integration Summary & Commit Log
+
+All changes were performed exclusively on `integration/feature-plus-audit-fixes` branched from `origin/feature/unit-linkage-and-safety-fixes`. No changes, merges, or commits were made to `main`. Every commit includes a 2-3 line "why" explaining the rationale.
+
+### Full Commit Log on `integration/feature-plus-audit-fixes`:
+
+| Commit Hash | Subject | Mentor Explanation ("Why") |
+|---|---|---|
+| `58fe7fc` | `fix(database): fix media table rollback and protect order history from customer deletion` | Cherry-picked from audit branch to ensure media table rolls back cleanly with dropIfExists and begins customer deletion protection. |
+| `a1fbddb` | `fix(database): restore historical orders migration and rely on app guard` | Reverts mutation of already-run migration `create_orders_table.php` back to `origin/main`. Protects customer deletion via new schema migration for MySQL/PG and application deleting hook on Customer model across all database drivers. |
+| `d406d01` | `fix(security): sanitize blog/product views against XSS, protect customer PII in logs, and validate trade-in email` | Cherry-picked non-overlapping security fixes: redacts customer phone/address from checkout failure logs and validates trade-in emails. |
+| `5b63fee` | `fix(shop): untrack temporary storage files, add branded HTTP error pages, and scale seeder prices to NPR` | Untracks temporary files from `storage/tmp/`, adds customized HTTP error pages (404, 419, 429, 500), and scales seeder catalogs to realistic NPR values. |
+| `c5ff22c` | `fix(deps): patch security vulnerabilities in Composer and NPM dependencies` | Upgrades locked non-breaking dependencies to address known security advisories in NPM and Composer packages without breaking changes. |
+| `9c4584f` | `docs: record cherry-picked audit commits and dependency audits` | Records baseline verification and dependency audit results in integration documentation. |
+| `6ecf5bc` | `feat(security): implement robust DOMDocument HtmlSanitizer and secure views` | Implements DOMDocument-based strict allowlist HTML sanitizer removing all dangerous attributes/protocols (javascript:, data:, onclick, etc.) while allowing safe formatting. Disarms unclosed foreign tags and secures external links. |
+| `04bc437` | `feat(finance): resolve profit cost inconsistency with cost_total_at_purchase column` | Adds `order_items.cost_total_at_purchase` migration with chunked backfill. Records total cost for tracked and untracked items and average per-unit cost for compatibility, completely eliminating N+1 device unit queries. |
+| `8b1aa22` | `fix(delivery): enforce delivery fee payable on delivery policy across views and emails` | Standardizes all customer touchpoints (checkout, confirmation page, emails, admin panel) on the policy that delivery fares are paid by the customer directly to the courier on delivery. |
+
+### Final Automated Quality Gate Verification
+- `vendor/bin/pint --test`: PASSED (0 lint errors).
+- `vendor/bin/phpstan analyse --memory-limit=2G`: PASSED (Level 6 strict, 0 errors).
+- `vendor/bin/phpunit`: PASSED (286 tests, 1,782 assertions, 0 failures, 0 errors).
+- `php artisan migrate:fresh --seed`: PASSED cleanly on throwaway database.
 

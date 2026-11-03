@@ -17,14 +17,15 @@ However, the audit identified critical structural vulnerabilities in database mi
 
 ## 2. Findings Summary by Severity
 
-| Severity | Count | Primary Impact Areas |
-| :--- | :---: | :--- |
-| **CRITICAL** | **2** | Migration rollback crash (`create_media_table`); Customer cascade delete destroying orders. |
-| **HIGH** | **6** | DeviceUnit stock drift; admin order auto-cancellation; trade-in race condition; delivery fee omission; cancelled order stock duplication; upstream package CVEs. |
-| **MEDIUM** | **5** | Stored XSS risk via unescaped Blade output; customer PII dumped to log files; 17 PHPStan Level 5 errors; 13 Pint lint failures; negative stock database race condition. |
-| **LOW** | **4** | Unvalidated email in trade-in request; 16 tracked temporary files in `storage/tmp/`; dead config keys in `shop.php`; missing custom HTTP error pages. |
-| **INFO** | **1** | Catalog seeders use USD prices (Rs 150–1700) instead of realistic NPR market values. |
-| **TOTAL** | **18** | **Comprehensive evidence documented in [FINDINGS.md](file:///c:/Users/Acer/Desktop/Fone-X-Store/docs/audit/FINDINGS.md)** |
+| Severity | Count | Primary Impact Areas | Status |
+| :--- | :---: | :--- | :---: |
+| **CRITICAL** | **2** | Migration rollback crash (`create_media_table`); Customer cascade delete destroying orders. | **100% RESOLVED** |
+| **HIGH** | **6** | DeviceUnit stock drift; admin order auto-cancellation; trade-in race condition; delivery fee omission; cancelled order stock duplication; upstream package CVEs. | **100% RESOLVED** |
+| **MEDIUM** | **5** | Stored XSS risk via unescaped Blade output; customer PII dumped to log files; 17 PHPStan Level 5 errors; 13 Pint lint failures; negative stock database race condition. | **100% RESOLVED** |
+| **LOW** | **4** | Unvalidated email in trade-in request; 16 tracked temporary files in `storage/tmp/`; dead config keys in `shop.php`; missing custom HTTP error pages. | **100% RESOLVED** |
+| **INFO** | **1** | Catalog seeders use USD prices (Rs 150–1700) instead of realistic NPR market values. | **100% RESOLVED** |
+| **TOTAL** | **18** | **Comprehensive evidence documented in [FINDINGS.md](file:///c:/Users/Acer/Desktop/Fone-X-Store/docs/audit/FINDINGS.md)** | **18 of 18 RESOLVED** |
+
 
 ---
 

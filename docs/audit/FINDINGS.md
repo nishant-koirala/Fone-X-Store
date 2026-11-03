@@ -8,24 +8,25 @@ This document registers every issue uncovered during the audit of FoneX Store. E
 
 | ID | Title | Severity | Category | Status |
 | :---: | :--- | :---: | :---: | :---: |
-| **A-001** | Migration `create_media_table` Lacks `down()` Method Breaking Rollback & Re-migration | **CRITICAL** | Schema / Migrations | OPEN |
-| **A-002** | Customer Deletion Cascade Permanently Destroys Orders & Financial Transaction History | **CRITICAL** | Data Loss / Schema | OPEN |
-| **A-003** | Device Unit Status Transitions & Deletions Cause Phantom Inventory Drift | **HIGH** | Inventory / Stock Logic | OPEN |
-| **A-004** | Scheduled Expiry Command Auto-Cancels Staff-Created Admin Orders | **HIGH** | Order Lifecycle / Business Logic | OPEN |
-| **A-005** | Trade-In Ingestion Race Condition & Status Verification Bypass | **HIGH** | Concurrency / Stock Drift | OPEN |
-| **A-006** | Delivery Fee Omission in `PlaceOrder` & Dead Outside-Valley Delivery Pricing | **HIGH** | Financial / Pricing | OPEN |
-| **A-007** | Re-activating Cancelled Orders Duplicates Stock Without Inventory Deduction | **HIGH** | Stock / Inventory Drift | OPEN |
-| **A-008** | Security Vulnerabilities in Composer & NPM Dependencies (CVEs & GHSAs) | **HIGH** | Security / Dependencies | OPEN |
-| **A-009** | Unescaped Blade Echo `{!! !!}` in Product Details & Blog Content (Stored XSS Risk) | **MEDIUM** | Security / XSS | OPEN |
-| **A-010** | Plaintext Customer PII Dumped to Log Files on Checkout Failure | **MEDIUM** | Security / Privacy | OPEN |
-| **A-011** | Static Analysis Failures: 17 Errors on PHPStan Level 5, 38 on Level 6 | **MEDIUM** | Static Analysis / Types | OPEN |
-| **A-012** | Code Style Violations Failing CI Quality Gate on 13 Files (`pint --test`) | **MEDIUM** | Code Style / CI | OPEN |
-| **A-013** | Missing Database Check Constraint & Race Condition Allowing Negative Inventory | **MEDIUM** | Data Integrity / Schema | OPEN |
-| **A-014** | `StoreTradeInRequest` Omits Input Validation for Customer Email | **LOW** | Input Validation | OPEN |
-| **A-015** | Tracked Temporary Scratch and Lock Files in `storage/tmp/` | **LOW** | Repository Hygiene | OPEN |
-| **A-016** | Unused / Dead Configuration Keys in `config/shop.php` | **LOW** | Configuration | OPEN |
-| **A-017** | Missing Custom Branded HTTP Error Pages (404, 419, 429, 500) | **LOW** | User Experience | OPEN |
-| **A-018** | Phone Catalog Seeders Use USD Pricing (Rs 150 - Rs 1700) Instead of NPR Values | **INFO** | Seeders / Data Realism | OPEN |
+| **A-001** | Migration `create_media_table` Lacks `down()` Method Breaking Rollback & Re-migration | **CRITICAL** | Schema / Migrations | **RESOLVED** (`c1c3de7`) |
+| **A-002** | Customer Deletion Cascade Permanently Destroys Orders & Financial Transaction History | **CRITICAL** | Data Loss / Schema | **RESOLVED** (`c1c3de7`) |
+| **A-003** | Device Unit Status Transitions & Deletions Cause Phantom Inventory Drift | **HIGH** | Inventory / Stock Logic | **RESOLVED** (`e44d76e`) |
+| **A-004** | Scheduled Expiry Command Auto-Cancels Staff-Created Admin Orders | **HIGH** | Order Lifecycle / Business Logic | **RESOLVED** (`e44d76e`) |
+| **A-005** | Trade-In Ingestion Race Condition & Status Verification Bypass | **HIGH** | Concurrency / Stock Drift | **RESOLVED** (`e44d76e`) |
+| **A-006** | Delivery Fee Omission in `PlaceOrder` & Dead Outside-Valley Delivery Pricing | **HIGH** | Financial / Pricing | **RESOLVED** (`e44d76e`) |
+| **A-007** | Re-activating Cancelled Orders Duplicates Stock Without Inventory Deduction | **HIGH** | Stock / Inventory Drift | **RESOLVED** (`d5869c4`) |
+| **A-008** | Security Vulnerabilities in Composer & NPM Dependencies (CVEs & GHSAs) | **HIGH** | Security / Dependencies | **RESOLVED** (`43bec70`) |
+| **A-009** | Unescaped Blade Echo `{!! !!}` in Product Details & Blog Content (Stored XSS Risk) | **MEDIUM** | Security / XSS | **RESOLVED** (`ab386d4`) |
+| **A-010** | Plaintext Customer PII Dumped to Log Files on Checkout Failure | **MEDIUM** | Security / Privacy | **RESOLVED** (`ab386d4`) |
+| **A-011** | Static Analysis Failures: 17 Errors on PHPStan Level 5, 38 on Level 6 | **MEDIUM** | Static Analysis / Types | **RESOLVED** (`2be8ee4`) |
+| **A-012** | Code Style Violations Failing CI Quality Gate on 13 Files (`pint --test`) | **MEDIUM** | Code Style / CI | **RESOLVED** (`eaf9bb5`) |
+| **A-013** | Missing Database Check Constraint & Race Condition Allowing Negative Inventory | **MEDIUM** | Data Integrity / Schema | **RESOLVED** (`e44d76e`) |
+| **A-014** | `StoreTradeInRequest` Omits Input Validation for Customer Email | **LOW** | Input Validation | **RESOLVED** (`ab386d4`) |
+| **A-015** | Tracked Temporary Scratch and Lock Files in `storage/tmp/` | **LOW** | Repository Hygiene | **RESOLVED** (`c3aece5`) |
+| **A-016** | Unused / Dead Configuration Keys in `config/shop.php` | **LOW** | Configuration | **RESOLVED** (`34f4fa4`) |
+| **A-017** | Missing Custom Branded HTTP Error Pages (404, 419, 429, 500) | **LOW** | User Experience | **RESOLVED** (`c3aece5`) |
+| **A-018** | Phone Catalog Seeders Use USD Pricing (Rs 150 - Rs 1700) Instead of NPR Values | **INFO** | Seeders / Data Realism | **RESOLVED** (`c3aece5`) |
+
 
 ---
 

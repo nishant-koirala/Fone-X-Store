@@ -6,7 +6,7 @@ return [
     | Store Currency & Formatting
     |--------------------------------------------------------------------------
     */
-    'currency'        => 'NPR',
+    'currency' => 'NPR',
     'currency_symbol' => 'Rs ',
 
     /*
@@ -38,8 +38,8 @@ return [
     |
     */
     'delivery' => [
-        'free_threshold'     => env('SHOP_FREE_DELIVERY_THRESHOLD', 0),
-        'inside_valley_fee'  => env('SHOP_INSIDE_VALLEY_FEE', 0),
+        'free_threshold' => env('SHOP_FREE_DELIVERY_THRESHOLD', 0),
+        'inside_valley_fee' => env('SHOP_INSIDE_VALLEY_FEE', 0),
         'outside_valley_fee' => env('SHOP_OUTSIDE_VALLEY_FEE', 200),
     ],
 
@@ -56,7 +56,7 @@ return [
     */
     'guarantees' => [
         'check_guarantee_days' => env('SHOP_CHECK_GUARANTEE_DAYS', 7),
-        'warranty_new_days'    => env('SHOP_WARRANTY_NEW_DAYS', 365),
+        'warranty_new_days' => env('SHOP_WARRANTY_NEW_DAYS', 365),
     ],
 
     /*

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\DeviceUnitStatusEnum;
 use App\Enums\GradeEnum;
 use App\Enums\StockMovementTypeEnum;
 use Illuminate\Database\Eloquent\Builder;
@@ -70,7 +71,7 @@ class ProductCondition extends Model
      */
     public function availableDeviceUnits(): HasMany
     {
-        return $this->hasMany(DeviceUnit::class)->where('status', \App\Enums\DeviceUnitStatusEnum::AVAILABLE);
+        return $this->hasMany(DeviceUnit::class)->where('status', DeviceUnitStatusEnum::AVAILABLE);
     }
 
     /**

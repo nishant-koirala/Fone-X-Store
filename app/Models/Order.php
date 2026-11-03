@@ -130,7 +130,7 @@ class Order extends Model
      */
     public function calculateProfit(): ?float
     {
-        $this->loadMissing(['items.deviceUnits']);
+        $this->loadMissing('items');
 
         if ($this->items->isEmpty()) {
             return 0.0;

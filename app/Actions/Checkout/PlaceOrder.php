@@ -129,12 +129,16 @@ class PlaceOrder
                 $condition = $itemData['condition'];
                 $qty = (int) $itemData['quantity'];
 
+                $unitCost = $condition->cost_price !== null ? (float) $condition->cost_price : null;
+                $totalCost = $unitCost !== null ? round($unitCost * $qty, 2) : null;
+
                 /** @var OrderItem $orderItem */
                 $orderItem = $order->items()->create([
                     'product_condition_id' => $condition->id,
                     'quantity' => $qty,
                     'price_at_purchase' => $itemData['price_at_purchase'],
-                    'cost_price_at_purchase' => $condition->cost_price,
+                    'cost_price_at_purchase' => $unitCost,
+                    'cost_total_at_purchase' => $totalCost,
                 ]);
 
                 // Auto-assign available serialized units if this condition tracks units
@@ -142,22 +146,23 @@ class PlaceOrder
 
                 // Compute cost price from units if tracked
                 if ($condition->tracks_units && $assignedUnits->isNotEmpty()) {
-                    $totalCost = 0.0;
+                    $sumCost = 0.0;
                     $hasNullCost = false;
                     foreach ($assignedUnits as $unit) {
-                        $unitCost = $unit->cost_price !== null
+                        $uCost = $unit->cost_price !== null
                             ? (float) $unit->cost_price
                             : ($condition->cost_price !== null ? (float) $condition->cost_price : null);
 
-                        if ($unitCost === null) {
+                        if ($uCost === null) {
                             $hasNullCost = true;
                             break;
                         }
-                        $totalCost += $unitCost;
+                        $sumCost += $uCost;
                     }
 
                     $orderItem->update([
-                        'cost_price_at_purchase' => $hasNullCost ? null : $totalCost,
+                        'cost_price_at_purchase' => $hasNullCost ? null : round($sumCost / $qty, 2),
+                        'cost_total_at_purchase' => $hasNullCost ? null : round($sumCost, 2),
                     ]);
                 }
 

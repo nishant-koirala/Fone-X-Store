@@ -18,12 +18,14 @@ class OrderItem extends Model
         'quantity',
         'price_at_purchase',
         'cost_price_at_purchase',
+        'cost_total_at_purchase',
     ];
 
     protected $casts = [
         'quantity' => 'integer',
         'price_at_purchase' => 'decimal:2',
         'cost_price_at_purchase' => 'decimal:2',
+        'cost_total_at_purchase' => 'decimal:2',
     ];
 
     /**
@@ -31,21 +33,17 @@ class OrderItem extends Model
      */
     public function getProfitAttribute(): ?float
     {
-        if ($this->cost_price_at_purchase === null) {
-            return null;
-        }
-
         $revenue = (float) ($this->price_at_purchase * $this->quantity);
 
-        $hasUnits = $this->relationLoaded('deviceUnits')
-            ? $this->deviceUnits->isNotEmpty()
-            : $this->deviceUnits()->exists();
-
-        if ($hasUnits) {
-            return $revenue - (float) $this->cost_price_at_purchase;
+        if ($this->cost_total_at_purchase !== null) {
+            return $revenue - (float) $this->cost_total_at_purchase;
         }
 
-        return (float) (($this->price_at_purchase - $this->cost_price_at_purchase) * $this->quantity);
+        if ($this->cost_price_at_purchase !== null) {
+            return (float) (($this->price_at_purchase - $this->cost_price_at_purchase) * $this->quantity);
+        }
+
+        return null;
     }
 
     /**

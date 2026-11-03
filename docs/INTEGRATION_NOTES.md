@@ -71,7 +71,33 @@ Audit results across the entire repository:
 
 ## Step 3 - Profit Cost Inconsistency Fix
 
-*(To be populated in Step 3)*
+### Problem Analysis
+- Previously, `order_items.cost_price_at_purchase` held the total cost for unit-tracked items, but held a per-unit cost for untracked items.
+- `OrderItem::getProfitAttribute()` checked whether device units were linked via `$this->deviceUnits()->exists()`, triggering N+1 queries per item and breaking profit calculations if units were unlinked/restocked after order cancellation.
+
+### Resolution & Implementation
+1. **New Migration**:
+   - `2026_11_03_210000_add_cost_total_at_purchase_to_order_items_table.php` added nullable decimal column `order_items.cost_total_at_purchase`.
+   - Included safe, idempotent chunked backfill: `cost_total = cost_price_at_purchase * quantity` for existing rows where `cost_price_at_purchase` was recorded per-unit and `cost_total` was null.
+2. **Sales Actions Updated**:
+   - `PlaceOrder` (storefront checkout) and `CreateOrder` (admin panel):
+     - For untracked items: writes `cost_price_at_purchase = condition->cost_price`, `cost_total_at_purchase = condition->cost_price * quantity`.
+     - For tracked items: writes `cost_total_at_purchase = sum(assigned unit costs)` (with existing condition fallback), and writes `cost_price_at_purchase = round(total / quantity, 2)` (average per unit for backwards compatibility).
+3. **Decoupled Profit Formula**:
+   - In `OrderItem::getProfitAttribute()`:
+     - When `cost_total_at_purchase !== null`: `(price_at_purchase * quantity) - cost_total_at_purchase`.
+     - Else when `cost_price_at_purchase !== null`: `(price_at_purchase - cost_price_at_purchase) * quantity` (safe fallback for legacy rows).
+     - Else: `null`.
+   - Completely eliminated queries to `device_units`. `Order::calculateProfit()` loads only `items` without `deviceUnits`.
+4. **Verification & Testing**:
+   - Verified across 7 distinct scenarios in `tests/Unit/Models/OrderItemProfitTest.php`:
+     1. Untracked quantity 3.
+     2. Tracked quantity 3 with differing unit costs.
+     3. Mixed cart with tracked and untracked items.
+     4. Null-cost unit handling (returns null profit).
+     5. Legacy rows with `cost_total_at_purchase = null` continue to calculate correctly.
+     6. Cancelled and restocked orders maintain stable profit snapshots without active unit linkage.
+     7. Filament `gross_profit` margin column calculates without querying `device_units`.
 
 ---
 

@@ -144,11 +144,14 @@ class CreateOrder extends CreateRecord
                 }
 
                 $item->forceFill([
-                    'cost_price_at_purchase' => $hasNullCost ? null : $totalCost,
+                    'cost_price_at_purchase' => $hasNullCost ? null : round($totalCost / $qty, 2),
+                    'cost_total_at_purchase' => $hasNullCost ? null : round($totalCost, 2),
                 ])->saveQuietly();
             } else {
+                $unitCost = $condition->cost_price !== null ? (float) $condition->cost_price : null;
                 $item->forceFill([
-                    'cost_price_at_purchase' => $condition->cost_price,
+                    'cost_price_at_purchase' => $unitCost,
+                    'cost_total_at_purchase' => $unitCost !== null ? round($unitCost * $qty, 2) : null,
                 ])->saveQuietly();
             }
 

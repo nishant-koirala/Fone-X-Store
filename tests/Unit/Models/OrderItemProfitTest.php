@@ -4,6 +4,7 @@ namespace Tests\Unit\Models;
 
 use App\Actions\Checkout\PlaceOrder;
 use App\Enums\DeviceUnitStatusEnum;
+use App\Enums\OrderStatusEnum;
 use App\Models\DeviceUnit;
 use App\Models\Order;
 use App\Models\OrderItem;
@@ -11,139 +12,93 @@ use App\Models\Product;
 use App\Models\ProductCondition;
 use App\Rules\Imei;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class OrderItemProfitTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_tracked_item_with_multiple_units_calculates_profit_from_summed_cost(): void
+    public function test_untracked_qty_3_calculates_profit_correctly(): void
     {
-        $order = Order::factory()->create();
+        $product = Product::factory()->create();
         $condition = ProductCondition::factory()->create([
-            'price' => 50000.00,
-            'tracks_units' => true,
+            'product_id' => $product->id,
+            'price' => 1000.00,
+            'cost_price' => 600.00,
+            'quantity_in_stock' => 10,
+            'tracks_units' => false,
         ]);
 
-        $item = OrderItem::factory()->create([
-            'order_id' => $order->id,
-            'product_condition_id' => $condition->id,
-            'quantity' => 2,
-            'price_at_purchase' => 50000.00,
-            'cost_price_at_purchase' => 75000.00, // Sum of unit 1 (35,000) and unit 2 (40,000)
-        ]);
+        $order = (new PlaceOrder)->execute(
+            data: [
+                'name' => 'Untracked Customer',
+                'phone' => '9841234567',
+                'address' => 'Kathmandu',
+            ],
+            cartSession: [
+                $condition->id => ['quantity' => 3],
+            ]
+        );
 
-        DeviceUnit::factory()->create([
-            'order_item_id' => $item->id,
-            'product_condition_id' => $condition->id,
-            'status' => DeviceUnitStatusEnum::SOLD,
-            'cost_price' => 35000.00,
-        ]);
+        $item = $order->items->first();
+        $this->assertEquals(600.00, (float) $item->cost_price_at_purchase);
+        $this->assertEquals(1800.00, (float) $item->cost_total_at_purchase);
 
-        DeviceUnit::factory()->create([
-            'order_item_id' => $item->id,
-            'product_condition_id' => $condition->id,
-            'status' => DeviceUnitStatusEnum::SOLD,
-            'cost_price' => 40000.00,
-        ]);
-
-        // Revenue: 50,000 * 2 = 100,000. Total Cost: 75,000. Gross Profit: 25,000.
-        $this->assertEquals(25000.00, $item->profit);
-        $this->assertEquals(25000.00, $order->calculateProfit());
-    }
-
-    public function test_untracked_item_calculates_profit_from_per_unit_cost(): void
-    {
-        $order = Order::factory()->create();
-        $item = OrderItem::factory()->create([
-            'order_id' => $order->id,
-            'quantity' => 3,
-            'price_at_purchase' => 1000.00,
-            'cost_price_at_purchase' => 600.00, // Per-unit cost
-        ]);
-
-        // Revenue: 1,000 * 3 = 3,000. Total Cost: 600 * 3 = 1,800. Profit: 1,200.
+        // Revenue: 1,000 * 3 = 3,000. Cost Total: 1,800. Profit: 1,200.
         $this->assertEquals(1200.00, $item->profit);
         $this->assertEquals(1200.00, $order->calculateProfit());
     }
 
-    public function test_tracked_order_snapshots_cost_falling_back_to_condition_cost(): void
+    public function test_tracked_qty_3_with_different_unit_costs_calculates_profit_from_summed_cost(): void
     {
         $product = Product::factory()->create();
         $condition = ProductCondition::factory()->create([
             'product_id' => $product->id,
-            'price' => 40000.00,
-            'cost_price' => 28000.00, // Fallback cost
-            'quantity_in_stock' => 2,
+            'price' => 50000.00,
+            'quantity_in_stock' => 3,
             'tracks_units' => true,
         ]);
 
         DeviceUnit::factory()->create([
             'product_condition_id' => $condition->id,
             'status' => DeviceUnitStatusEnum::AVAILABLE,
-            'cost_price' => 25000.00, // Has specific cost
+            'cost_price' => 30000.00,
             'imei' => Imei::fake(),
         ]);
-
         DeviceUnit::factory()->create([
             'product_condition_id' => $condition->id,
             'status' => DeviceUnitStatusEnum::AVAILABLE,
-            'cost_price' => null, // Falls back to condition cost 28,000
+            'cost_price' => 32000.00,
+            'imei' => Imei::fake(),
+        ]);
+        DeviceUnit::factory()->create([
+            'product_condition_id' => $condition->id,
+            'status' => DeviceUnitStatusEnum::AVAILABLE,
+            'cost_price' => 34000.00,
             'imei' => Imei::fake(),
         ]);
 
         $order = (new PlaceOrder)->execute(
             data: [
-                'name' => 'Bishal Sharma',
+                'name' => 'Tracked Customer',
                 'phone' => '9841234567',
-                'address' => 'New Road, Kathmandu',
+                'address' => 'Patan',
             ],
             cartSession: [
-                $condition->id => ['quantity' => 2],
+                $condition->id => ['quantity' => 3],
             ]
         );
 
         $item = $order->items->first();
-        // Total cost = 25,000 + 28,000 = 53,000
-        $this->assertEquals(53000.00, (float) $item->cost_price_at_purchase);
-        // Revenue = 40,000 * 2 = 80,000. Profit = 80,000 - 53,000 = 27,000
-        $this->assertEquals(27000.00, $item->profit);
-        $this->assertEquals(27000.00, $order->calculateProfit());
-    }
+        // Sum: 30000 + 32000 + 34000 = 96000
+        $this->assertEquals(96000.00, (float) $item->cost_total_at_purchase);
+        // Average: 96000 / 3 = 32000
+        $this->assertEquals(32000.00, (float) $item->cost_price_at_purchase);
 
-    public function test_tracked_order_with_unresolvable_cost_sets_cost_null_and_profit_null(): void
-    {
-        $product = Product::factory()->create();
-        $condition = ProductCondition::factory()->create([
-            'product_id' => $product->id,
-            'price' => 30000.00,
-            'cost_price' => null, // No condition cost
-            'quantity_in_stock' => 1,
-            'tracks_units' => true,
-        ]);
-
-        DeviceUnit::factory()->create([
-            'product_condition_id' => $condition->id,
-            'status' => DeviceUnitStatusEnum::AVAILABLE,
-            'cost_price' => null, // No unit cost either
-            'imei' => Imei::fake(),
-        ]);
-
-        $order = (new PlaceOrder)->execute(
-            data: [
-                'name' => 'Kiran Adhikari',
-                'phone' => '9841234567',
-                'address' => 'Patan, Lalitpur',
-            ],
-            cartSession: [
-                $condition->id => ['quantity' => 1],
-            ]
-        );
-
-        $item = $order->items->first();
-        $this->assertNull($item->cost_price_at_purchase);
-        $this->assertNull($item->profit);
-        $this->assertNull($order->calculateProfit());
+        // Revenue: 50,000 * 3 = 150,000. Cost: 96,000. Profit: 54,000
+        $this->assertEquals(54000.00, $item->profit);
+        $this->assertEquals(54000.00, $order->calculateProfit());
     }
 
     public function test_mixed_cart_calculates_profit_correctly_across_tracked_and_untracked_items(): void
@@ -159,13 +114,13 @@ class OrderItemProfitTest extends TestCase
         DeviceUnit::factory()->create([
             'product_condition_id' => $trackedCondition->id,
             'status' => DeviceUnitStatusEnum::AVAILABLE,
-            'cost_price' => 36000.00,
+            'cost_price' => 35000.00,
             'imei' => Imei::fake(),
         ]);
         DeviceUnit::factory()->create([
             'product_condition_id' => $trackedCondition->id,
             'status' => DeviceUnitStatusEnum::AVAILABLE,
-            'cost_price' => 38000.00,
+            'cost_price' => 40000.00,
             'imei' => Imei::fake(),
         ]);
 
@@ -190,19 +145,155 @@ class OrderItemProfitTest extends TestCase
             ]
         );
 
-        $order->load(['items.deviceUnits']);
         $trackedItem = $order->items->firstWhere('product_condition_id', $trackedCondition->id);
         $untrackedItem = $order->items->firstWhere('product_condition_id', $untrackedCondition->id);
 
-        // Tracked item: Revenue 100,000, Total Cost 74,000 => Profit 26,000
-        $this->assertEquals(74000.00, (float) $trackedItem->cost_price_at_purchase);
-        $this->assertEquals(26000.00, $trackedItem->profit);
+        // Tracked item: Cost total = 75,000. Cost per-unit = 37,500. Profit = 100,000 - 75,000 = 25,000
+        $this->assertEquals(75000.00, (float) $trackedItem->cost_total_at_purchase);
+        $this->assertEquals(37500.00, (float) $trackedItem->cost_price_at_purchase);
+        $this->assertEquals(25000.00, $trackedItem->profit);
 
-        // Untracked item: Revenue 3,000, Unit Cost 600 * 3 = 1,800 => Profit 1,200
+        // Untracked item: Unit Cost = 600, Total Cost = 1,800. Profit = 3,000 - 1,800 = 1,200
         $this->assertEquals(600.00, (float) $untrackedItem->cost_price_at_purchase);
+        $this->assertEquals(1800.00, (float) $untrackedItem->cost_total_at_purchase);
         $this->assertEquals(1200.00, $untrackedItem->profit);
 
-        // Combined Order Profit: 26,000 + 1,200 = 27,200
-        $this->assertEquals(27200.00, $order->calculateProfit());
+        // Combined Order Profit: 25,000 + 1,200 = 26,200
+        $this->assertEquals(26200.00, $order->calculateProfit());
+    }
+
+    public function test_tracked_order_with_null_cost_unit_sets_cost_null_and_profit_null(): void
+    {
+        $product = Product::factory()->create();
+        $condition = ProductCondition::factory()->create([
+            'product_id' => $product->id,
+            'price' => 30000.00,
+            'cost_price' => null, // No condition fallback cost
+            'quantity_in_stock' => 2,
+            'tracks_units' => true,
+        ]);
+
+        DeviceUnit::factory()->create([
+            'product_condition_id' => $condition->id,
+            'status' => DeviceUnitStatusEnum::AVAILABLE,
+            'cost_price' => 20000.00,
+            'imei' => Imei::fake(),
+        ]);
+        DeviceUnit::factory()->create([
+            'product_condition_id' => $condition->id,
+            'status' => DeviceUnitStatusEnum::AVAILABLE,
+            'cost_price' => null, // Missing cost
+            'imei' => Imei::fake(),
+        ]);
+
+        $order = (new PlaceOrder)->execute(
+            data: [
+                'name' => 'Null Cost Customer',
+                'phone' => '9841234567',
+                'address' => 'Bhaktapur',
+            ],
+            cartSession: [
+                $condition->id => ['quantity' => 2],
+            ]
+        );
+
+        $item = $order->items->first();
+        $this->assertNull($item->cost_price_at_purchase);
+        $this->assertNull($item->cost_total_at_purchase);
+        $this->assertNull($item->profit);
+        $this->assertNull($order->calculateProfit());
+    }
+
+    public function test_old_rows_with_null_cost_total_still_compute_profit_using_per_unit_formula(): void
+    {
+        $order = Order::factory()->create();
+        $item = OrderItem::factory()->create([
+            'order_id' => $order->id,
+            'quantity' => 3,
+            'price_at_purchase' => 1000.00,
+            'cost_price_at_purchase' => 600.00,
+            'cost_total_at_purchase' => null, // Legacy row without cost_total_at_purchase
+        ]);
+
+        // (1000 - 600) * 3 = 1200
+        $this->assertEquals(1200.00, $item->profit);
+        $this->assertEquals(1200.00, $order->calculateProfit());
+    }
+
+    public function test_cancelled_and_restocked_order_preserves_profit_and_costs_without_linked_units(): void
+    {
+        $product = Product::factory()->create();
+        $condition = ProductCondition::factory()->create([
+            'product_id' => $product->id,
+            'price' => 60000.00,
+            'quantity_in_stock' => 1,
+            'tracks_units' => true,
+        ]);
+
+        $unit = DeviceUnit::factory()->create([
+            'product_condition_id' => $condition->id,
+            'status' => DeviceUnitStatusEnum::AVAILABLE,
+            'cost_price' => 42000.00,
+            'imei' => Imei::fake(),
+        ]);
+
+        $order = (new PlaceOrder)->execute(
+            data: [
+                'name' => 'Cancel Customer',
+                'phone' => '9841234567',
+                'address' => 'Kathmandu',
+            ],
+            cartSession: [
+                $condition->id => ['quantity' => 1],
+            ]
+        );
+
+        $item = $order->items->first();
+        $this->assertEquals(42000.00, (float) $item->cost_total_at_purchase);
+        $this->assertEquals(18000.00, $item->profit);
+
+        // Cancel the order (restocks device unit)
+        $order->update(['status' => OrderStatusEnum::CANCELLED]);
+
+        // Device unit is restocked to available and unlinked from order item
+        $this->assertSame(DeviceUnitStatusEnum::AVAILABLE, $unit->fresh()->status);
+        $this->assertNull($unit->fresh()->order_item_id);
+
+        // Order item profit calculation remains valid because it relies on snapshot columns, not linked units
+        $freshItem = $item->fresh();
+        $this->assertEquals(42000.00, (float) $freshItem->cost_total_at_purchase);
+        $this->assertEquals(18000.00, $freshItem->profit);
+        $this->assertEquals(18000.00, $order->fresh()->calculateProfit());
+    }
+
+    public function test_filament_margin_column_computation_does_not_query_device_units(): void
+    {
+        $order = Order::factory()->create();
+        OrderItem::factory()->create([
+            'order_id' => $order->id,
+            'quantity' => 2,
+            'price_at_purchase' => 50000.00,
+            'cost_price_at_purchase' => 35000.00,
+            'cost_total_at_purchase' => 70000.00,
+        ]);
+
+        // Clear loaded relations to simulate fresh query
+        $order = Order::with('items')->find($order->id);
+
+        DB::flushQueryLog();
+        DB::enableQueryLog();
+
+        $profit = $order->calculateProfit();
+
+        $queries = DB::getQueryLog();
+        DB::disableQueryLog();
+
+        // 50,000 * 2 = 100,000 - 70,000 = 30,000
+        $this->assertEquals(30000.00, $profit);
+
+        // Ensure no query to device_units was made
+        foreach ($queries as $query) {
+            $this->assertStringNotContainsString('device_units', $query['query']);
+        }
     }
 }

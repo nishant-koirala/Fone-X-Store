@@ -141,10 +141,16 @@ class Phase2DataIntegrityTest extends TestCase
             ->count();
         $this->assertEquals(1, $movementCount);
 
-        // Change status back and forth -> must NOT restock a second time
-        $order->update(['status' => 'pending']);
-        $order->update(['status' => 'cancelled']);
+        // Guard: changing status away from cancelled is strictly forbidden
+        try {
+            $order->update(['status' => 'pending']);
+            $this->fail('Expected LogicException when changing status from cancelled to pending');
+        } catch (\LogicException $e) {
+            $this->assertStringContainsString('cannot be changed', $e->getMessage());
+        }
 
+        // Saving cancelled order again must NOT restock a second time
+        $order->update(['status' => 'cancelled']);
         $this->assertEquals(10, $condition->fresh()->quantity_in_stock);
         $newMovementCount = StockMovement::where('product_condition_id', $condition->id)
             ->where('type', 'restock')

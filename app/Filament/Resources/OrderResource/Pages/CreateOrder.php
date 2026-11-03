@@ -4,8 +4,8 @@ namespace App\Filament\Resources\OrderResource\Pages;
 
 use App\Enums\OrderStatusEnum;
 use App\Enums\StockMovementTypeEnum;
-use App\Exceptions\InsufficientStockException;
 use App\Filament\Resources\OrderResource;
+use App\Models\Order;
 use App\Models\ProductCondition;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\CreateRecord;
@@ -15,6 +15,16 @@ use Illuminate\Support\Facades\DB;
 class CreateOrder extends CreateRecord
 {
     protected static string $resource = OrderResource::class;
+
+    /**
+     * Automatically confirm staff-created admin orders so they are never auto-cancelled by expiry cron.
+     */
+    protected function mutateFormDataBeforeCreate(array $data): array
+    {
+        $data['confirmed_at'] = now();
+
+        return $data;
+    }
 
     /**
      * afterCreate() is called after Filament has:
@@ -32,6 +42,7 @@ class CreateOrder extends CreateRecord
      */
     protected function afterCreate(): void
     {
+        /** @var Order $order */
         $order = $this->record;
         $order->loadMissing('items.productCondition');
 
@@ -54,7 +65,7 @@ class CreateOrder extends CreateRecord
 
         foreach ($order->items as $item) {
             $condId = $item->product_condition_id;
-            $qty    = (int) $item->quantity;
+            $qty = (int) $item->quantity;
 
             if (! isset($conditions[$condId])) {
                 Notification::make()
@@ -100,7 +111,7 @@ class CreateOrder extends CreateRecord
         }
 
         $order->forceFill([
-            'total'        => $total,
+            'total' => $total,
             'restocked_at' => $order->status === OrderStatusEnum::CANCELLED ? now() : null,
         ])->saveQuietly();
     }

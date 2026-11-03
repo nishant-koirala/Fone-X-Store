@@ -17,7 +17,7 @@ class PlaceOrder
     /**
      * Process checkout submission inside a database transaction, lock stock, create order, and deduct inventory.
      *
-     * @param  array{name: string, phone: string, email?: ?string, address: string}  $data
+     * @param  array{name: string, phone: string, email?: ?string, address: string, delivery_zone?: string}  $data
      * @param  array<int|string, array{quantity: int|string}>|null  $cartSession
      *
      * @throws InsufficientStockException

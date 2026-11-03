@@ -7,6 +7,7 @@ use App\Filament\Resources\TradeInValuationResource\Pages\EditTradeInValuation;
 use App\Filament\Resources\TradeInValuationResource\Pages\ListTradeInValuations;
 use App\Models\ProductCondition;
 use App\Models\TradeInValuation;
+use App\Rules\Imei;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -68,10 +69,11 @@ class TradeInResourceTest extends TestCase
             'cost_price' => null,
         ]);
 
-        $valuation = TradeInValuation::factory()->reviewed(45000)->create();
+        $valuation = TradeInValuation::factory()->accepted(45000)->create();
+        $imei = Imei::fake();
 
         // Ingest into inventory
-        $movement = $valuation->ingestIntoStock($condition);
+        $movement = $valuation->ingestIntoStock($condition, null, $imei, 90);
 
         $this->assertNotNull($movement);
         $this->assertEquals(3, $condition->fresh()->quantity_in_stock);
@@ -83,42 +85,68 @@ class TradeInResourceTest extends TestCase
         $this->assertEquals(TradeInStatusEnum::COMPLETED, $freshVal->status);
         $this->assertEquals($condition->id, $freshVal->product_condition_id);
         $this->assertNotNull($freshVal->stock_ingested_at);
+
+        $this->assertDatabaseHas('device_units', [
+            'product_condition_id' => $condition->id,
+            'imei' => $imei,
+            'battery_health' => 90,
+            'trade_in_valuation_id' => $valuation->id,
+        ]);
+    }
+
+    public function test_trade_in_ingestion_fails_if_not_accepted(): void
+    {
+        $condition = ProductCondition::factory()->create(['quantity_in_stock' => 5]);
+        $valuation = TradeInValuation::factory()->reviewed(30000)->create();
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Only accepted trade-in valuations can be ingested');
+
+        $valuation->ingestIntoStock($condition);
     }
 
     public function test_trade_in_stock_ingestion_is_strictly_idempotent(): void
     {
         $condition = ProductCondition::factory()->create(['quantity_in_stock' => 5]);
-        $valuation = TradeInValuation::factory()->reviewed(30000)->create();
+        $valuation = TradeInValuation::factory()->accepted(30000)->create();
 
-        // First ingestion
+        // First ingestion succeeds
         $valuation->ingestIntoStock($condition);
         $this->assertEquals(6, $condition->fresh()->quantity_in_stock);
 
-        // Second ingestion must be a no-op
-        $secondResult = $valuation->fresh()->ingestIntoStock($condition);
-        $this->assertNull($secondResult);
-        $this->assertEquals(6, $condition->fresh()->quantity_in_stock);
+        // Second ingestion must throw LogicException to prevent double ingest
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('already been ingested');
+
+        $valuation->fresh()->ingestIntoStock($condition);
     }
 
-    public function test_can_ingest_trade_in_via_filament_edit_save(): void
+    public function test_can_ingest_trade_in_via_filament_action(): void
     {
         $condition = ProductCondition::factory()->create(['quantity_in_stock' => 1]);
-        $valuation = TradeInValuation::factory()->reviewed(50000)->create();
+        $valuation = TradeInValuation::factory()->accepted(50000)->create();
+        $validImei = Imei::fake();
 
-        Livewire::test(EditTradeInValuation::class, ['record' => $valuation->getRouteKey()])
-            ->fillForm([
-                'status' => 'completed',
+        Livewire::test(ListTradeInValuations::class)
+            ->callTableAction('ingestStock', $valuation, [
                 'product_condition_id' => $condition->id,
+                'imei' => $validImei,
+                'battery_health' => 88,
             ])
-            ->call('save')
-            ->assertHasNoFormErrors();
+            ->assertHasNoTableActionErrors();
 
         $this->assertEquals(2, $condition->fresh()->quantity_in_stock);
         $this->assertNotNull($valuation->fresh()->stock_ingested_at);
+        $this->assertEquals(TradeInStatusEnum::COMPLETED, $valuation->fresh()->status);
         $this->assertDatabaseHas('stock_movements', [
             'product_condition_id' => $condition->id,
             'type' => 'exchange_in',
             'quantity' => 1,
+        ]);
+        $this->assertDatabaseHas('device_units', [
+            'product_condition_id' => $condition->id,
+            'imei' => $validImei,
+            'battery_health' => 88,
         ]);
     }
 }

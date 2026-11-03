@@ -49,7 +49,16 @@ class OrderResource extends Resource
                             ->required(),
 
                         Forms\Components\Select::make('status')
-                            ->options(OrderStatusEnum::class)
+                            ->options(function (?Order $record): array|string {
+                                if ($record && $record->status === OrderStatusEnum::CANCELLED) {
+                                    return [
+                                        OrderStatusEnum::CANCELLED->value => OrderStatusEnum::CANCELLED->getLabel(),
+                                    ];
+                                }
+
+                                return OrderStatusEnum::class;
+                            })
+                            ->disabled(fn (?Order $record): bool => $record?->status === OrderStatusEnum::CANCELLED)
                             ->required()
                             ->default(OrderStatusEnum::PENDING),
 
@@ -207,10 +216,10 @@ class OrderResource extends Resource
                 Tables\Columns\TextColumn::make('total')->money('NPR')->sortable(),
                 Tables\Columns\TextColumn::make('gross_profit')
                     ->label('Est. Margin')
-                    ->state(function (Order $record): ?string {
+                    ->state(function (Order $record): string {
                         $profit = $record->calculateProfit();
 
-                        return $profit !== null ? 'Rs ' . number_format($profit) : '—';
+                        return $profit !== null ? 'Rs '.number_format($profit) : '—';
                     })
                     ->color(fn (?string $state): string => match (true) {
                         $state && ! str_contains($state, '—') && ! str_contains($state, '-') => 'success',

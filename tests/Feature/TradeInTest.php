@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Mail\AdminTradeInAlert;
+use App\Models\Customer;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
@@ -46,7 +47,7 @@ class TradeInTest extends TestCase
         Mail::fake();
 
         // Pre-existing customer
-        $customer = \App\Models\Customer::factory()->create([
+        $customer = Customer::factory()->create([
             'name' => 'Original Customer Name',
             'phone' => '9841112233',
             'email' => 'original@example.com',
@@ -82,7 +83,7 @@ class TradeInTest extends TestCase
 
         $response->assertRedirect();
 
-        $customer = \App\Models\Customer::where('phone', '9849998877')->first();
+        $customer = Customer::where('phone', '9849998877')->first();
         $this->assertNotNull($customer);
         $this->assertNull($customer->address);
         $this->assertNotEquals('Trade-In Request Submission', $customer->address);

@@ -4,8 +4,10 @@ namespace App\Filament\Resources;
 
 use App\Enums\TradeInStatusEnum;
 use App\Filament\Resources\TradeInValuationResource\Pages;
+use App\Models\DeviceUnit;
 use App\Models\ProductCondition;
 use App\Models\TradeInValuation;
+use App\Rules\Imei;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
@@ -122,7 +124,7 @@ class TradeInValuationResource extends Resource
                     ->label('Ingest to Stock')
                     ->icon('heroicon-o-arrow-down-tray')
                     ->color('success')
-                    ->visible(fn (TradeInValuation $record): bool => $record->stock_ingested_at === null)
+                    ->visible(fn (TradeInValuation $record): bool => $record->status === TradeInStatusEnum::ACCEPTED && $record->stock_ingested_at === null)
                     ->form([
                         Forms\Components\Select::make('product_condition_id')
                             ->label('Select Condition to Ingest Into (+1 Stock)')
@@ -142,23 +144,53 @@ class TradeInValuationResource extends Resource
                             ->label('Device IMEI (15 digits)')
                             ->maxLength(25)
                             ->placeholder('e.g. 356938031234567')
-                            ->helperText('IMEI for NTA/MDMS registration and returns tracking')
+                            ->helperText('15-digit unique IMEI with Luhn check digit')
+                            ->required()
+                            ->rule(new Imei)
+                            ->rules([
+                                fn () => function (string $attribute, $value, \Closure $fail) {
+                                    $val = trim((string) $value);
+                                    if (DeviceUnit::where('imei', $val)->orWhere('imei2', $val)->exists()) {
+                                        $fail('This IMEI is already registered to an existing device unit.');
+                                    }
+                                },
+                            ]),
+
+                        Forms\Components\TextInput::make('imei2')
+                            ->label('Secondary IMEI (Dual-SIM, optional)')
+                            ->maxLength(25)
+                            ->placeholder('e.g. 356938031234568')
+                            ->helperText('15-digit unique secondary IMEI (must differ from primary IMEI)')
+                            ->different('imei')
+                            ->rule(new Imei)
+                            ->rules([
+                                fn () => function (string $attribute, $value, \Closure $fail) {
+                                    if (empty($value)) {
+                                        return;
+                                    }
+                                    $val = trim((string) $value);
+                                    if (DeviceUnit::where('imei', $val)->orWhere('imei2', $val)->exists()) {
+                                        $fail('This secondary IMEI is already registered to an existing device unit.');
+                                    }
+                                },
+                            ])
                             ->nullable(),
 
                         Forms\Components\TextInput::make('battery_health')
                             ->label('Tested Battery Health %')
                             ->numeric()
-                            ->minValue(1)
+                            ->minValue(0)
                             ->maxValue(100)
                             ->suffix('%')
                             ->nullable(),
                     ])
                     ->action(function (TradeInValuation $record, array $data): void {
                         $condition = ProductCondition::findOrFail($data['product_condition_id']);
-                        $imei = ! empty($data['imei']) ? trim($data['imei']) : null;
+                        $imei = trim((string) $data['imei']);
+                        $imei2 = ! empty($data['imei2']) ? trim((string) $data['imei2']) : null;
                         $batteryHealth = ! empty($data['battery_health']) ? (int) $data['battery_health'] : null;
 
-                        $record->ingestIntoStock($condition, auth()->id(), $imei, $batteryHealth);
+                        $record->ingestIntoStock($condition, auth()->id(), $imei, $batteryHealth, $imei2);
 
                         Notification::make()
                             ->title('Device Ingested Into Inventory')

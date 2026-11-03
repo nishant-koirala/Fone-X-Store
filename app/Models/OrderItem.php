@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class OrderItem extends Model
 {
@@ -53,17 +55,17 @@ class OrderItem extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<DeviceUnit, $this>
+     * @return HasMany<DeviceUnit, $this>
      */
-    public function deviceUnits(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function deviceUnits(): HasMany
     {
         return $this->hasMany(DeviceUnit::class);
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne<DeviceUnit, $this>
+     * @return HasOne<DeviceUnit, $this>
      */
-    public function deviceUnit(): \Illuminate\Database\Eloquent\Relations\HasOne
+    public function deviceUnit(): HasOne
     {
         return $this->hasOne(DeviceUnit::class);
     }

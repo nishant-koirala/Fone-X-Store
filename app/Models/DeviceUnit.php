@@ -15,6 +15,7 @@ class DeviceUnit extends Model
     protected $fillable = [
         'product_condition_id',
         'imei',
+        'imei2',
         'serial_number',
         'battery_health',
         'cost_price',

@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\CustomerResource\Pages;
 use App\Models\Customer;
+use App\Rules\NepaliPhone;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
@@ -40,6 +41,23 @@ class CustomerResource extends Resource
 
                 Forms\Components\TextInput::make('phone')
                     ->tel()
+                    ->helperText('10-digit Nepali mobile number (e.g. 98XXXXXXXX or 97XXXXXXXX)')
+                    ->rule(new NepaliPhone)
+                    ->rules([
+                        fn (?Customer $record) => function (string $attribute, $value, \Closure $fail) use ($record) {
+                            $normalized = NepaliPhone::normalize((string) $value);
+                            if ($normalized !== null) {
+                                $query = Customer::where('phone', $normalized);
+                                if ($record) {
+                                    $query->where('id', '!=', $record->id);
+                                }
+                                if ($query->exists()) {
+                                    $fail('A customer with this phone number already exists.');
+                                }
+                            }
+                        },
+                    ])
+                    ->dehydrateStateUsing(fn (?string $state): ?string => NepaliPhone::normalize($state))
                     ->required(),
 
                 Forms\Components\TextInput::make('email')

@@ -45,6 +45,14 @@ class TradeInValuationFactory extends Factory
         ]);
     }
 
+    public function accepted(?float $value = 45000.00): static
+    {
+        return $this->state(fn () => [
+            'status' => 'accepted',
+            'estimated_value' => $value,
+        ]);
+    }
+
     public function completed(?float $value = 45000.00): static
     {
         return $this->state(fn () => [

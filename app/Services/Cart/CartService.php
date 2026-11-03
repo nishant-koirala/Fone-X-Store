@@ -87,32 +87,15 @@ class CartService
     }
 
     /**
-     * Calculate shipping cost (free for phone orders, flat for accessories-only, or configured).
+    /**
+     * Calculate shipping cost.
+     * All delivery fares are payable on delivery directly to courier/Pathao, so storefront shipping is 0 NPR.
      *
      * @param  array<int|string, array{quantity: int|string}>|null  $sessionCart
      */
     public function shipping(?array $sessionCart = null): float
     {
-        $items = $this->getItems($sessionCart);
-
-        if ($items->isEmpty()) {
-            return 0.0;
-        }
-
-        $accessorySlugs = (array) config('shop.accessory_category_slugs', []);
-        $hasPhoneOrOther = $items->contains(function (CartItemData $item) use ($accessorySlugs) {
-            $categorySlug = $item->condition->product?->category?->slug;
-
-            return ! in_array($categorySlug, $accessorySlugs, true);
-        });
-
-        // If order contains phone / non-accessory, shipping is free (0 NPR).
-        if ($hasPhoneOrOther) {
-            return 0.0;
-        }
-
-        // Accessories-only flat shipping — uses inside-valley fee as a conservative default
-        return (float) config('shop.delivery.inside_valley_fee', 0.0);
+        return 0.0;
     }
 
     /**

@@ -62,6 +62,7 @@ class OrderTest extends TestCase
         $this->assertSame(OrderStatusEnum::PENDING, $order->status);
         $this->assertSame('pending', $order->status->value);
     }
+
     public function test_order_soft_deletes_and_is_recoverable(): void
     {
         $order = Order::factory()->create();

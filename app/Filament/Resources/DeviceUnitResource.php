@@ -3,10 +3,10 @@
 namespace App\Filament\Resources;
 
 use App\Enums\DeviceUnitStatusEnum;
-use App\Enums\GradeEnum;
 use App\Filament\Resources\DeviceUnitResource\Pages;
 use App\Models\DeviceUnit;
 use App\Models\ProductCondition;
+use App\Rules\Imei;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
@@ -57,10 +57,54 @@ class DeviceUnitResource extends Resource
                     ->required(),
 
                 Forms\Components\TextInput::make('imei')
-                    ->label('IMEI Number')
+                    ->label('Primary IMEI')
                     ->maxLength(25)
                     ->placeholder('e.g. 356938035643809')
-                    ->helperText('15-digit unique device identifier for NTA / MDMS compliance and warranty verification')
+                    ->helperText('15-digit unique device identifier with Luhn check digit')
+                    ->rule(new Imei)
+                    ->rules([
+                        fn (?DeviceUnit $record) => function (string $attribute, $value, \Closure $fail) use ($record) {
+                            if (empty($value)) {
+                                return;
+                            }
+                            $val = trim((string) $value);
+                            $query = DeviceUnit::where(function ($q) use ($val) {
+                                $q->where('imei', $val)->orWhere('imei2', $val);
+                            });
+                            if ($record) {
+                                $query->where('id', '!=', $record->id);
+                            }
+                            if ($query->exists()) {
+                                $fail('This IMEI is already registered to another device unit.');
+                            }
+                        },
+                    ])
+                    ->nullable(),
+
+                Forms\Components\TextInput::make('imei2')
+                    ->label('Secondary IMEI (Dual-SIM)')
+                    ->maxLength(25)
+                    ->placeholder('e.g. 356938035643817')
+                    ->helperText('15-digit secondary IMEI (must differ from primary IMEI)')
+                    ->different('imei')
+                    ->rule(new Imei)
+                    ->rules([
+                        fn (?DeviceUnit $record) => function (string $attribute, $value, \Closure $fail) use ($record) {
+                            if (empty($value)) {
+                                return;
+                            }
+                            $val = trim((string) $value);
+                            $query = DeviceUnit::where(function ($q) use ($val) {
+                                $q->where('imei', $val)->orWhere('imei2', $val);
+                            });
+                            if ($record) {
+                                $query->where('id', '!=', $record->id);
+                            }
+                            if ($query->exists()) {
+                                $fail('This secondary IMEI is already registered to another device unit.');
+                            }
+                        },
+                    ])
                     ->nullable(),
 
                 Forms\Components\TextInput::make('serial_number')
@@ -71,7 +115,7 @@ class DeviceUnitResource extends Resource
                 Forms\Components\TextInput::make('battery_health')
                     ->label('Battery Health')
                     ->numeric()
-                    ->minValue(1)
+                    ->minValue(0)
                     ->maxValue(100)
                     ->suffix('%')
                     ->helperText('Verified battery health percentage')
@@ -106,6 +150,13 @@ class DeviceUnitResource extends Resource
                     ->copyable()
                     ->default('—')
                     ->fontFamily('mono'),
+                Tables\Columns\TextColumn::make('imei2')
+                    ->label('IMEI 2')
+                    ->searchable()
+                    ->copyable()
+                    ->default('—')
+                    ->fontFamily('mono')
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('productCondition.product.name')
                     ->label('Phone Model')
                     ->searchable()

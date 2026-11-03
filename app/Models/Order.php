@@ -37,6 +37,17 @@ class Order extends Model
 
     protected static function booted(): void
     {
+        static::updating(function (Order $order) {
+            $originalStatus = $order->getOriginal('status');
+            $wasCancelled = $originalStatus instanceof OrderStatusEnum
+                ? $originalStatus === OrderStatusEnum::CANCELLED
+                : $originalStatus === OrderStatusEnum::CANCELLED->value;
+
+            if ($wasCancelled && $order->status !== OrderStatusEnum::CANCELLED) {
+                throw new \LogicException('A cancelled order cannot be changed to another status. Staff must create a new order instead.');
+            }
+        });
+
         static::updated(function (Order $order) {
             $isCancelled = $order->status === OrderStatusEnum::CANCELLED;
             if ($order->wasChanged('status') && $isCancelled && $order->restocked_at === null) {

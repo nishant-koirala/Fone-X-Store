@@ -101,6 +101,32 @@ APP_DEBUG=false
 
 ---
 
+## Production Setup
+
+### 1. Task Scheduler (Cron)
+
+FoneX Store relies on Laravel's schedule runner for automated background tasks, including hourly cancellation and stock restocking of unconfirmed stale COD orders (`orders:expire-unconfirmed`), catalog audits, and daily inventory drift reconciliation (`inventory:reconcile`).
+
+Add the following standard cron job to your production server's crontab (e.g. via `crontab -e` on the `www-data` or deployment user):
+
+```bash
+* * * * * cd /path-to-your-project && php artisan schedule:run >> /dev/null 2>&1
+```
+
+### 2. Environment Configuration & Admin Alerts
+
+Ensure the following critical environment variables are configured in `.env`:
+
+```ini
+# Administrator contact email for system alerts (trade-in valuations, stock drift reports)
+ADMIN_EMAIL="admin@fonex.com.np"
+
+# Application URL (used for generating absolute asset & email links)
+APP_URL="https://fonex.com.np"
+```
+
+---
+
 ## Security & Architecture Notes
 
 - **CSRF Protection:** Strictly enforced on all order checkout, cart modification, and trade-in submission endpoints.

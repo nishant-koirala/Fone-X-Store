@@ -8,6 +8,7 @@ use App\Filament\Resources\DeviceUnitResource\Pages\EditDeviceUnit;
 use App\Filament\Resources\DeviceUnitResource\Pages\ListDeviceUnits;
 use App\Models\DeviceUnit;
 use App\Models\ProductCondition;
+use App\Rules\Imei;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -34,11 +35,12 @@ class DeviceUnitResourceTest extends TestCase
     public function test_can_create_device_unit_with_imei_and_battery_health(): void
     {
         $condition = ProductCondition::factory()->create(['quantity_in_stock' => 2]);
+        $validImei = Imei::fake();
 
         Livewire::test(CreateDeviceUnit::class)
             ->fillForm([
                 'product_condition_id' => $condition->id,
-                'imei' => '356938039999888',
+                'imei' => $validImei,
                 'serial_number' => 'F2LZG899XYZ',
                 'battery_health' => 91,
                 'cost_price' => 45000,
@@ -48,7 +50,7 @@ class DeviceUnitResourceTest extends TestCase
             ->call('create')
             ->assertHasNoFormErrors();
 
-        $unit = DeviceUnit::where('imei', '356938039999888')->first();
+        $unit = DeviceUnit::where('imei', $validImei)->first();
         $this->assertNotNull($unit);
         $this->assertEquals(91, $unit->battery_health);
         $this->assertEquals(45000.0, (float) $unit->cost_price);
@@ -60,6 +62,30 @@ class DeviceUnitResourceTest extends TestCase
             'type' => 'restock',
             'quantity' => 1,
         ]);
+    }
+
+    public function test_rejects_invalid_luhn_imei_and_duplicate_imei(): void
+    {
+        $condition = ProductCondition::factory()->create();
+        $existing = DeviceUnit::factory()->create(['imei' => Imei::fake()]);
+
+        // 1. Invalid Luhn check digit
+        Livewire::test(CreateDeviceUnit::class)
+            ->fillForm([
+                'product_condition_id' => $condition->id,
+                'imei' => '123456789012345',
+            ])
+            ->call('create')
+            ->assertHasFormErrors(['imei']);
+
+        // 2. Duplicate IMEI
+        Livewire::test(CreateDeviceUnit::class)
+            ->fillForm([
+                'product_condition_id' => $condition->id,
+                'imei' => $existing->imei,
+            ])
+            ->call('create')
+            ->assertHasFormErrors(['imei']);
     }
 
     public function test_can_edit_device_unit_status(): void

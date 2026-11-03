@@ -8,6 +8,7 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\ProductCondition;
 use App\Models\TradeInValuation;
+use App\Rules\Imei;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -61,20 +62,22 @@ class DeviceUnitTest extends TestCase
     public function test_trade_in_ingestion_creates_linked_device_unit(): void
     {
         $condition = ProductCondition::factory()->create();
-        $valuation = TradeInValuation::factory()->reviewed(55000)->create([
+        $valuation = TradeInValuation::factory()->accepted(55000)->create([
             'device_brand' => 'Apple',
             'device_model' => 'iPhone 13',
             'condition_description' => 'Grade A with 92% battery',
         ]);
 
+        $imei = Imei::fake();
+
         $valuation->ingestIntoStock(
             condition: $condition,
             staffUserId: null,
-            imei: '356938031234567',
+            imei: $imei,
             batteryHealth: 92
         );
 
-        $unit = DeviceUnit::where('imei', '356938031234567')->first();
+        $unit = DeviceUnit::where('imei', $imei)->first();
         $this->assertNotNull($unit);
         $this->assertEquals($condition->id, $unit->product_condition_id);
         $this->assertEquals(92, $unit->battery_health);

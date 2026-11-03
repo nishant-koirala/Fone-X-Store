@@ -38,7 +38,7 @@ class SamsungCatalogSeeder extends Seeder
                     'name' => $model['name'],
                     'brand' => 'Samsung',
                     'category_id' => $samsungCategory->id,
-                    'base_price' => $model['base_price'],
+                    'base_price' => $model['base_price'] * 100,
                     'description' => 'The '.$model['name'].' delivers premium performance and brilliant display technology.',
                     'is_visible' => true,
                     'is_featured' => $model['featured'],
@@ -53,7 +53,7 @@ class SamsungCatalogSeeder extends Seeder
             ];
 
             foreach ($conditions as $cond) {
-                $price = round($model['base_price'] * $cond['modifier'], 2);
+                $price = round(($model['base_price'] * 100) * $cond['modifier'], 2);
 
                 $product->conditions()->firstOrCreate(
                     ['grade' => $cond['grade']],

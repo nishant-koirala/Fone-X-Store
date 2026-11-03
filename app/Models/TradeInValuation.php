@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\DeviceUnitStatusEnum;
 use App\Enums\StockMovementTypeEnum;
 use App\Enums\TradeInStatusEnum;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -74,7 +75,7 @@ class TradeInValuation extends Model
         }
 
         return DB::transaction(function () use ($condition, $staffUserId, $imei, $batteryHealth): StockMovement {
-            $customerName = $this->customer?->name ?? 'Customer';
+            $customerName = $this->customer->name ?? 'Customer';
             $note = "Trade-in #{$this->id} accepted: {$this->device_brand} {$this->device_model} from {$customerName}";
 
             $movement = $condition->recordStockMovement(
@@ -95,7 +96,7 @@ class TradeInValuation extends Model
                 'imei' => $imei,
                 'battery_health' => $batteryHealth,
                 'cost_price' => $this->estimated_value,
-                'status' => \App\Enums\DeviceUnitStatusEnum::AVAILABLE,
+                'status' => DeviceUnitStatusEnum::AVAILABLE,
                 'trade_in_valuation_id' => $this->id,
                 'notes' => "Trade-in from {$customerName} ({$this->device_brand} {$this->device_model})",
             ]);

@@ -43,7 +43,7 @@ class ExpireUnconfirmedOrders extends Command
         $cancelledCount = 0;
 
         foreach ($orders as $order) {
-            $customerName = $order->customer?->name ?? $order->shipping_name ?? 'Guest';
+            $customerName = $order->customer->name ?? $order->shipping_name ?? 'Guest';
             $itemsCount = $order->items->sum('quantity');
 
             if ($isDryRun) {

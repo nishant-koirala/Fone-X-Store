@@ -5,6 +5,7 @@ namespace App\Filament\Resources\DeviceUnitResource\Pages;
 use App\Enums\DeviceUnitStatusEnum;
 use App\Enums\StockMovementTypeEnum;
 use App\Filament\Resources\DeviceUnitResource;
+use App\Models\DeviceUnit;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateDeviceUnit extends CreateRecord
@@ -13,13 +14,14 @@ class CreateDeviceUnit extends CreateRecord
 
     protected function afterCreate(): void
     {
+        /** @var DeviceUnit $unit */
         $unit = $this->record;
 
         if ($unit->status === DeviceUnitStatusEnum::AVAILABLE && $unit->productCondition) {
             $unit->productCondition->recordStockMovement(
                 type: StockMovementTypeEnum::RESTOCK,
                 quantity: 1,
-                note: "New device unit registered (IMEI: " . ($unit->imei ?? 'N/A') . ")",
+                note: 'New device unit registered (IMEI: '.($unit->imei ?? 'N/A').')',
                 createdBy: auth()->id()
             );
         }

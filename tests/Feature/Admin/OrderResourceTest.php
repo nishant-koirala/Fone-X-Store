@@ -8,7 +8,6 @@ use App\Filament\Resources\OrderResource\Pages\EditOrder;
 use App\Filament\Resources\OrderResource\Pages\ListOrders;
 use App\Models\Customer;
 use App\Models\Order;
-use App\Models\ProductCondition;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -150,21 +149,22 @@ class OrderResourceTest extends TestCase
 
         $this->assertEquals(2, $condition->fresh()->quantity_in_stock);
     }
+
     public function test_deleting_non_cancelled_order_restocks_inventory(): void
     {
-        $customer  = Customer::factory()->create();
+        $customer = Customer::factory()->create();
         $condition = $this->createCondition(['quantity_in_stock' => 5, 'price' => 30000]);
 
         // Create a pending order via Filament
         Livewire::test(CreateOrder::class)
             ->fillForm([
                 'customer_id' => $customer->id,
-                'status'      => OrderStatusEnum::PENDING->value,
-                'items'       => [
+                'status' => OrderStatusEnum::PENDING->value,
+                'items' => [
                     [
                         'product_condition_id' => $condition->id,
-                        'quantity'             => 2,
-                        'price_at_purchase'    => 30000,
+                        'quantity' => 2,
+                        'price_at_purchase' => 30000,
                     ],
                 ],
             ])
@@ -180,27 +180,27 @@ class OrderResourceTest extends TestCase
         $this->assertEquals(5, $condition->fresh()->quantity_in_stock); // restored
         $this->assertDatabaseHas('stock_movements', [
             'product_condition_id' => $condition->id,
-            'type'                 => 'restock',
-            'quantity'             => 2,
-            'note'                 => "Restock from deleted Order #{$order->id}",
+            'type' => 'restock',
+            'quantity' => 2,
+            'note' => "Restock from deleted Order #{$order->id}",
         ]);
     }
 
     public function test_deleting_cancelled_order_does_not_double_restock(): void
     {
-        $customer  = Customer::factory()->create();
+        $customer = Customer::factory()->create();
         $condition = $this->createCondition(['quantity_in_stock' => 5, 'price' => 30000]);
 
         // Create a pending order
         Livewire::test(CreateOrder::class)
             ->fillForm([
                 'customer_id' => $customer->id,
-                'status'      => OrderStatusEnum::PENDING->value,
-                'items'       => [
+                'status' => OrderStatusEnum::PENDING->value,
+                'items' => [
                     [
                         'product_condition_id' => $condition->id,
-                        'quantity'             => 1,
-                        'price_at_purchase'    => 30000,
+                        'quantity' => 1,
+                        'price_at_purchase' => 30000,
                     ],
                 ],
             ])
@@ -226,13 +226,13 @@ class OrderResourceTest extends TestCase
         $this->assertEquals(5, $condition->fresh()->quantity_in_stock);
         $this->assertDatabaseMissing('stock_movements', [
             'product_condition_id' => $condition->id,
-            'note'                 => "Restock from deleted Order #{$order->id}",
+            'note' => "Restock from deleted Order #{$order->id}",
         ]);
     }
 
     public function test_concurrent_creation_with_insufficient_stock_fails_atomically(): void
     {
-        $customer  = Customer::factory()->create();
+        $customer = Customer::factory()->create();
         $condition = $this->createCondition(['quantity_in_stock' => 1, 'price' => 50000]);
 
         // Simulate the race: deplete the unit from outside the Filament form
@@ -244,12 +244,12 @@ class OrderResourceTest extends TestCase
         Livewire::test(CreateOrder::class)
             ->fillForm([
                 'customer_id' => $customer->id,
-                'status'      => OrderStatusEnum::PENDING->value,
-                'items'       => [
+                'status' => OrderStatusEnum::PENDING->value,
+                'items' => [
                     [
                         'product_condition_id' => $condition->id,
-                        'quantity'             => 1,
-                        'price_at_purchase'    => 50000,
+                        'quantity' => 1,
+                        'price_at_purchase' => 50000,
                     ],
                 ],
             ])

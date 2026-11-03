@@ -35,7 +35,37 @@ This document records decisions, baseline status, and security/data audit observ
 
 ## Step 2 - HTML Sanitizer & XSS Audit
 
-*(To be populated in Step 2)*
+### App\Support\HtmlSanitizer Implementation
+- Built zero-dependency `App\Support\HtmlSanitizer` using PHP's native `DOMDocument` and `DOMXPath`.
+- **Strict Tag Allowlist**: `['p', 'br', 'strong', 'em', 'b', 'i', 'u', 'ul', 'ol', 'li', 'h2', 'h3', 'h4', 'blockquote', 'code', 'pre', 'hr', 'a', 'img']`.
+- **Disallowed Elements Handling**:
+  - Dangerous blocks and foreign content (`script`, `style`, `svg`, `iframe`, `object`, `embed`, `form`, `math`, `base`, `meta`, `link`, etc.) are pre-stripped and purged along with their contents, even if unclosed or malformed.
+  - Safe formatting/container elements (e.g. `div`, `span`) have their tags and attributes stripped while safely preserving their children.
+- **Strict Attribute Allowlist**: Only `a[href]`, `img[src]`, and `img[alt]` are permitted. All other attributes (`onclick`, `onerror`, `onload`, `style`, `class`, `id`, `srcset`, etc.) are stripped.
+- **URL & Scheme Sanitization**:
+  - `href`: Must match `http`, `https`, `mailto`, or `tel`, or be a local relative path (`/` or `#`). Protocol-relative `//` and dangerous schemes (`javascript:`, `data:`, `vbscript:`, including recursive HTML entities and embedded whitespace/control characters) are rejected.
+  - External links automatically enforce `rel="noopener noreferrer nofollow"` and `target="_blank"`.
+  - `img[src]`: Must match `http(s)://` or relative `/storage` or `/images` paths. Non-conforming images are purged.
+- **Plain-Text Detection**: If no HTML tags are detected, input is safely rendered using `nl2br(e($text))` for readable paragraph formatting with line breaks.
+- **Error Handling**: Gracefully handles invalid UTF-8 and malformed HTML without throwing, falling back to `nl2br(e($html))`.
+
+### Views Updated
+- `resources/views/blog/show.blade.php`: Replaced insecure `strip_tags()` with `{!! \App\Support\HtmlSanitizer::clean($post->content) !!}`. Also disarmed `meta_description`.
+- `resources/views/products/show.blade.php`: Replaced `nl2br(e())` with `{!! \App\Support\HtmlSanitizer::clean($product->description) !!}`. Plain-text descriptions still render line breaks; rich descriptions render allowed HTML tags safely. Disarmed JSON-LD schema description.
+- `resources/views/blog/index.blade.php`: Cleaned preview excerpt before applying `strip_tags()`.
+
+### Comprehensive Grep of Unescaped Blade Echoes (`{!! !!}`)
+Audit results across the entire repository:
+1. `resources/views/blog/show.blade.php:28`: `{!! \App\Support\HtmlSanitizer::clean($post->content) !!}` (User-controlled blog content, strictly sanitized).
+2. `resources/views/products/show.blade.php:490`: `{!! \App\Support\HtmlSanitizer::clean($product->description) !!}` (User-controlled product description, strictly sanitized).
+3. `resources/views/products/show.blade.php:9`: `{!! json_encode([...]) !!}` (JSON-LD structured schema script, user input sanitized and json-encoded).
+4. `resources/views/sitemap/index.blade.php:1`: `{!! '<?xml version="1.0" encoding="UTF-8"?>' !!}` (Static XML header to bypass PHP short tag parsing; safe, non-user input).
+5. `resources/views/vendor/livewire/*.blade.php`: Framework pagination translation strings (`{!! __('pagination.previous') !!}`, `{!! __('Showing') !!}`). Safe system strings.
+*Conclusion*: No unescaped user-controlled output remains unprotected.
+
+### Test Verification
+- Unit test suite `tests/Unit/Support/HtmlSanitizerTest.php` passes all 16 test cases including all requested attack payloads (`<script>`, `<img onerror>`, `javascript:`, obfuscated entities, `data:`, `svg onload`, `iframe`, `onclick`, `style`, inline background `javascript:`, nested/unclosed tags, uppercase tags, safe links, plain text).
+- Feature test suite `tests/Feature/Security/XssSanitizationViewTest.php` verifies that blog and product show views render zero executable attack attributes or tags while preserving safe content.
 
 ---
 

@@ -11,7 +11,7 @@
     '@type' => 'Product',
     'name' => $product->name,
     'image' => $product->image ? url(Storage::url($product->image)) : asset('images/default-og.jpg'),
-    'description' => Str::limit(strip_tags($product->description), 150),
+    'description' => Str::limit(strip_tags(\App\Support\HtmlSanitizer::clean($product->description)), 150),
     'brand' => [
         '@type' => 'Brand',
         'name' => $product->brand,
@@ -487,7 +487,7 @@
                         </h2>
                         
                         <div class="prose prose-base sm:prose-lg max-w-none text-brand-charcoal/90 font-sans leading-relaxed">
-                            {!! nl2br(e($product->description)) !!}
+                            {!! \App\Support\HtmlSanitizer::clean($product->description) !!}
                         </div>
 
                         <!-- Technical Specs Quick Snapshot -->

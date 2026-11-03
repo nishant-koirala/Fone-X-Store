@@ -1,7 +1,7 @@
 @extends('layouts.storefront')
 
 @section('title', $post->title . ' - Blog | FoneX Store')
-@section('meta_description', Str::limit(strip_tags($post->content), 150))
+@section('meta_description', Str::limit(strip_tags(\App\Support\HtmlSanitizer::clean($post->content)), 150))
 @section('og_image', $post->getFirstMediaUrl('thumbnail') ?: asset('images/default-og.jpg'))
 @section('og_type', 'article')
 
@@ -25,7 +25,7 @@
 
     <!-- Prose Content -->
     <div class="prose prose-lg prose-slate max-w-none prose-headings:font-display prose-headings:uppercase prose-headings:text-brand-charcoal prose-a:text-brand-red hover:prose-a:text-red-700">
-        {!! strip_tags($post->content, ['p', 'br', 'strong', 'em', 'b', 'i', 'a', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'h4', 'blockquote', 'code', 'pre', 'img', 'hr']) !!}
+        {!! \App\Support\HtmlSanitizer::clean($post->content) !!}
     </div>
 
     <div class="mt-16 pt-8 border-t border-gray-200 text-center">

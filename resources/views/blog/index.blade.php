@@ -38,7 +38,7 @@
                             {{ $post->title }}
                         </h2>
                         <p class="text-sm text-brand-grey line-clamp-3 mb-6 flex-1">
-                            {{ Str::limit(strip_tags($post->content), 120) }}
+                            {{ Str::limit(strip_tags(\App\Support\HtmlSanitizer::clean($post->content)), 120) }}
                         </p>
                         <span class="font-mono text-xs font-bold uppercase tracking-wider text-brand-red flex items-center space-x-1">
                             <span>Read Article</span>

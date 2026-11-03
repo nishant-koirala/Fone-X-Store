@@ -49,7 +49,7 @@
                     <span>OFFICIAL STORE</span>
                 </span>
                 <span class="hidden sm:inline-block text-white/80">
-                    ⚡ FREE NEPALWIDE DELIVERY • THOROUGHLY INSPECTED • {{ config('shop.guarantees.check_guarantee_days') }}-DAY CHECK GUARANTEE
+                    🛵 PATHAO DELIVERY INSIDE VALLEY • COURIER NATIONWIDE • {{ config('shop.guarantees.check_guarantee_days') }}-DAY CHECK GUARANTEE
                 </span>
             </div>
             <div class="flex items-center space-x-4 text-white/70">
@@ -274,7 +274,7 @@
                     </p>
                     <div class="font-mono text-xs text-white/50 space-y-1">
                         <p>📍 Store Address: <a href="https://maps.app.goo.gl/ofXysJJNMjXPPYiEA" target="_blank" rel="noopener noreferrer" class="hover:text-brand-red underline underline-offset-2 transition-colors">Fone X Store, Kathmandu, Nepal &nearr;</a></p>
-                        <p>📞 Phone Contact: +977-9841234567 | Support Hours: 10 AM - 7 PM</p>
+                        <p>📞 Phone / WhatsApp: <a href="https://wa.me/9779741661901" class="hover:text-brand-red underline underline-offset-2 transition-colors">+977-9741661901</a> | Support Hours: 10 AM – 7 PM</p>
                     </div>
                 </div>
 

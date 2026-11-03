@@ -111,8 +111,8 @@ class CartService
             return 0.0;
         }
 
-        // Accessories-only flat shipping (default 0 or config if set)
-        return (float) config('shop.accessory_shipping_cost', 0.0);
+        // Accessories-only flat shipping — uses inside-valley fee as a conservative default
+        return (float) config('shop.delivery.inside_valley_fee', 0.0);
     }
 
     /**

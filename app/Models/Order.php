@@ -55,6 +55,31 @@ class Order extends Model
                 });
             }
         });
+
+        // Guard: if a non-cancelled order with unreturned stock is deleted (soft or force),
+        // restock its items first so stock numbers stay accurate.
+        static::deleting(function (Order $order) {
+            $needsRestock = $order->status !== OrderStatusEnum::CANCELLED
+                && $order->restocked_at === null;
+
+            if ($needsRestock) {
+                DB::transaction(function () use ($order) {
+                    $order->loadMissing('items.productCondition');
+                    foreach ($order->items as $item) {
+                        if ($item->productCondition) {
+                            $item->productCondition->recordStockMovement(
+                                type: StockMovementTypeEnum::RESTOCK,
+                                quantity: $item->quantity,
+                                note: "Restock from deleted Order #{$order->id}",
+                                createdBy: auth()->id()
+                            );
+                        }
+                    }
+
+                    $order->forceFill(['restocked_at' => now()])->saveQuietly();
+                });
+            }
+        });
     }
 
     /**

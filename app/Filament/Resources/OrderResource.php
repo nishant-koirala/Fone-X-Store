@@ -207,8 +207,12 @@ class OrderResource extends Resource
             ->actions([
                 EditAction::make(),
                 RestoreAction::make(),
-                DeleteAction::make(),
-                ForceDeleteAction::make(),
+                DeleteAction::make()
+                    ->visible(fn (Order $record): bool => $record->status === OrderStatusEnum::CANCELLED)
+                    ->tooltip('Only cancelled orders can be deleted. Cancel the order first to auto-restock inventory.'),
+                ForceDeleteAction::make()
+                    ->visible(fn (Order $record): bool => $record->status === OrderStatusEnum::CANCELLED)
+                    ->tooltip('Only cancelled orders can be permanently deleted.'),
             ]);
     }
 

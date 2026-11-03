@@ -96,9 +96,15 @@ class TradeInController extends Controller
                 Mail::to($customer->email)->send(new TradeInSubmitted($valuation));
             }
 
-            // Send alert to Admin
-            $adminEmail = config('mail.admin_address', 'admin@fonex.com');
-            Mail::to($adminEmail)->send(new AdminTradeInAlert($valuation));
+            // Send alert to admin — ADMIN_EMAIL must be set in .env.
+            // No fallback: if unconfigured, log a warning rather than sending
+            // customer PII to a placeholder address.
+            $adminEmail = config('mail.admin_address');
+            if ($adminEmail) {
+                Mail::to($adminEmail)->send(new AdminTradeInAlert($valuation));
+            } else {
+                Log::warning("AdminTradeInAlert not sent for valuation #{$valuation->id}: ADMIN_EMAIL is not configured in .env.");
+            }
         } catch (\Throwable $mailException) {
             Log::error("Failed sending trade-in notification emails for valuation #{$valuation->id}: {$mailException->getMessage()}", [
                 'exception' => $mailException,

@@ -150,4 +150,117 @@ class OrderResourceTest extends TestCase
 
         $this->assertEquals(2, $condition->fresh()->quantity_in_stock);
     }
+    public function test_deleting_non_cancelled_order_restocks_inventory(): void
+    {
+        $customer  = Customer::factory()->create();
+        $condition = $this->createCondition(['quantity_in_stock' => 5, 'price' => 30000]);
+
+        // Create a pending order via Filament
+        Livewire::test(CreateOrder::class)
+            ->fillForm([
+                'customer_id' => $customer->id,
+                'status'      => OrderStatusEnum::PENDING->value,
+                'items'       => [
+                    [
+                        'product_condition_id' => $condition->id,
+                        'quantity'             => 2,
+                        'price_at_purchase'    => 30000,
+                    ],
+                ],
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $order = Order::latest('id')->first();
+        $this->assertEquals(3, $condition->fresh()->quantity_in_stock); // 5 - 2 = 3
+
+        // Soft-delete the pending order; the deleting hook must restock
+        $order->delete();
+
+        $this->assertEquals(5, $condition->fresh()->quantity_in_stock); // restored
+        $this->assertDatabaseHas('stock_movements', [
+            'product_condition_id' => $condition->id,
+            'type'                 => 'restock',
+            'quantity'             => 2,
+            'note'                 => "Restock from deleted Order #{$order->id}",
+        ]);
+    }
+
+    public function test_deleting_cancelled_order_does_not_double_restock(): void
+    {
+        $customer  = Customer::factory()->create();
+        $condition = $this->createCondition(['quantity_in_stock' => 5, 'price' => 30000]);
+
+        // Create a pending order
+        Livewire::test(CreateOrder::class)
+            ->fillForm([
+                'customer_id' => $customer->id,
+                'status'      => OrderStatusEnum::PENDING->value,
+                'items'       => [
+                    [
+                        'product_condition_id' => $condition->id,
+                        'quantity'             => 1,
+                        'price_at_purchase'    => 30000,
+                    ],
+                ],
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $order = Order::latest('id')->first();
+        $this->assertEquals(4, $condition->fresh()->quantity_in_stock);
+
+        // Cancel first (triggers restock via updated hook)
+        Livewire::test(EditOrder::class, ['record' => $order->getRouteKey()])
+            ->fillForm(['status' => OrderStatusEnum::CANCELLED->value])
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        $this->assertEquals(5, $condition->fresh()->quantity_in_stock);
+        $this->assertNotNull($order->fresh()->restocked_at);
+
+        // Now soft-delete the already-cancelled, already-restocked order
+        $order->fresh()->delete();
+
+        // Stock must NOT increase again (deleting hook skipped because restocked_at is set)
+        $this->assertEquals(5, $condition->fresh()->quantity_in_stock);
+        $this->assertDatabaseMissing('stock_movements', [
+            'product_condition_id' => $condition->id,
+            'note'                 => "Restock from deleted Order #{$order->id}",
+        ]);
+    }
+
+    public function test_concurrent_creation_with_insufficient_stock_fails_atomically(): void
+    {
+        $customer  = Customer::factory()->create();
+        $condition = $this->createCondition(['quantity_in_stock' => 1, 'price' => 50000]);
+
+        // Simulate the race: deplete the unit from outside the Filament form
+        // (e.g., a storefront order just beat this staff order to the transaction)
+        $condition->update(['quantity_in_stock' => 0]);
+
+        $initialOrderCount = Order::count();
+
+        Livewire::test(CreateOrder::class)
+            ->fillForm([
+                'customer_id' => $customer->id,
+                'status'      => OrderStatusEnum::PENDING->value,
+                'items'       => [
+                    [
+                        'product_condition_id' => $condition->id,
+                        'quantity'             => 1,
+                        'price_at_purchase'    => 50000,
+                    ],
+                ],
+            ])
+            ->call('create');
+
+        // No order should have been created
+        $this->assertEquals($initialOrderCount, Order::count());
+        // Stock must remain at 0 — no phantom restock
+        $this->assertEquals(0, $condition->fresh()->quantity_in_stock);
+        $this->assertDatabaseMissing('stock_movements', [
+            'product_condition_id' => $condition->id,
+        ]);
+    }
 }

@@ -146,6 +146,13 @@ class ProductResource extends Resource
                                     ->prefix('Rs ')
                                     ->required(),
 
+                                Forms\Components\TextInput::make('cost_price')
+                                    ->label('Cost Price (Purchase/Buy-in)')
+                                    ->numeric()
+                                    ->prefix('Rs ')
+                                    ->helperText('Wholesale or trade-in buy-in cost (internal only)')
+                                    ->nullable(),
+
                                 Forms\Components\TextInput::make('quantity_in_stock')
                                     ->numeric()
                                     ->default(0)
@@ -153,7 +160,7 @@ class ProductResource extends Resource
                                     ->dehydrated(false)
                                     ->helperText('Stock changes must be recorded via Stock Movements.'),
                             ])
-                            ->columns(4)
+                            ->columns(5)
                             ->defaultItems(1),
                     ]),
             ]);

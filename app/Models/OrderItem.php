@@ -15,12 +15,26 @@ class OrderItem extends Model
         'product_condition_id',
         'quantity',
         'price_at_purchase',
+        'cost_price_at_purchase',
     ];
 
     protected $casts = [
         'quantity' => 'integer',
         'price_at_purchase' => 'decimal:2',
+        'cost_price_at_purchase' => 'decimal:2',
     ];
+
+    /**
+     * Calculate line item gross profit if cost price is known.
+     */
+    public function getProfitAttribute(): ?float
+    {
+        if ($this->cost_price_at_purchase === null) {
+            return null;
+        }
+
+        return (float) (($this->price_at_purchase - $this->cost_price_at_purchase) * $this->quantity);
+    }
 
     /**
      * @return BelongsTo<Order, $this>

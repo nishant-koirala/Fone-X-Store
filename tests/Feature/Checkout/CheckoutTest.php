@@ -348,4 +348,32 @@ class CheckoutTest extends TestCase
 
         $responseInvalid->assertSessionHasErrors(['delivery_zone']);
     }
+
+    public function test_checkout_snapshots_cost_price_at_purchase(): void
+    {
+        Mail::fake();
+
+        $cond = ProductCondition::factory()->create([
+            'price' => 50000,
+            'cost_price' => 38000,
+            'quantity_in_stock' => 5,
+        ]);
+        $this->setCartSession([$cond->id => ['quantity' => 1]]);
+
+        $response = $this->post(route('checkout.store'), [
+            'name' => 'Ram Shrestha',
+            'phone' => '9841234567',
+            'address' => 'Baluwatar, Kathmandu',
+            'delivery_zone' => 'inside_valley',
+        ]);
+
+        $response->assertRedirect();
+        $order = Order::latest()->first();
+        $item = $order->items()->first();
+
+        $this->assertNotNull($item);
+        $this->assertEquals(50000.0, (float) $item->price_at_purchase);
+        $this->assertEquals(38000.0, (float) $item->cost_price_at_purchase);
+        $this->assertEquals(12000.0, $order->calculateProfit());
+    }
 }

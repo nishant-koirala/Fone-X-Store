@@ -129,6 +129,7 @@ class PlaceOrder
                     'product_condition_id' => $condition->id,
                     'quantity' => $qty,
                     'price_at_purchase' => $itemData['price_at_purchase'],
+                    'cost_price_at_purchase' => $condition->cost_price,
                 ]);
 
                 // Call stock movement helper to deduct stock (type: sale)

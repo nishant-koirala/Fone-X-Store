@@ -85,4 +85,47 @@ class OrderTest extends TestCase
         $this->assertNotNull(Order::find($orderId));
         $this->assertNull(Order::find($orderId)->deleted_at);
     }
+
+    public function test_order_and_order_item_profit_calculation(): void
+    {
+        $order = Order::factory()->create();
+        $condition = ProductCondition::factory()->create(['cost_price' => 40000]);
+
+        $item1 = OrderItem::factory()->create([
+            'order_id' => $order->id,
+            'product_condition_id' => $condition->id,
+            'quantity' => 2,
+            'price_at_purchase' => 50000.00,
+            'cost_price_at_purchase' => 40000.00,
+        ]);
+
+        $item2 = OrderItem::factory()->create([
+            'order_id' => $order->id,
+            'product_condition_id' => $condition->id,
+            'quantity' => 1,
+            'price_at_purchase' => 60000.00,
+            'cost_price_at_purchase' => 45000.00,
+        ]);
+
+        // item1: (50000 - 40000) * 2 = 20000
+        $this->assertEquals(20000.0, $item1->profit);
+        // item2: (60000 - 45000) * 1 = 15000
+        $this->assertEquals(15000.0, $item2->profit);
+
+        // order total profit: 20000 + 15000 = 35000
+        $this->assertEquals(35000.0, $order->calculateProfit());
+    }
+
+    public function test_calculate_profit_returns_null_when_costs_unrecorded(): void
+    {
+        $order = Order::factory()->create();
+        OrderItem::factory()->create([
+            'order_id' => $order->id,
+            'quantity' => 1,
+            'price_at_purchase' => 50000.00,
+            'cost_price_at_purchase' => null,
+        ]);
+
+        $this->assertNull($order->calculateProfit());
+    }
 }

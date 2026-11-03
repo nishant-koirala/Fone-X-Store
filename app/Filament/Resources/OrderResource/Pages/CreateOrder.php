@@ -92,6 +92,10 @@ class CreateOrder extends CreateRecord
                 );
             }
 
+            $item->forceFill([
+                'cost_price_at_purchase' => $condition->cost_price,
+            ])->saveQuietly();
+
             $total += $qty * $item->price_at_purchase;
         }
 

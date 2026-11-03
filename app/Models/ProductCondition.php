@@ -20,6 +20,7 @@ class ProductCondition extends Model
         'product_id',
         'grade',
         'price',
+        'cost_price',
         'original_price',
         'quantity_in_stock',
     ];
@@ -27,6 +28,7 @@ class ProductCondition extends Model
     protected $casts = [
         'grade' => GradeEnum::class,
         'price' => 'decimal:2',
+        'cost_price' => 'decimal:2',
         'original_price' => 'decimal:2',
         'quantity_in_stock' => 'integer',
     ];

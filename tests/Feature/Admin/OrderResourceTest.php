@@ -263,4 +263,37 @@ class OrderResourceTest extends TestCase
             'product_condition_id' => $condition->id,
         ]);
     }
+
+    public function test_admin_order_creation_snapshots_cost_price_and_computes_margin(): void
+    {
+        $customer = Customer::factory()->create();
+        $condition = $this->createCondition([
+            'quantity_in_stock' => 5,
+            'price' => 60000,
+            'cost_price' => 45000,
+        ]);
+
+        Livewire::test(CreateOrder::class)
+            ->fillForm([
+                'customer_id' => $customer->id,
+                'status' => OrderStatusEnum::PENDING->value,
+                'items' => [
+                    [
+                        'product_condition_id' => $condition->id,
+                        'quantity' => 2,
+                        'price_at_purchase' => 60000,
+                    ],
+                ],
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $order = Order::latest('id')->first();
+        $item = $order->items->first();
+
+        $this->assertNotNull($item);
+        $this->assertEquals(45000.0, (float) $item->cost_price_at_purchase);
+        // (60000 - 45000) * 2 = 30000
+        $this->assertEquals(30000.0, $order->calculateProfit());
+    }
 }

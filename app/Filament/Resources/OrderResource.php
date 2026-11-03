@@ -158,8 +158,17 @@ class OrderResource extends Resource
                                     ->numeric()
                                     ->prefix('Rs ')
                                     ->required(),
+
+                                Forms\Components\TextInput::make('cost_price_at_purchase')
+                                    ->label('Cost at Sale')
+                                    ->numeric()
+                                    ->prefix('Rs ')
+                                    ->disabled()
+                                    ->dehydrated(false)
+                                    ->helperText('Cost price snapshotted at time of sale')
+                                    ->visible(fn (string $operation): bool => $operation !== 'create'),
                             ])
-                            ->columns(3)
+                            ->columns(4)
                             ->defaultItems(1)
                             ->disabled(fn (string $operation): bool => $operation !== 'create')
                             ->deletable(fn (string $operation): bool => $operation === 'create')
@@ -189,6 +198,19 @@ class OrderResource extends Resource
                         default => 'info',
                     }),
                 Tables\Columns\TextColumn::make('total')->money('NPR')->sortable(),
+                Tables\Columns\TextColumn::make('gross_profit')
+                    ->label('Est. Margin')
+                    ->state(function (Order $record): ?string {
+                        $profit = $record->calculateProfit();
+
+                        return $profit !== null ? 'Rs ' . number_format($profit) : '—';
+                    })
+                    ->color(fn (?string $state): string => match (true) {
+                        $state && ! str_contains($state, '—') && ! str_contains($state, '-') => 'success',
+                        $state && str_contains($state, '-') && ! str_contains($state, '—') => 'danger',
+                        default => 'gray',
+                    })
+                    ->tooltip('Total revenue minus purchase cost of inventory'),
                 Tables\Columns\TextColumn::make('items_count')
                     ->counts('items')
                     ->label('Items'),

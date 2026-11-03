@@ -105,4 +105,29 @@ class Order extends Model
     {
         return $this->hasMany(OrderItem::class);
     }
+
+    /**
+     * Calculate total gross profit for this order if cost prices are known.
+     * Returns null if no line items have a cost_price_at_purchase recorded.
+     */
+    public function calculateProfit(): ?float
+    {
+        $this->loadMissing('items');
+
+        if ($this->items->isEmpty()) {
+            return 0.0;
+        }
+
+        $totalProfit = 0.0;
+        $hasAnyCost = false;
+
+        foreach ($this->items as $item) {
+            if ($item->cost_price_at_purchase !== null) {
+                $totalProfit += ($item->price_at_purchase - $item->cost_price_at_purchase) * $item->quantity;
+                $hasAnyCost = true;
+            }
+        }
+
+        return $hasAnyCost ? $totalProfit : null;
+    }
 }

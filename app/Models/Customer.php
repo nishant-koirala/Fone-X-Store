@@ -17,6 +17,15 @@ class Customer extends Model
         'address',
     ];
 
+    protected static function booted(): void
+    {
+        static::deleting(function (Customer $customer) {
+            if ($customer->orders()->exists()) {
+                throw new \DomainException("Cannot delete customer #{$customer->id} because they have existing orders.");
+            }
+        });
+    }
+
     /**
      * @return HasMany<Order, $this>
      */

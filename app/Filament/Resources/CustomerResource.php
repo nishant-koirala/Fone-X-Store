@@ -7,6 +7,7 @@ use App\Models\Customer;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables;
@@ -65,7 +66,18 @@ class CustomerResource extends Resource
             ])
             ->actions([
                 EditAction::make(),
-                DeleteAction::make(),
+                DeleteAction::make()
+                    ->before(function (DeleteAction $action, Customer $record): void {
+                        if ($record->orders()->exists()) {
+                            Notification::make()
+                                ->title('Cannot Delete Customer')
+                                ->body('This customer has historical orders and cannot be deleted.')
+                                ->danger()
+                                ->send();
+
+                            $action->cancel();
+                        }
+                    }),
             ]);
     }
 

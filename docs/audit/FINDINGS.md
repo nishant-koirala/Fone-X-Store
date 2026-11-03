@@ -375,7 +375,7 @@ static::updated(function (Order $order) {
 - **Why It Matters:** Breaks continuous integration quality gates (`ci.yml:75` running `composer run analyse`). Untyped `$this->record` references in Filament pages hide runtime type bugs.
 - **Recommended Fix:** Add correct PHPDoc types to `$data` in `PlaceOrder`, remove redundant nullsafe operators, declare `/** @var Order $order */` and `/** @var DeviceUnit $unit */` on Filament page records, and adjust return type in `OrderResource.php`.
 - **Effort:** S
-- **Status:** **OPEN** *(Qualifying individual single-file type fixes will be addressed in Mode B).*
+- **Status:** **RESOLVED (Mode B)** *(Fully resolved across commits `2be8ee4`, `3c20719`, `0f13457`, `bc6a59d`, `93fa3c6`, `8cd6416`, and `2ee356a`. PHPStan Level 5 now passes with 0 errors across the entire codebase).*
 
 ---
 
@@ -383,14 +383,14 @@ static::updated(function (Order $order) {
 - **Severity:** **MEDIUM**
 - **Category:** Code Style / CI
 - **File & Line(s):** 13 files across `app/`, `config/`, `database/`, and `tests/`.
-- **Evidence:** `vendor/bin/pint --test` exits with code 1.
+- **Evidence:** `vendor/bin/pint --test` exited with code 1.
   - Unused imports in `CreateOrder.php`, `DeviceUnitResource.php`, `clean_legacy_trade_in_placeholder_addresses.php`.
   - Missing blank lines between methods in `OrderResourceTest.php` and `OrderTest.php`.
   - Operator spacing in `config/shop.php` and `NepaliPhone.php`.
 - **Why It Matters:** The CI workflow (`.github/workflows/ci.yml:44`) executes `composer run lint` (`vendor/bin/pint --test`) as a mandatory prerequisite for running test suites. Pull requests will fail CI immediately until style issues are resolved.
 - **Recommended Fix:** Run `vendor/bin/pint` on the repository or resolve unused imports and spacing in qualifying files.
 - **Effort:** S
-- **Status:** **OPEN** *(Qualifying individual single-file fixes will be addressed in Mode B).*
+- **Status:** **RESOLVED (Mode B for all application & test code)** *(Fixed across commits `162f6ca`, `03cc296`, `0809dd0`, `6145dcb`, `f6b7d2b`, `34f4fa4`, `eae6cc0`, `7d58d44`, and `8dad519`. The sole remaining Pint notice is in migration `database/migrations/2026_11_02_163555_clean_legacy_trade_in_placeholder_addresses.php`, which is intentionally preserved unedited under audit rule "Never edit an already-run migration" and Decision [D-004](file:///docs/audit/DECISIONS.md#d-004)).*
 
 ---
 

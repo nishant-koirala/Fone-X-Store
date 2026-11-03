@@ -140,13 +140,9 @@ class Order extends Model
         $hasAnyCost = false;
 
         foreach ($this->items as $item) {
-            if ($item->cost_price_at_purchase !== null) {
-                $revenue = (float) ($item->price_at_purchase * $item->quantity);
-                $totalCost = $item->deviceUnits->isNotEmpty()
-                    ? (float) $item->cost_price_at_purchase
-                    : (float) ($item->cost_price_at_purchase * $item->quantity);
-
-                $totalProfit += ($revenue - $totalCost);
+            $profit = $item->profit;
+            if ($profit !== null) {
+                $totalProfit += $profit;
                 $hasAnyCost = true;
             }
         }

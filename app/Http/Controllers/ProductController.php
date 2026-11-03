@@ -103,7 +103,7 @@ class ProductController extends Controller
         abort_if(! $product->is_visible, 404);
 
         $product->load([
-            'conditions',
+            'conditions.availableDeviceUnits',
             'category',
             'reviews' => fn ($q) => $q->where('is_approved', true)->latest(),
         ]);

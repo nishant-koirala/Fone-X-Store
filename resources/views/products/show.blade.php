@@ -134,6 +134,12 @@
                         <template x-if="selectedCondition">
                             <span class="font-mono text-[11px] font-bold uppercase tracking-wider text-white bg-brand-charcoal px-2.5 py-1" x-text="selectedCondition.grade.toUpperCase() === 'NEW' ? 'SEALED BOX' : 'GRADE ' + selectedCondition.grade.toUpperCase()"></span>
                         </template>
+                        <template x-if="selectedCondition && selectedCondition.tracks_units && selectedCondition.battery_claim">
+                            <span class="font-mono text-[11px] font-bold uppercase tracking-wider text-emerald-900 bg-emerald-100 border border-emerald-300 px-2.5 py-1" x-text="selectedCondition.battery_claim"></span>
+                        </template>
+                        <template x-if="selectedCondition && selectedCondition.tracks_units && selectedCondition.imei_claim">
+                            <span class="font-mono text-[11px] font-bold uppercase tracking-wider text-blue-900 bg-blue-100 border border-blue-300 px-2.5 py-1" x-text="selectedCondition.imei_claim"></span>
+                        </template>
                     </div>
 
                     <!-- Top Right: Stock Status Pill -->
@@ -326,9 +332,22 @@
                                             </span>
                                         </div>
 
-                                        <p class="font-sans text-xs text-brand-grey mt-1 font-light leading-snug"
-                                           x-text="c.grade.toUpperCase() === 'NEW' ? 'Sealed in original box • Full accessories • Official distributor stock' : (c.grade.toUpperCase() === 'A' ? 'Near-flawless display & body • Strong battery health • Thoroughly inspected' : (c.grade.toUpperCase() === 'B' ? 'Light micro-marks not visible from 20cm • Good battery health • Fully functional' : 'Noticeable exterior cosmetic wear • Core internals verified & working'))">  
-                                        </p>
+                                        <template x-if="c.tracks_units">
+                                            <div class="mt-1 flex flex-wrap items-center gap-1.5">
+                                                <template x-if="c.battery_claim">
+                                                    <span class="inline-flex items-center space-x-1 font-mono text-[11px] font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-sm" x-text="'🔋 ' + c.battery_claim"></span>
+                                                </template>
+                                                <template x-if="c.imei_claim">
+                                                    <span class="inline-flex items-center space-x-1 font-mono text-[11px] font-bold text-blue-800 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-sm" x-text="'✓ ' + c.imei_claim"></span>
+                                                </template>
+                                            </div>
+                                        </template>
+
+                                        <template x-if="!c.tracks_units">
+                                            <p class="font-sans text-xs text-brand-grey mt-1 font-light leading-snug"
+                                               x-text="c.grade.toUpperCase() === 'NEW' ? 'Sealed in original box • Full accessories • Official distributor stock' : (c.grade.toUpperCase() === 'A' ? 'Near-flawless display & body • Strong battery health • Thoroughly inspected' : (c.grade.toUpperCase() === 'B' ? 'Light micro-marks not visible from 20cm • Good battery health • Fully functional' : 'Noticeable exterior cosmetic wear • Core internals verified & working'))">  
+                                            </p>
+                                        </template>
                                     </div>
 
                                     <!-- Price & Stock Column -->

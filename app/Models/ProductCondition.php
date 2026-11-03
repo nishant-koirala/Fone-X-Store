@@ -37,6 +37,16 @@ class ProductCondition extends Model
         'quantity_in_stock' => 'integer',
     ];
 
+    /**
+     * @var list<string>
+     */
+    protected $appends = [
+        'battery_range',
+        'battery_claim',
+        'has_imei_registered',
+        'imei_claim',
+    ];
+
     protected static function booted(): void
     {
         static::saving(function (ProductCondition $condition) {
@@ -152,5 +162,68 @@ class ProductCondition extends Model
 
             return $movement;
         });
+    }
+
+    /**
+     * Get the battery health range across available units if tracked.
+     */
+    public function getBatteryRangeAttribute(): ?string
+    {
+        if (! $this->tracks_units) {
+            return null;
+        }
+
+        $units = $this->relationLoaded('availableDeviceUnits')
+            ? $this->availableDeviceUnits
+            : $this->availableDeviceUnits()->get();
+
+        $batteries = $units->pluck('battery_health')->filter(fn ($b) => $b !== null);
+
+        if ($batteries->isEmpty()) {
+            return null;
+        }
+
+        $min = $batteries->min();
+        $max = $batteries->max();
+
+        return $min === $max ? "{$min}%" : "{$min}% - {$max}%";
+    }
+
+    /**
+     * Get battery claim display text.
+     */
+    public function getBatteryClaimAttribute(): ?string
+    {
+        $range = $this->battery_range;
+
+        return $range !== null ? "Battery: {$range}" : null;
+    }
+
+    /**
+     * Determine if every available unit has a registered IMEI.
+     */
+    public function getHasImeiRegisteredAttribute(): bool
+    {
+        if (! $this->tracks_units) {
+            return false;
+        }
+
+        $units = $this->relationLoaded('availableDeviceUnits')
+            ? $this->availableDeviceUnits
+            : $this->availableDeviceUnits()->get();
+
+        if ($units->isEmpty()) {
+            return false;
+        }
+
+        return $units->every(fn (DeviceUnit $u) => ! empty($u->imei));
+    }
+
+    /**
+     * Get IMEI claim display text.
+     */
+    public function getImeiClaimAttribute(): ?string
+    {
+        return $this->has_imei_registered ? 'IMEI registered' : null;
     }
 }

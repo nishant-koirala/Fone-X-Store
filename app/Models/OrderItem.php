@@ -37,7 +37,11 @@ class OrderItem extends Model
 
         $revenue = (float) ($this->price_at_purchase * $this->quantity);
 
-        if ($this->deviceUnits()->exists()) {
+        $hasUnits = $this->relationLoaded('deviceUnits')
+            ? $this->deviceUnits->isNotEmpty()
+            : $this->deviceUnits()->exists();
+
+        if ($hasUnits) {
             return $revenue - (float) $this->cost_price_at_purchase;
         }
 

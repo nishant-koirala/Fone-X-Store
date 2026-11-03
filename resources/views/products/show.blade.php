@@ -487,7 +487,7 @@
                         </h2>
                         
                         <div class="prose prose-base sm:prose-lg max-w-none text-brand-charcoal/90 font-sans leading-relaxed">
-                            {!! $product->description !!}
+                            {!! nl2br(e($product->description)) !!}
                         </div>
 
                         <!-- Technical Specs Quick Snapshot -->

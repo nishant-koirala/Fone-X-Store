@@ -29,6 +29,7 @@ class StoreTradeInRequest extends FormRequest
             'condition' => ['required', 'string', 'in:flawless,good,broken'],
             'customer_name' => ['required', 'string', 'max:255'],
             'customer_phone' => ['required', 'string', new NepaliPhone],
+            'customer_email' => ['nullable', 'email', 'max:255'],
             'additional_notes' => ['nullable', 'string', 'max:1000'],
         ];
     }

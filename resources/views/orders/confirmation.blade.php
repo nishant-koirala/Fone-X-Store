@@ -50,10 +50,13 @@
             <div>
                 <h4 class="font-mono text-xs font-bold uppercase tracking-wider text-brand-grey mb-2">Delivery Address</h4>
                 <p class="text-brand-charcoal leading-snug">{{ $order->customer->address }}</p>
-                <div class="mt-2">
-                    <span class="font-mono text-xs font-bold uppercase bg-amber-100 text-amber-800 px-2 py-0.5 border border-amber-300">
+                <div class="mt-2 space-y-1">
+                    <span class="font-mono text-xs font-bold uppercase bg-amber-100 text-amber-800 px-2 py-0.5 border border-amber-300 inline-block">
                         STATUS: {{ strtoupper($order->status instanceof \App\Enums\OrderStatusEnum ? $order->status->value : (string) $order->status) }} (CASH ON DELIVERY)
                     </span>
+                    <p class="font-sans text-xs text-brand-grey mt-1">
+                        Delivery Zone: {{ $order->delivery_zone === 'outside_valley' ? 'Outside Valley (Courier)' : 'Inside Kathmandu Valley (Pathao)' }} • Delivery fare payable directly to courier on delivery.
+                    </p>
                 </div>
             </div>
         </div>

@@ -16,7 +16,7 @@ Thank you for your order! We have received your order (#{{ $order->id }}) and it
 | **Total** | | | **Rs {{ number_format($order->total) }}** |
 </x-mail::table>
 
-If you have any questions, feel free to reply to this email.
+If you have any questions, feel free to reply to this email. Note: Delivery fare (Pathao within Kathmandu Valley or courier nationwide) is paid directly to the courier upon delivery.
 
 Thanks,<br>
 {{ config('app.name') }}

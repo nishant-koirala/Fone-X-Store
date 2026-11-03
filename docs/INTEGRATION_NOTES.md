@@ -103,4 +103,17 @@ Audit results across the entire repository:
 
 ## Step 4 - Delivery Fee Policy Check
 
-*(To be populated in Step 4)*
+A-006 resolved by policy: delivery payable on delivery
+
+### Audit Findings & Verification
+- **Policy Definition**: Delivery fares are paid by the customer directly to the courier upon delivery (Pathao inside Kathmandu Valley; registered courier nationwide). The website does not charge shipping fees.
+- **Config & Environment Keys**:
+  - `config/shop.php` inspected: No dead delivery fee config keys remain.
+  - `.env.example` inspected: No dead delivery environment variables.
+  - `README.md` inspected: Reflects Cash on Delivery without inaccurate shipping promises.
+- **Storefront & Admin Consistency**:
+  - `resources/views/checkout/index.blade.php`: Clearly notes delivery fees as "Pathao / Courier (Payable on Delivery)" with an order total matching pure item subtotal.
+  - `resources/views/orders/confirmation.blade.php`: States that delivery fare is payable directly to the courier upon delivery.
+  - `resources/views/emails/orders/placed.blade.php`: Confirmation email reminds customer that courier fare is paid separately to the courier upon delivery.
+  - `app/Filament/Resources/OrderResource.php`: Table `delivery_zone` column includes tooltip confirming delivery fares are paid by customer to courier upon delivery.
+

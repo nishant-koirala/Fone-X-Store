@@ -262,7 +262,8 @@ class OrderResource extends Resource
                     ->color(fn (?string $state): string => match ($state) {
                         'outside_valley' => 'warning',
                         default => 'info',
-                    }),
+                    })
+                    ->tooltip('Delivery fare payable by customer to courier on delivery'),
                 Tables\Columns\TextColumn::make('total')->money('NPR')->sortable(),
                 Tables\Columns\TextColumn::make('gross_profit')
                     ->label('Est. Margin')

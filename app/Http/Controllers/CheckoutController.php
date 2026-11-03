@@ -77,7 +77,8 @@ class CheckoutController extends Controller
         } catch (\Throwable $e) {
             Log::error('Order checkout failed: '.$e->getMessage(), [
                 'exception' => $e,
-                'payload' => $request->except(['_token']),
+                'delivery_zone' => $request->input('delivery_zone'),
+                'payment_method' => $request->input('payment_method'),
             ]);
 
             return back()->withInput()->with('error', 'An unexpected error occurred while processing your order. Please try again.');

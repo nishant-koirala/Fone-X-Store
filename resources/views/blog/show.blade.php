@@ -25,7 +25,7 @@
 
     <!-- Prose Content -->
     <div class="prose prose-lg prose-slate max-w-none prose-headings:font-display prose-headings:uppercase prose-headings:text-brand-charcoal prose-a:text-brand-red hover:prose-a:text-red-700">
-        {!! $post->content !!}
+        {!! strip_tags($post->content, ['p', 'br', 'strong', 'em', 'b', 'i', 'a', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'h4', 'blockquote', 'code', 'pre', 'img', 'hr']) !!}
     </div>
 
     <div class="mt-16 pt-8 border-t border-gray-200 text-center">

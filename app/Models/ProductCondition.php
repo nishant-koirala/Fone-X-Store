@@ -118,20 +118,24 @@ class ProductCondition extends Model
             throw new \InvalidArgumentException("{$typeValue} stock movement must have a positive quantity. Given: {$quantity}.");
         }
 
-        if ($this->quantity_in_stock + $quantity < 0) {
-            throw new \InvalidArgumentException("Cannot reduce stock below zero for condition #{$this->id}. Available stock: {$this->quantity_in_stock}, requested adjustment: {$quantity}.");
-        }
-
         return DB::transaction(function () use ($type, $quantity, $note, $createdBy): StockMovement {
+            /** @var ProductCondition $locked */
+            $locked = static::query()->whereKey($this->id)->lockForUpdate()->firstOrFail();
+
+            if ($locked->quantity_in_stock + $quantity < 0) {
+                throw new \InvalidArgumentException("Cannot reduce stock below zero for condition #{$this->id}. Available stock: {$locked->quantity_in_stock}, requested adjustment: {$quantity}.");
+            }
+
             /** @var StockMovement $movement */
-            $movement = $this->stockMovements()->create([
+            $movement = $locked->stockMovements()->create([
                 'type' => $type,
                 'quantity' => $quantity,
                 'note' => $note,
                 'created_by' => $createdBy ?? auth()->id(),
             ]);
 
-            $this->increment('quantity_in_stock', $quantity);
+            $locked->increment('quantity_in_stock', $quantity);
+            $this->quantity_in_stock = $locked->quantity_in_stock;
 
             return $movement;
         });

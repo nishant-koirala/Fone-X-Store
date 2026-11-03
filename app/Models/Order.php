@@ -56,6 +56,31 @@ class Order extends Model
                     $order->forceFill(['restocked_at' => now()])->saveQuietly();
                 });
             }
+
+            // If reactivating a previously cancelled order, re-deduct the stock
+            $originalStatus = $order->getOriginal('status');
+            if (is_string($originalStatus)) {
+                $originalStatus = OrderStatusEnum::tryFrom($originalStatus);
+            }
+            $wasCancelled = $originalStatus === OrderStatusEnum::CANCELLED;
+            $isNowActive = $order->status !== OrderStatusEnum::CANCELLED;
+            if ($order->wasChanged('status') && $wasCancelled && $isNowActive && $order->restocked_at !== null) {
+                DB::transaction(function () use ($order) {
+                    $order->loadMissing('items.productCondition');
+                    foreach ($order->items as $item) {
+                        if ($item->productCondition) {
+                            $item->productCondition->recordStockMovement(
+                                type: StockMovementTypeEnum::SALE,
+                                quantity: -$item->quantity,
+                                note: "Re-deduct stock for re-activated Order #{$order->id}",
+                                createdBy: auth()->id()
+                            );
+                        }
+                    }
+
+                    $order->forceFill(['restocked_at' => null])->saveQuietly();
+                });
+            }
         });
 
         // Guard: if a non-cancelled order with unreturned stock is deleted (soft or force),

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\DeviceUnitStatusEnum;
+use App\Enums\StockMovementTypeEnum;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -31,6 +32,49 @@ class DeviceUnit extends Model
         'battery_health' => 'integer',
         'sold_at' => 'datetime',
     ];
+
+    protected static function booted(): void
+    {
+        static::deleting(function (DeviceUnit $unit) {
+            if ($unit->status === DeviceUnitStatusEnum::AVAILABLE && $unit->productCondition) {
+                $unit->productCondition->recordStockMovement(
+                    type: StockMovementTypeEnum::ADJUSTMENT,
+                    quantity: -1,
+                    note: 'Device unit deleted from inventory (IMEI: '.($unit->imei ?? 'N/A').')',
+                    createdBy: auth()->id()
+                );
+            }
+        });
+
+        static::updated(function (DeviceUnit $unit) {
+            if ($unit->wasChanged('status') && $unit->productCondition) {
+                $originalStatus = $unit->getOriginal('status');
+                if (is_string($originalStatus)) {
+                    $originalStatus = DeviceUnitStatusEnum::tryFrom($originalStatus);
+                }
+
+                // If moving from AVAILABLE to DEFECTIVE/RETURNED (taken off shelves)
+                if ($originalStatus === DeviceUnitStatusEnum::AVAILABLE && in_array($unit->status, [DeviceUnitStatusEnum::DEFECTIVE, DeviceUnitStatusEnum::RETURNED], true)) {
+                    $unit->productCondition->recordStockMovement(
+                        type: StockMovementTypeEnum::ADJUSTMENT,
+                        quantity: -1,
+                        note: "Device unit marked {$unit->status->value} (IMEI: ".($unit->imei ?? 'N/A').')',
+                        createdBy: auth()->id()
+                    );
+                }
+
+                // If moving from DEFECTIVE/RETURNED back to AVAILABLE (repaired/restocked)
+                if (in_array($originalStatus, [DeviceUnitStatusEnum::DEFECTIVE, DeviceUnitStatusEnum::RETURNED], true) && $unit->status === DeviceUnitStatusEnum::AVAILABLE) {
+                    $unit->productCondition->recordStockMovement(
+                        type: StockMovementTypeEnum::ADJUSTMENT,
+                        quantity: 1,
+                        note: 'Device unit restored to available (IMEI: '.($unit->imei ?? 'N/A').')',
+                        createdBy: auth()->id()
+                    );
+                }
+            }
+        });
+    }
 
     /**
      * @return BelongsTo<ProductCondition, $this>

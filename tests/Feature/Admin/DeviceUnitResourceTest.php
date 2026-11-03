@@ -64,7 +64,8 @@ class DeviceUnitResourceTest extends TestCase
 
     public function test_can_edit_device_unit_status(): void
     {
-        $unit = DeviceUnit::factory()->available()->create();
+        $condition = ProductCondition::factory()->create(['quantity_in_stock' => 5]);
+        $unit = DeviceUnit::factory()->available()->create(['product_condition_id' => $condition->id]);
 
         Livewire::test(EditDeviceUnit::class, ['record' => $unit->getRouteKey()])
             ->fillForm([
@@ -77,5 +78,28 @@ class DeviceUnitResourceTest extends TestCase
         $fresh = $unit->fresh();
         $this->assertEquals(DeviceUnitStatusEnum::DEFECTIVE, $fresh->status);
         $this->assertStringContainsString('Faulty camera', $fresh->notes);
+
+        // Stock counter should decrement via booted updated hook
+        $this->assertEquals(4, $condition->fresh()->quantity_in_stock);
+        $this->assertDatabaseHas('stock_movements', [
+            'product_condition_id' => $condition->id,
+            'type' => 'adjustment',
+            'quantity' => -1,
+        ]);
+    }
+
+    public function test_deleting_available_device_unit_decrements_condition_stock(): void
+    {
+        $condition = ProductCondition::factory()->create(['quantity_in_stock' => 3]);
+        $unit = DeviceUnit::factory()->available()->create(['product_condition_id' => $condition->id]);
+
+        $unit->delete();
+
+        $this->assertEquals(2, $condition->fresh()->quantity_in_stock);
+        $this->assertDatabaseHas('stock_movements', [
+            'product_condition_id' => $condition->id,
+            'type' => 'adjustment',
+            'quantity' => -1,
+        ]);
     }
 }

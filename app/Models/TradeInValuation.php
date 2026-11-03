@@ -71,13 +71,16 @@ class TradeInValuation extends Model
      */
     public function ingestIntoStock(ProductCondition $condition, ?int $staffUserId = null, ?string $imei = null, ?int $batteryHealth = null): ?StockMovement
     {
-        if ($this->stock_ingested_at !== null) {
-            return null;
-        }
+        return DB::transaction(function () use ($condition, $staffUserId, $imei, $batteryHealth): ?StockMovement {
+            /** @var TradeInValuation $locked */
+            $locked = static::query()->whereKey($this->id)->lockForUpdate()->firstOrFail();
 
-        return DB::transaction(function () use ($condition, $staffUserId, $imei, $batteryHealth): StockMovement {
-            $customerName = $this->customer->name ?? 'Customer';
-            $note = "Trade-in #{$this->id} accepted: {$this->device_brand} {$this->device_model} from {$customerName}";
+            if ($locked->stock_ingested_at !== null) {
+                return null;
+            }
+
+            $customerName = $locked->customer->name ?? 'Customer';
+            $note = "Trade-in #{$locked->id} accepted: {$locked->device_brand} {$locked->device_model} from {$customerName}";
 
             $movement = $condition->recordStockMovement(
                 type: StockMovementTypeEnum::EXCHANGE_IN,
@@ -87,8 +90,8 @@ class TradeInValuation extends Model
             );
 
             // If condition has no cost price set, apply estimated trade-in valuation as cost basis
-            if ($this->estimated_value !== null && $condition->cost_price === null) {
-                $condition->update(['cost_price' => $this->estimated_value]);
+            if ($locked->estimated_value !== null && $condition->cost_price === null) {
+                $condition->update(['cost_price' => $locked->estimated_value]);
             }
 
             // Create individual serialized device unit
@@ -96,17 +99,21 @@ class TradeInValuation extends Model
                 'product_condition_id' => $condition->id,
                 'imei' => $imei,
                 'battery_health' => $batteryHealth,
-                'cost_price' => $this->estimated_value,
+                'cost_price' => $locked->estimated_value,
                 'status' => DeviceUnitStatusEnum::AVAILABLE,
-                'trade_in_valuation_id' => $this->id,
-                'notes' => "Trade-in from {$customerName} ({$this->device_brand} {$this->device_model})",
+                'trade_in_valuation_id' => $locked->id,
+                'notes' => "Trade-in from {$customerName} ({$locked->device_brand} {$locked->device_model})",
             ]);
 
-            $this->forceFill([
+            $locked->forceFill([
                 'product_condition_id' => $condition->id,
                 'status' => TradeInStatusEnum::COMPLETED,
                 'stock_ingested_at' => now(),
             ])->saveQuietly();
+
+            $this->stock_ingested_at = $locked->stock_ingested_at;
+            $this->status = $locked->status;
+            $this->product_condition_id = $locked->product_condition_id;
 
             return $movement;
         });

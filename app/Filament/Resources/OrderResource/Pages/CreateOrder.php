@@ -101,6 +101,7 @@ class CreateOrder extends CreateRecord
 
         $order->forceFill([
             'total' => $total,
+            'confirmed_at' => now(),
             'restocked_at' => $order->status === OrderStatusEnum::CANCELLED ? now() : null,
         ])->saveQuietly();
     }

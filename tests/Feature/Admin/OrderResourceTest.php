@@ -309,4 +309,72 @@ class OrderResourceTest extends TestCase
 
         $this->assertNotNull($order->fresh()->confirmed_at);
     }
+
+    public function test_reactivating_cancelled_order_re_deducts_inventory(): void
+    {
+        $customer = Customer::factory()->create();
+        $condition = $this->createCondition(['quantity_in_stock' => 5, 'price' => 20000]);
+
+        $order = Order::factory()->create([
+            'customer_id' => $customer->id,
+            'status' => OrderStatusEnum::PENDING,
+            'restocked_at' => null,
+        ]);
+        $order->items()->create([
+            'product_condition_id' => $condition->id,
+            'quantity' => 2,
+            'price_at_purchase' => 20000,
+        ]);
+
+        // Cancel order: restocks 2 units (stock 5 -> 7)
+        $order->update(['status' => OrderStatusEnum::CANCELLED]);
+        $this->assertEquals(7, $condition->fresh()->quantity_in_stock);
+        $this->assertNotNull($order->fresh()->restocked_at);
+
+        // Reactivate order to PAID: should re-deduct 2 units (stock 7 -> 5)
+        $order->update(['status' => OrderStatusEnum::PAID]);
+        $this->assertEquals(5, $condition->fresh()->quantity_in_stock);
+        $this->assertNull($order->fresh()->restocked_at);
+        $this->assertDatabaseHas('stock_movements', [
+            'product_condition_id' => $condition->id,
+            'type' => 'sale',
+            'quantity' => -2,
+            'note' => "Re-deduct stock for re-activated Order #{$order->id}",
+        ]);
+    }
+
+    public function test_manual_order_creation_sets_confirmed_at_preventing_auto_expiry(): void
+    {
+        $customer = Customer::factory()->create();
+        $condition = $this->createCondition(['quantity_in_stock' => 5, 'price' => 30000]);
+
+        Livewire::test(CreateOrder::class)
+            ->fillForm([
+                'customer_id' => $customer->id,
+                'status' => OrderStatusEnum::PENDING->value,
+                'items' => [
+                    [
+                        'product_condition_id' => $condition->id,
+                        'quantity' => 1,
+                        'price_at_purchase' => 30000,
+                    ],
+                ],
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $order = Order::latest('id')->first();
+        $this->assertNotNull($order->confirmed_at);
+
+        // Advance time by 72 hours
+        $this->travel(72)->hours();
+
+        // Run the expiry command
+        $this->artisan('shop:expire-unconfirmed-orders')
+            ->expectsOutput('No expired unconfirmed orders found.')
+            ->assertExitCode(0);
+
+        // Order remains PENDING because staff already confirmed it upon creation
+        $this->assertEquals(OrderStatusEnum::PENDING, $order->fresh()->status);
+    }
 }

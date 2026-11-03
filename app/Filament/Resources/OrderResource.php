@@ -7,11 +7,13 @@ use App\Filament\Resources\OrderResource\Pages;
 use App\Models\Order;
 use App\Models\ProductCondition;
 use BackedEnum;
+use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
 use Filament\Forms;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -65,7 +67,12 @@ class OrderResource extends Resource
                             ->disabled()
                             ->dehydrated(false)
                             ->helperText('Order total is read-only / computed from items.'),
-                    ])->columns(4),
+
+                        Forms\Components\DateTimePicker::make('confirmed_at')
+                            ->label('Phone Confirmation')
+                            ->helperText('Timestamp of staff phone confirmation')
+                            ->nullable(),
+                    ])->columns(5),
 
                 Section::make('Order Items')
                     ->description(fn (string $operation): string => $operation === 'edit'
@@ -211,6 +218,11 @@ class OrderResource extends Resource
                         default => 'gray',
                     })
                     ->tooltip('Total revenue minus purchase cost of inventory'),
+                Tables\Columns\TextColumn::make('confirmed_at')
+                    ->label('Phone Verified')
+                    ->badge()
+                    ->formatStateUsing(fn ($state) => $state ? 'Confirmed' : 'Awaiting Call')
+                    ->color(fn ($state) => $state ? 'success' : 'warning'),
                 Tables\Columns\TextColumn::make('items_count')
                     ->counts('items')
                     ->label('Items'),
@@ -227,6 +239,23 @@ class OrderResource extends Resource
                 TrashedFilter::make(),
             ])
             ->actions([
+                Action::make('confirmPhone')
+                    ->label('Confirm Phone')
+                    ->icon('heroicon-o-phone')
+                    ->color('success')
+                    ->visible(fn (Order $record): bool => $record->confirmed_at === null && $record->status === OrderStatusEnum::PENDING)
+                    ->requiresConfirmation()
+                    ->modalHeading('Confirm Order by Phone')
+                    ->modalDescription('Mark this COD order as confirmed with the customer. Confirmed orders are protected from automatic expiry.')
+                    ->action(function (Order $record): void {
+                        $record->update(['confirmed_at' => now()]);
+
+                        Notification::make()
+                            ->title('Order Confirmed')
+                            ->body("Order #{$record->id} confirmed with customer.")
+                            ->success()
+                            ->send();
+                    }),
                 EditAction::make(),
                 RestoreAction::make(),
                 DeleteAction::make()

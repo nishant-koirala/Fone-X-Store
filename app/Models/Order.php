@@ -25,11 +25,13 @@ class Order extends Model
         'shipping_phone',
         'shipping_email',
         'shipping_address',
+        'confirmed_at',
     ];
 
     protected $casts = [
         'status' => OrderStatusEnum::class,
         'total' => 'decimal:2',
+        'confirmed_at' => 'datetime',
         'restocked_at' => 'datetime',
     ];
 

@@ -291,9 +291,22 @@ class OrderResourceTest extends TestCase
         $order = Order::latest('id')->first();
         $item = $order->items->first();
 
-        $this->assertNotNull($item);
         $this->assertEquals(45000.0, (float) $item->cost_price_at_purchase);
         // (60000 - 45000) * 2 = 30000
         $this->assertEquals(30000.0, $order->calculateProfit());
+    }
+
+    public function test_can_confirm_order_by_phone_in_admin_table(): void
+    {
+        $order = Order::factory()->create([
+            'status' => OrderStatusEnum::PENDING,
+            'confirmed_at' => null,
+        ]);
+
+        Livewire::test(ListOrders::class)
+            ->callTableAction('confirmPhone', $order)
+            ->assertHasNoTableActionErrors();
+
+        $this->assertNotNull($order->fresh()->confirmed_at);
     }
 }

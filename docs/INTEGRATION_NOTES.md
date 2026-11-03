@@ -22,9 +22,14 @@ This document records decisions, baseline status, and security/data audit observ
 | Commit | Description | Conflict / Integration Resolution |
 |---|---|---|
 | `c1c3de7` | media table rollback + protect order history from customer deletion | Restored historical migration `2026_08_07_000006_create_orders_table.php` to `origin/main` (cannot mutate past migrations). Enforced customer protection via new migration `2026_11_03_200000_prevent_customer_cascade_delete_on_orders.php` for MySQL/PostgreSQL, plus cross-driver application hook in `Customer::booted` and Filament `CustomerResource` action cancellation. Passed CI (266 tests). |
-| `ab386d4` | XSS views, PII in logs, trade-in email validation | Pending |
-| `c3aece5` | untrack storage/tmp files, branded HTTP error pages, NPR seeder prices | Pending |
-| `43bec70` | patch Composer/NPM vulnerabilities | Pending |
+| `ab386d4` | XSS views, PII in logs, trade-in email validation | Clean cherry-pick without conflict. Redacted customer phone/address/name from checkout failure logs, added `customer_email` validation rule to `StoreTradeInRequest`, and initial view escape. (Note: Step 2 will upgrade the views to use the robust `HtmlSanitizer`). Passed CI (266 tests). |
+| `c3aece5` | untrack storage/tmp files, branded HTTP error pages, NPR seeder prices | Clean cherry-pick without conflict. Removed untracked temporary files from storage/tmp, added customized branded error views (404, 419, 429, 500) with shop branding and support details, and scaled seeder catalog pricing to realistic NPR values. Passed CI (266 tests). |
+| `43bec70` | patch Composer/NPM vulnerabilities | Clean cherry-pick without conflict. `npm audit` returned 0 vulnerabilities. `npm run build` succeeded without error. `composer audit` noted existing framework/filament upstream advisories (no breaking package bumps allowed per ground rules). Full test suite passed (266 tests, 1706 assertions). |
+
+### Dependency Audit Summary
+- **NPM Audit**: 0 vulnerabilities found.
+- **Vite Build**: Succeeded in 9.05s (`manifest.json`, `app.css`, `app.js` generated).
+- **Composer Audit**: 6 upstream advisories identified in locked framework versions (`filament/filament` MFA password prompt, `laravel/framework` TokenGuard/unauthorized relation deletion/XSS in debug page, `league/flysystem` path normalization on malformed UTF-8, `livewire/livewire` authorize parameter order). Per ground rules ("No new Composer/NPM packages"), lockfile patches from audit branch applied cleanly without breaking changes.
 
 ---
 
